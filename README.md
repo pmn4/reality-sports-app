@@ -1,4 +1,4 @@
-# Reality Sports ~~Online~~ App
+# Reality Sports _~~Online~~_ App
 Non-Sanctioned Mobile App for Reality Sports Online
 
 If you play fantasy football, you want to check your scores with an app.
