@@ -1,0 +1,129 @@
+<ion-view view-title="🏈 Game">
+  <ion-content>
+    <div id="game-summary" class="row">
+      <div class="col col-50 left-side">
+        <h3 class="team-name one-liner">
+          {{ awayTeam.name }}
+        </h3>
+        <div class="row scoring-summary">
+          <div class="col-75 scoring-values">
+            <div class="scoring-total title">
+              <span class="remaining">
+                ({{ awayTeam.summary.playerTimeRemaining }})
+              </span>
+              <span class="">
+                {{ awayTeam.summary.totalPoints }}
+              </span>
+            </div>
+            <div class="scoring-projected">
+              {{ awayTeam.summary.projectedPoints }}
+            </div>
+          </div>
+          <div class="col-25 team-image">
+            <img src="http://www.realitysportsonline.com/{{ awayTeam.imageUrl }}" width="90%" />
+          </div>
+        </div>
+      </div>
+      <div class="col col-50 right-side">
+        <h3 class="team-name one-liner">
+          {{ homeTeam.name }}
+        </h3>
+        <div class="row scoring-summary">
+          <div class="col-25 team-image">
+            <img src="http://www.realitysportsonline.com/{{ homeTeam.imageUrl }}" width="90%" />
+          </div>
+          <div class="col-75 scoring-values">
+            <div class="scoring-total title">
+              <span class="">
+                {{ homeTeam.summary.totalPoints }}
+              </span>
+              <span class="remaining">
+                ({{ homeTeam.summary.playerTimeRemaining }})
+              </span>
+            </div>
+            <div class="scoring-projected">
+              {{ homeTeam.summary.projectedPoints }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="player-scoring">
+      <div class="list" ng-repeat="(status, positions) in playerScoringData">
+        <div class="item item-divider">
+          {{ status }}
+        </div>
+        <div class="player-score" ng-repeat="(position, players) in positions">
+          <div class="item" ng-repeat="playerData in players">
+            <div class="row row-center player-comparison">
+              <div class="col col-player" toggle-class="detail-view">
+                <div class="row">
+                  <div class="col player-name one-liner">
+                    {{ playerData.away.name }}
+                    <span class="player-team">
+                      {{ playerData.away.team }}
+                    </span>
+                  </div>
+                </div>
+                <div class="row row-bottom">
+                  <div class="col col-points player-points number positive">
+                    {{ playerData.away.points }}
+                  </div>
+                  <div class="col col-name">
+                    <div class="player-game-status one-liner calm">
+                      {{ playerData.away.gameStatus.opponent }}
+                      {{ playerData.away.gameStatus.score }}
+                      {{ playerData.away.gameStatus.timeRemaining }}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col player-stats one-liner">
+                    {{ playerData.away.statLine }}
+                  </div>
+                </div>
+              </div>
+              <div class="col col-position player-position">
+                {{ position }}
+              </div>
+              <div class="col col-player" toggle-class="detail-view">
+                <div class="row">
+                  <div class="col player-name one-liner">
+                    {{ playerData.home.name }}
+                    <span class="player-team">
+                      {{ playerData.home.team }}
+                    </span>
+                  </div>
+                </div>
+                <div class="row row-bottom">
+                  <div class="col col-name">
+                    <div class="player-game-status one-liner calm">
+                      {{ playerData.home.gameStatus.opponent }}
+                      {{ playerData.home.gameStatus.score }}
+                      {{ playerData.home.gameStatus.timeRemaining }}
+                    </div>
+                  </div>
+                  <div class="col col-points player-points number positive">
+                    {{ playerData.home.points }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col player-stats one-liner">
+                    {{ playerData.home.statLine }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <pre>
+      {{ awayTeam | json }}
+    </pre>
+
+    <pre>
+      {{ homeTeam | json }}
+    </pre>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,26 @@
+<ion-view view-title="Scoreboard">
+  <ion-content>
+    <ion-list>
+      <div class="item" ng-repeat="boxScore in boxScores" ui-sref="app.game({ week: boxScore.week, gameId: boxScore.gameId })">
+        <div class="scoreboard">
+          <div class="row row-middle">
+            <div class="col col-75 team-name">
+              {{ boxScore.awayTeam.name }}
+            </div>
+            <div class="col col-25 number">
+              {{ boxScore.awayTeam.summary.totalPoints }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-75 team-name">
+              {{ boxScore.homeTeam.name }}
+            </div>
+            <div class="col col-25 number">
+              {{ boxScore.homeTeam.summary.totalPoints }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </ion-list>
+  </ion-content>
+</ion-view>

@@ -19,5 +19,130 @@ $dark:                            #444 !default;
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
-@import "www/lib/ionic/scss/ionic";
+@import "../www/lib/ionic/scss/ionic";
 
+.scoreboard {
+	font-size: ceil($font-size-base * 1.70); // just like an h3
+}
+
+// .team-name {
+// }
+
+.number {
+	text-align: right;
+}
+
+.one-liner {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#game-summary {
+	.left-side {
+		text-align: right;
+	}
+	.right-side {
+
+	}
+
+	.team-name {
+		padding: $content-padding;
+	}
+
+	.scoring-total {
+		font-size: 150%;
+		font-weight: bold;
+
+		.remaining {
+			font-size: 50%;
+			font-weight: normal;
+			font-style: italic;
+		}
+	}
+}
+
+#player-scoring {
+	// $scoring-width: 15%;
+	$position-width: 7.5%;
+	$player-width: (100% - $position-width) / 2.0;
+	// $name-width: (100% - 2 * $scoring-width - $position-width) / 2.0;
+
+	.player-score .item {
+		padding: 0;
+	}
+
+	.col-player {
+		@include flex(0, 0, $player-width);
+		max-width: $player-width;
+
+		&,
+		.row {
+			padding: 0;
+		}
+
+		&.detail-view {
+			$expanded-width: 100%;
+			@include flex(0, 0, $expanded-width);
+			max-width: $expanded-width;
+			background-color: $stable;
+			padding-left: $content-padding;
+			padding-right: $content-padding;
+
+			@include transition(all 0.3s ease-in-out);
+		}
+
+		&:last-child {
+			position: absolute;
+
+			&.detail-view {
+				right: 0;
+			}
+		}
+	}
+
+	// .player-comparison {
+	// 	.col.detail-view ~ .col {
+
+	// 	}
+	// }
+
+	.col-points {
+		$scoring-width: 62px;
+		@include flex(0, 0, $scoring-width);
+		max-width: $scoring-width;
+	}
+
+	// .col-name {
+	// 	@include flex(0, 0, $name-width);
+	// 	max-width: $name-width;
+	// }
+
+	.col-position {
+		@include flex(0, 0, $position-width);
+		max-width: $position-width;
+	}
+
+	.player-points {
+		font-size: 125%;
+		font-weight: bold;
+	}
+
+	.player-position {
+		font-size: 75%;
+		text-align: center;
+	}
+
+	.player-name {
+		font-weight: bold;
+	}
+
+	.player-game-status {
+		font-size: 67%;
+	}
+
+	.player-team,
+	.player-stats {
+		font-size: 75%;
+	}
+}
