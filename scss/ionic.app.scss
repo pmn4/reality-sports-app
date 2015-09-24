@@ -64,7 +64,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 #player-scoring {
 	// $scoring-width: 15%;
-	$position-width: 7.5%;
+	$position-width: 5%;
 	$player-width: (100% - $position-width) / 2.0;
 	// $name-width: (100% - 2 * $scoring-width - $position-width) / 2.0;
 
@@ -101,11 +101,10 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		}
 	}
 
-	// .player-comparison {
-	// 	.col.detail-view ~ .col {
-
-	// 	}
-	// }
+	.player-comparison {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
 
 	.col-points {
 		$scoring-width: 62px;
@@ -131,6 +130,12 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	.player-position {
 		font-size: 75%;
 		text-align: center;
+		padding: 0;
+		background: $stable;
+		@include align-self(stretch);
+		@include display-flex();
+		@include align-items(center);
+		@include justify-content(center);
 	}
 
 	.player-name {

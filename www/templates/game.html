@@ -59,7 +59,7 @@
               <div class="col col-player" toggle-class="detail-view">
                 <div class="row">
                   <div class="col player-name one-liner">
-                    {{ playerData.away.name }}
+                    {{ playerData.away.name|| '&nbsp;' }}
                     <span class="player-team">
                       {{ playerData.away.team }}
                     </span>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-points player-points number positive">
-                    {{ playerData.away.points }}
+                    {{ playerData.away.points|| '&nbsp;' }}
                   </div>
                   <div class="col col-name">
                     <div class="player-game-status one-liner calm">
@@ -79,7 +79,7 @@
                 </div>
                 <div class="row">
                   <div class="col player-stats one-liner">
-                    {{ playerData.away.statLine }}
+                    {{ playerData.away.statLine|| '&nbsp;' }}
                   </div>
                 </div>
               </div>
@@ -118,12 +118,5 @@
         </div>
       </div>
     </div>
-    <pre>
-      {{ awayTeam | json }}
-    </pre>
-
-    <pre>
-      {{ homeTeam | json }}
-    </pre>
   </ion-content>
 </ion-view>
