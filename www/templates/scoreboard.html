@@ -1,5 +1,21 @@
 <ion-view view-title="Scoreboard">
-  <ion-content>
+  <ion-content has-subheader>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="subheader">
+      <ion-scroll direction="x" class="wide-as-needed">
+        <div class="button-bar button-bar-inline">
+          <div class="button button-clear">Week</div>
+          <a ng-repeat="weekNumber in [] | range:1:16"
+            ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: weekNumber })"
+            ui-sref-opts="{ location: 'replace' }"
+            class="button"
+            ng-class="{ 'button-positive': weekNumber == week }"
+          >
+            {{ weekNumber }}
+          </a>
+        </div>
+      </ion-scroll>
+    </div>
     <ion-list>
       <div class="item" ng-repeat="boxScore in boxScores" ui-sref="app.game({ week: boxScore.week, gameId: boxScore.gameId })">
         <div class="scoreboard">

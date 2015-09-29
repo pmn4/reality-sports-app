@@ -39,7 +39,7 @@ angular.module('starter', [
     })
 
     .state("app.game", {
-      url: "/scoreboard/:week/game/:gameId?",
+      url: "/leagues/:leagueId/scoreboards/:week/games/:gameId",
       views: {
         "menuContent": {
           templateUrl: "templates/game.html",
@@ -48,8 +48,18 @@ angular.module('starter', [
       }
     })
 
-    .state("app.scoreboard", {
-      url: "/scoreboard/:week?",
+    .state("app.my-game", {
+      url: "/leagues/:leagueId/scoreboards/:week/games",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/game.html",
+          controller: "GameController"
+        }
+      }
+    })
+
+    .state("app.scoreboards-for-week", {
+      url: "/leagues/:leagueId/scoreboards/:week",
       views: {
         "menuContent": {
           templateUrl: "templates/scoreboard.html",
@@ -57,8 +67,38 @@ angular.module('starter', [
         }
       }
     })
+
+    .state("app.scoreboards-for-this-week", {
+      url: "/leagues/:leagueId/scoreboards",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/scoreboard.html",
+          controller: "ScoreboardController"
+        }
+      }
+    })
+
+    .state("app.leagues", {
+      url: "/leagues",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/leagues.html",
+          controller: "LeagueController"
+        }
+      }
+    })
+
+    .state("app.login", {
+      url: "/leagues",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/login.html",
+          controller: "LoginController"
+        }
+      }
+    })
   ;
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise("/app/scoreboard/");
+  $urlRouterProvider.otherwise("/app/leagues");
 });

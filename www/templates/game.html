@@ -1,5 +1,6 @@
 <ion-view view-title="🏈 Game">
   <ion-content>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div id="game-summary" class="row">
       <div class="col col-50 left-side">
         <h3 class="team-name one-liner">
@@ -70,7 +71,7 @@
                     {{ playerData.away.points|| '&nbsp;' }}
                   </div>
                   <div class="col col-name">
-                    <div class="player-game-status one-liner calm">
+                    <div class="player-game-status one-liner dark">
                       {{ playerData.away.gameStatus.opponent }}
                       {{ playerData.away.gameStatus.score }}
                       {{ playerData.away.gameStatus.timeRemaining }}
@@ -97,7 +98,7 @@
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-name">
-                    <div class="player-game-status one-liner calm">
+                    <div class="player-game-status one-liner dark">
                       {{ playerData.home.gameStatus.opponent }}
                       {{ playerData.home.gameStatus.score }}
                       {{ playerData.home.gameStatus.timeRemaining }}

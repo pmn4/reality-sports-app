@@ -1,0 +1,17 @@
+<ion-view view-title="Leagues">
+  <ion-content>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <ion-list>
+      <div class="item item-divider">
+        Choose your league:
+      </div>
+      <div class="item" ng-repeat="league in leagues" ui-sref="app.scoreboards-for-this-week({ leagueId: league.leagueId })">
+        <div class="league">
+          {{ league.name }}
+          ({{ league.teamName }})
+        </div>
+        <!-- <pre>{{ league | json }}</pre> -->
+      </div>
+    </ion-list>
+  </ion-content>
+</ion-view>

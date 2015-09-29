@@ -151,3 +151,12 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		font-size: 75%;
 	}
 }
+
+.wide-as-needed {
+	width: auto;
+	white-space: nowrap;
+
+	.button-bar.button-bar-inline > .button {
+		float: none;
+	}
+}

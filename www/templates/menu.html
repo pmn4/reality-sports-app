@@ -10,6 +10,9 @@
       </ion-nav-buttons>
     </ion-nav-bar>
     <ion-nav-view name="menuContent"></ion-nav-view>
+    <div class="bar bar-footer dark">
+      <img src="https://www.draftkings.com/_raptor/images/dk-logo-new.png" height="44" />
+    </div>
   </ion-side-menu-content>
 
   <ion-side-menu side="left">
@@ -21,8 +24,8 @@
         <ion-item menu-close ng-click="login()">
           Login
         </ion-item>
-        <ion-item menu-close href="#/app/league_scoreboard">
-          Scoreboard
+        <ion-item menu-close ui-sref="app.leagues">
+          Leagues
         </ion-item>
       </ion-list>
     </ion-content>

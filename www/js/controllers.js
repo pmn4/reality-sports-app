@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($scope, $ionicModal, $timeout) {
+.controller("AppController", function ($scope, $ionicModal, AuthService) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -8,60 +8,78 @@ angular.module('starter.controllers', [])
   // listen for the $ionicView.enter event:
   //$scope.$on('$ionicView.enter', function(e) {
   //});
+})
 
+.controller("LoginController", function ($scope, $state, AuthService) {
   // Form data for the login modal
   $scope.loginData = {};
 
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl("templates/login.html", {
-    scope: $scope
-  }).then(function (modal) {
-    $scope.modal = modal;
-  });
-
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function () {
-    $scope.modal.hide();
-  };
-
-  // Open the login modal
   $scope.login = function () {
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function () {
-    console.log("Doing login", $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function () {
-      $scope.closeLogin();
-    }, 1000);
+    AuthService.login($scope.loginData.username, $scope.loginData.password)
+      .then(function (response) {
+        $scope.closeLogin();
+      }, function (response) {
+        $scope.errorMessage = response.data;
+      });
   };
 })
 
-.controller("ScoreboardController", function ($scope, $stateParams, ScoreboardService) {
-  $scope.week = $stateParams.week;
-  $scope.leagueId = undefined; // not sure
-  $scope.boxScores = [];
+.controller("LeagueController", function ($scope, $state, $stateParams, LeagueService) {
+  $scope.leagues = [];
 
   $scope.refresh = function () {
-    ScoreboardService.fetch($scope.week)
+    LeagueService.list()
       .then(function (response) {
-        $scope.week = response.week;
-        $scope.boxScores = response.boxScores;
-      });
-  };
+        $scope.leagues = response.data;
 
-  $scope.refresh();
+        if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
+
+        $state.go("app.scoreboards-for-this-week", {
+          leagueId: $scope.leagues[0].leagueId
+        });
+      }, function (response) {
+        $state.go("app.login");
+      }).finally(function () {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
 
   $scope.$on("$ionicView.enter", $scope.refresh);
 })
 
+.controller("ScoreboardController", function ($scope, $stateParams, LeagueService, ScoreboardService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.week = $stateParams.week || "";
+  $scope.boxScores = [];
+
+  $scope.setLeague = function () {
+    LeagueService.set($scope.leagueId)
+      .then(function (_response) {
+        $scope.refresh();
+      });
+  };
+
+  $scope.refresh = function () {
+    ScoreboardService.fetch($scope.week)
+      .then(function (response) {
+        $scope.week = response.data.week;
+        $scope.boxScores = response.data.boxScores;
+
+        ScoreboardService.currentWeek($scope.week);
+      }).finally(function () {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.$on("$ionicView.enter", $scope.setLeague);
+})
+
 .controller("GameController", function ($scope, $stateParams, GameService) {
+  $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
-  $scope.gameId = $stateParams.gameId;
+  $scope.gameId = $stateParams.gameId || "";
   $scope.homeTeam = {};
   $scope.awayTeam = {};
   $scope.playerScoringData = {};
@@ -114,20 +132,34 @@ angular.module('starter.controllers', [])
   $scope.refresh = function () {
     GameService.fetch($scope.week, $scope.gameId)
       .then(function (response) {
-        $scope.homeTeam = response.homeTeam;
-        $scope.awayTeam = response.awayTeam;
+        $scope.homeTeam = response.data.homeTeam;
+        $scope.awayTeam = response.data.awayTeam;
 
-        if (!('playerScores' in $scope.homeTeam && 'playerScores' in $scope.awayTeam)) {
+        if (!("playerScores" in $scope.homeTeam && "playerScores" in $scope.awayTeam)) {
           return;
         }
 
         $scope.playerScoringData = reformatPlayerData($scope.homeTeam.playerScores, $scope.awayTeam.playerScores);
-      });
+      }).finally(function () {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
   };
 
-  $scope.refresh();
-
   $scope.$on("$ionicView.enter", $scope.refresh);
+})
+
+.filter("range", function () {
+  return function (input, min, max) {
+    min = parseInt(min, 10); //Make string input int
+    max = parseInt(max, 10);
+
+    for (var i = min; i < max; i++) {
+      input.push(i);
+    }
+
+    return input;
+  };
 })
 
 .directive("toggleClass", function() {

@@ -5,31 +5,152 @@ var gameSummaryResponse = {"homeTeam":{"name":"Burton","imageUrl":"images/defaul
 
 angular.module("starter.services", [])
 
-.service("ScoreboardService", function ($http, $q) {
-	return({
-		fetch: fetch
-	});
+.service("LeagueService", function ($http, $q, AuthService /*, $localStorage */) {
+	var STORE_KEY_CURRENT_LEAGUE;
 
-	function fetch (week) {
-		var deferred = $q.defer();
+	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.LeagueService>currentLeagueId";
 
-		deferred.resolve(leagueScoreboardResponse);
+	return {
+		list: list,
+		set: set,
+		currentLeagueId: currentLeagueId
+	};
 
-		return deferred.promise;
+	function list () {
+		return $http({
+			method: "GET",
+			url: "http://localhost:1212/v1/leagues",
+			headers: {
+				"X-RSO-Auth-Token": AuthService.token(),
+				"X-RSO-Session": AuthService.session()
+			}
+		});
+	}
+
+	function set (leagueId, force) {
+		// this call is expensive, so 200 OK! if it's a repeat request
+		if (leagueId === currentLeagueId() && !force) {
+			return $q.resolve();
+		}
+
+		return $http({
+			method: "PUT",
+			url: "http://localhost:1212/v1/leagues/" + leagueId,
+			headers: {
+				"X-RSO-Auth-Token": AuthService.token(),
+				"X-RSO-Session": AuthService.session()
+			}
+		}).then(function (response) {
+			currentLeagueId(leagueId);
+
+			AuthService.token(response.data.token);
+			AuthService.session(response.data.session);
+		});
+	}
+
+	function currentLeagueId (leagueId) {
+		if (leagueId) {
+			localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, leagueId);
+		}
+
+		return localStorage.getItem(STORE_KEY_CURRENT_LEAGUE);
 	}
 })
 
-.service("GameService", function ($http, $q) {
-	return({
+.service("AuthService", function (/* $localStorage, */ $http) {
+	var STORE_KEY_TOKEN, STORE_KEY_SESSION;
+
+	STORE_KEY_TOKEN = "realitySportsApp.AuthService>token";
+	STORE_KEY_SESSION = "realitySportsApp.AuthService>session";
+
+	return {
+		token: token,
+		session: session,
+		login: login
+	};
+
+	function token (t) {
+		if (t) {
+			localStorage.setItem(STORE_KEY_TOKEN, t);
+		}
+
+		return localStorage.getItem(STORE_KEY_TOKEN);
+	}
+
+	function session (s) {
+		if (s) {
+			localStorage.setItem(STORE_KEY_SESSION, s);
+		}
+
+		return localStorage.getItem(STORE_KEY_SESSION);
+	}
+
+	function login (username, password) {
+		return $http({
+			method: "POST",
+			url: "http://localhost:1212/v1/tokens",
+			data: {
+				username: username,
+				password: password
+			},
+			headers: {
+				"X-RSO-Session": session()
+			}
+		}).then(function (response) {
+			token(response.data.token);
+			session(response.data.session);
+		});
+	}
+})
+
+.service("ScoreboardService", function ($http, AuthService, LeagueService) {
+	var STORE_KEY_CURRENT_WEEK;
+
+	STORE_KEY_CURRENT_WEEK = "realitySportsApp.ScoreboardService>currentWeek";
+
+	return {
+		fetch: fetch,
+		currentWeek: currentWeek
+	};
+
+	function fetch (week, gameId) {
+		if (!week) {
+			week = currentWeek() || "";
+		}
+
+		return $http({
+			method: "GET",
+			url: "http://localhost:1212/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
+			headers: {
+				"X-RSO-Auth-Token": AuthService.token(),
+				"X-RSO-Session": AuthService.session()
+			}
+		});
+	}
+
+	function currentWeek (leagueId) {
+		if (leagueId) {
+			localStorage.setItem(STORE_KEY_CURRENT_WEEK, leagueId);
+		}
+
+		return localStorage.getItem(STORE_KEY_CURRENT_WEEK);
+	}
+})
+
+.service("GameService", function ($http, AuthService, LeagueService) {
+	return {
 		fetch: fetch
-	});
+	};
 
-	function fetch (week) {
-		var deferred = $q.defer();
-
-		deferred.resolve(gameSummaryResponse);
-
-		return deferred.promise;
+	function fetch (week, gameId) {
+		return $http({
+			method: "GET",
+			url: "http://localhost:1212/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
+			headers: {
+				"X-RSO-Auth-Token": AuthService.token(),
+				"X-RSO-Session": AuthService.session()
+			}
+		});
 	}
 })
 ;
