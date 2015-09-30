@@ -45,7 +45,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("HelpController", function ($scope, HelpService, AuthService) {
+.controller("HelpController", function ($scope, $window, HelpService, AuthService) {
   $scope.helpData = {
     email: AuthService.currentEmail(),
     respondViaEmail: true
@@ -58,6 +58,10 @@ angular.module('starter.controllers', [])
         $scope.ajaxing = false;
       });
   }
+
+  $scope.launch = function (url) {
+    window.open(url, '_system');
+  };
 })
 
 .controller("LeagueController", function ($scope, $interval, $state, $stateParams, LeagueService) {
@@ -298,31 +302,40 @@ angular.module('starter.controllers', [])
   };
 })
 
-// copied straight from the docs
-// .controller('DashCtrl', function($scope, $ionicDeploy) {
-.controller('UpdatesController', function($scope, $ionicDeploy) {
-
+.controller('UpdatesController', function ($scope, $ionicDeploy) {
   // Update app code with new release from Ionic Deploy
-  $scope.doUpdate = function() {
-    $ionicDeploy.update().then(function(res) {
+  $scope.doUpdate = function () {
+    $scope.downloading = true;
+    $ionicDeploy.update().then(function (res) {
       console.log('Ionic Deploy: Update Success! ', res);
-    }, function(err) {
+    }, function (err) {
       console.log('Ionic Deploy: Update error! ', err);
-    }, function(prog) {
+    }, function (prog) {
+      $scope.percentComplete = prog;
       console.log('Ionic Deploy: Progress... ', prog);
+    }).finally(function () {
+      $scope.downloading = false;
     });
   };
 
   // Check Ionic Deploy for new code
-  $scope.checkForUpdates = function() {
-    console.log('Ionic Deploy: Checking for updates');
-    $ionicDeploy.check().then(function(hasUpdate) {
-      console.log('Ionic Deploy: Update available: ' + hasUpdate);
+  $scope.checkForUpdates = function () {
+    $scope.ajaxing = true;
+    $ionicDeploy.check().then(function (hasUpdate) {
       $scope.hasUpdate = hasUpdate;
-    }, function(err) {
+
+      if (hasUpdate) {
+        $scope.doUpdate();
+      }
+    }, function (err) {
       console.error('Ionic Deploy: Unable to check for updates', err);
+    }).finally(function () {
+      $scope.ajaxing = false;
     });
   }
 
+  $scope.$on("$ionicView.enter", function () {
+    $scope.checkForUpdates();
+  });
 })
 ;

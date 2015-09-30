@@ -1,13 +1,11 @@
 BUGS:
-- links to email/twitter not working
-- app updates not working
 
 TODO:
 - on login, leagues not refreshing
 - send to login on 401
 - do something with device info
 - email formatting (mailchimp)
-- auto refresh
+- refresh interval
 - Fan Duel
 
 BACKLOG:
@@ -24,3 +22,5 @@ DONE:
 - page ad
 - help page
 - logo
+- links to email/twitter not working
+- app updates not working
