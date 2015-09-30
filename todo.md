@@ -1,6 +1,11 @@
-- logo
+BUGS:
+- links to email/twitter not working
+- app updates not working
+
+TODO:
+- on login, leagues not refreshing
 - send to login on 401
-- device info
+- do something with device info
 - email formatting (mailchimp)
 - auto refresh
 - Fan Duel
@@ -18,3 +23,4 @@ DONE:
 - app updates
 - page ad
 - help page
+- logo
