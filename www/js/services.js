@@ -1,5 +1,5 @@
-// var API_HOST = "http://localhost:1212";
-var API_HOST = "http://reality-sports-app.herokuapp.com";
+var API_HOST = "http://localhost:1212";
+// var API_HOST = "http://reality-sports-app.herokuapp.com";
 
 angular.module("starter.services", [])
 .service("LeagueService", function ($http, $q, AuthService /*, $localStorage */) {

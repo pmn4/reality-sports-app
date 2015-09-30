@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller("LoginController", function ($scope, $state, AuthService) {
+.controller("LoginController", function ($scope, $state, AuthService, LeagueService) {
   // Form data for the login modal
   $scope.loginData = {
     username: AuthService.currentEmail(),
@@ -22,10 +22,12 @@ angular.module('starter.controllers', [])
     AuthService.login($scope.loginData)
       .then(function (response) {
         AuthService.currentEmail($scope.loginData.username);
+        LeagueService.currentLeagueId("reset");
 
         $state.go("app.leagues");
       }, function (response) {
-        $scope.errorMessage = response.data;
+        // $scope.errorMessage = response.data;
+        $scope.errorMessage = "Login Failed";
       })
       .finally(function () {
         $scope.ajaxing = false;
