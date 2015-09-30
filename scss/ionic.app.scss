@@ -43,11 +43,16 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 #game-summary {
+	padding: 0;
+
 	.left-side {
 		text-align: right;
 	}
-	.right-side {
-
+	.left-side,
+	.right-side,
+	.scoring-summary {
+		padding-top: 0;
+		padding-bottom: 0;
 	}
 
 	.team-name {

@@ -1,13 +1,12 @@
-- app updates
-- page ad
-- help page
 - logo
 - send to login on 401
-- help form
 - device info
 - email formatting (mailchimp)
 - auto refresh
 - Fan Duel
+
+BACKLOG:
+- help form
 
 DONE:
 - save email (local storage)
@@ -16,3 +15,6 @@ DONE:
 - refreshed timestamp
 - loading indicators
 - footer ad
+- app updates
+- page ad
+- help page

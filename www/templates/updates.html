@@ -1,0 +1,11 @@
+<ion-view view-title="Check for App Updates">
+  <ion-content padding="true">
+    <button class="button button-primary button-block " ng-click="checkForUpdates()">
+      Check for updates
+    </button>
+
+    <button class="button button-stable button-block button-pulse" ng-if="hasUpdate" ng-click="doUpdate()">
+      Download update
+    </button>
+  </ion-content>
+</ion-view>

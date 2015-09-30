@@ -6,14 +6,16 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', [
   'ionic',
-  'ionic.service.core',
+  'ionic.service.core','ionic.service.analytics',
   'ionic.service.deploy',
   'starter.controllers',
   'starter.services'
 ])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
+.run(function($ionicPlatform, $ionicAnalytics) {
+  $ionicPlatform.ready(function () {
+    $ionicAnalytics.register();
+
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -114,6 +116,26 @@ angular.module('starter', [
         "menuContent": {
           templateUrl: "templates/login.html",
           controller: "LoginController"
+        }
+      }
+    })
+
+    .state("app.updates", {
+      url: "/updates",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/updates.html",
+          controller: "UpdatesController"
+        }
+      }
+    })
+
+    .state("app.support", {
+      url: "/support",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/support.html",
+          controller: "SupportController"
         }
       }
     })

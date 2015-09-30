@@ -1,3 +1,6 @@
+// var API_HOST = "http://localhost:1212";
+var API_HOST = "http://reality-sports-app.herokuapp.com";
+
 angular.module("starter.services", [])
 .service("LeagueService", function ($http, $q, AuthService /*, $localStorage */) {
 	var STORE_KEY_CURRENT_LEAGUE;
@@ -13,7 +16,7 @@ angular.module("starter.services", [])
 	function list () {
 		return $http({
 			method: "GET",
-			url: "http://localhost:1212/v1/leagues",
+			url: API_HOST + "/v1/leagues",
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -29,7 +32,7 @@ angular.module("starter.services", [])
 
 		return $http({
 			method: "PUT",
-			url: "http://localhost:1212/v1/leagues/" + leagueId,
+			url: API_HOST + "/v1/leagues/" + leagueId,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -92,7 +95,7 @@ angular.module("starter.services", [])
 	function login (data) {
 		return $http({
 			method: "POST",
-			url: "http://localhost:1212/v1/tokens",
+			url: API_HOST + "/v1/tokens",
 			data: data,
 			headers: {
 				"X-RSO-Session": session()
@@ -121,7 +124,7 @@ angular.module("starter.services", [])
 
 		return $http({
 			method: "GET",
-			url: "http://localhost:1212/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
+			url: API_HOST + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -146,7 +149,7 @@ angular.module("starter.services", [])
 	function fetch (week, gameId) {
 		return $http({
 			method: "GET",
-			url: "http://localhost:1212/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
+			url: API_HOST + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -163,7 +166,7 @@ angular.module("starter.services", [])
 	function submitFeedback (data) {
 		return $http({
 			method: "POST",
-			url: "http://localhost:1212/v1/feedback",
+			url: API_HOST + "/v1/feedback",
 			data: data
 		});
 	}
