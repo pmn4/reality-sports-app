@@ -1,6 +1,17 @@
 <ion-view view-title="Leagues">
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
+  </ion-nav-buttons>
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="last-updated">
+      <div ng-show="ajaxing">
+        loading...
+      </div>
+      <div ng-hide="ajaxing || !lastUpdatedAgo">
+        <em>last updated {{ lastUpdatedAgo }} ago</em>
+      </div>
+    </div>
     <ion-list>
       <div class="item item-divider">
         Choose your league:

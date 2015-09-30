@@ -1,0 +1,41 @@
+<ion-view view-title="Help">
+  <ion-content padding="true">
+    <p class="assertive">
+      This app is not provided by Reality Sports Online.
+    </p>
+    <p>
+      I was tired of using the mobile version of their site, so I
+      built this to (hopefully) make it better. You like it? Great
+      You don't? Help me make it better.
+    </p>
+    <p>
+      Fill out this form with any problems you are seeing.
+    </p>
+    <p class="positive" ng-show="ajaxing === true">
+      Submitting feedback...
+    </p>
+    <form ng-submit="submitForm()" ng-show="ajaxing === undefined">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Issue</span>
+          <textarea ng-model="helpData.issueText" rows="5"></textarea>
+        </label>
+        <li class="item item-checkbox">
+           <label class="checkbox">
+             <input type="checkbox" ng-model="helpData.respondViaEmail">
+           </label>
+           Requires response (by email)
+        </li>
+        <label class="item item-input" ng-hide="loginData.email || !helpData.respondVieEmail">
+          <span class="input-label">Email</span>
+          <input type="text" ng-model="loginData.email">
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">
+            Submit
+          </button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

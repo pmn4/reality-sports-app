@@ -1,11 +1,17 @@
 <ion-view view-title="🏈 Game">
+  <ion-nav-buttons side="primary">
+    <button class="button button-icon button-clear ion-ios-list-outline" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
+  </ion-nav-buttons>
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div id="game-summary" class="row">
       <div class="col col-50 left-side">
-        <h3 class="team-name one-liner">
+        <h4 class="team-name one-liner">
           {{ awayTeam.name }}
-        </h3>
+        </h4>
         <div class="row scoring-summary">
           <div class="col-75 scoring-values">
             <div class="scoring-total title">
@@ -26,9 +32,9 @@
         </div>
       </div>
       <div class="col col-50 right-side">
-        <h3 class="team-name one-liner">
+        <h4 class="team-name one-liner">
           {{ homeTeam.name }}
-        </h3>
+        </h4>
         <div class="row scoring-summary">
           <div class="col-25 team-image">
             <img src="http://www.realitysportsonline.com/{{ homeTeam.imageUrl }}" width="90%" />
@@ -47,6 +53,14 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="last-updated">
+      <div ng-show="ajaxing">
+        loading...
+      </div>
+      <div ng-hide="ajaxing || !lastUpdatedAgo">
+        <em>last updated {{ lastUpdatedAgo }} ago</em>
       </div>
     </div>
     <div id="player-scoring">

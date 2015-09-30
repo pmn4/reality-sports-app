@@ -88,6 +88,26 @@ angular.module('starter', [
       }
     })
 
+    .state("app.entry", {
+      url: "/entry",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/entry.html",
+          controller: "EntryController"
+        }
+      }
+    })
+
+    .state("app.help", {
+      url: "/help",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/help.html",
+          controller: "HelpController"
+        }
+      }
+    })
+
     .state("app.login", {
       url: "/leagues",
       views: {

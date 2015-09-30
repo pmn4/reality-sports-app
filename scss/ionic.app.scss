@@ -1,3 +1,5 @@
+@import 'compass/css3/opacity';
+
 /*
 To customize the look and feel of Ionic, you can override the variables
 in ionic's _variables.scss file.
@@ -22,11 +24,13 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 @import "../www/lib/ionic/scss/ionic";
 
 .scoreboard {
-	font-size: ceil($font-size-base * 1.70); // just like an h3
+	font-size: ceil($font-size-base * 1.25); // just like an h4
 }
 
-// .team-name {
-// }
+.team-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
 .number {
 	text-align: right;
@@ -47,7 +51,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	}
 
 	.team-name {
-		padding: $content-padding;
+		padding: 0 $content-padding;
 	}
 
 	.scoring-total {
@@ -159,4 +163,49 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	.button-bar.button-bar-inline > .button {
 		float: none;
 	}
+}
+
+.ad-banner {
+	position: relative;
+	height: 100%;
+
+	.ad-banner-draft-kings & {
+		padding-left: 110px;
+
+		img {
+			position: absolute;
+			bottom: -5px;
+			left: 0;
+		}
+	}
+}
+.ad-banner-draft-kings {
+	background: black;
+	border-right: 0;
+	font-size: 80%;
+	line-height: 1.5;
+
+	.support {
+		color: #9bc23c;
+	}
+
+	a {
+		text-decoration: none;
+		color: white;
+	}
+}
+
+// .ajaxing-indicator {
+// 	height: 100%;
+// 	width: 100%;
+
+// 	@include flex();
+// }
+.last-updated {
+	padding: 2px $content-padding;
+	font-style: italic;
+	font-weight: normal;
+	text-align: right;
+	font-size: 75%;
+	@include opacity(0.5);
 }

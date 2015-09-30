@@ -12,25 +12,71 @@ angular.module('starter.controllers', [])
 
 .controller("LoginController", function ($scope, $state, AuthService) {
   // Form data for the login modal
-  $scope.loginData = {};
+  $scope.loginData = {
+    username: AuthService.currentEmail(),
+    optIn: true
+  };
 
   $scope.login = function () {
-    AuthService.login($scope.loginData.username, $scope.loginData.password)
+    $scope.ajaxing = true;
+    AuthService.login($scope.loginData)
       .then(function (response) {
-        $scope.closeLogin();
+        AuthService.currentEmail($scope.loginData.username);
+
+        $state.go("app.leagues");
       }, function (response) {
         $scope.errorMessage = response.data;
+      })
+      .finally(function () {
+        $scope.ajaxing = false;
       });
   };
 })
 
-.controller("LeagueController", function ($scope, $state, $stateParams, LeagueService) {
+.controller("EntryController", function ($scope, $state, AuthService) {
+  $scope.$on("$ionicView.enter", function () {
+    if (AuthService.token()) {
+      $state.go("app.leagues");
+    } else {
+      $state.go("app.login");
+    }
+  });
+})
+
+.controller("HelpController", function ($scope, HelpService, AuthService) {
+  $scope.helpData = {
+    email: AuthService.currentEmail(),
+    respondViaEmail: true
+  };
+
+  $scope.submitForm = function () {
+    $scope.ajaxing = true;
+    HelpService.submitFeedback($scope.helpData)
+      .finally(function () {
+        $scope.ajaxing = false;
+      });
+  }
+})
+
+.controller("LeagueController", function ($scope, $interval, $state, $stateParams, LeagueService) {
   $scope.leagues = [];
 
+  $scope.setLastUpdated = function (date) {
+    if (date) {
+      $scope.lastUpdated = date;
+    }
+
+    if (!$scope.lastUpdated) { return; }
+
+    $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
+  }
+
   $scope.refresh = function () {
+    $scope.ajaxing = true;
     LeagueService.list()
       .then(function (response) {
         $scope.leagues = response.data;
+        $scope.setLastUpdated(response.data.lastUpdated);
 
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
@@ -40,43 +86,83 @@ angular.module('starter.controllers', [])
       }, function (response) {
         $state.go("app.login");
       }).finally(function () {
-       // Stop the ion-refresher from spinning
-       $scope.$broadcast('scroll.refreshComplete');
+        $scope.ajaxing = false;
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
      });
   };
 
-  $scope.$on("$ionicView.enter", $scope.refresh);
+  $scope.refresh();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
 })
 
-.controller("ScoreboardController", function ($scope, $stateParams, LeagueService, ScoreboardService) {
+.controller("ScoreboardController", function ($scope, $interval, $filter, $stateParams, LeagueService, ScoreboardService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week || "";
   $scope.boxScores = [];
 
   $scope.setLeague = function () {
+    $scope.ajaxing = true;
     LeagueService.set($scope.leagueId)
       .then(function (_response) {
         $scope.refresh();
+      })
+      .finally(function () {
+        $scope.ajaxing = false;
       });
   };
 
+  $scope.setLastUpdated = function (date) {
+    if (date) {
+      $scope.lastUpdated = date;
+    }
+
+    if (!$scope.lastUpdated) { return; }
+
+    $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
+  }
+
   $scope.refresh = function () {
+    $scope.ajaxing = true;
     ScoreboardService.fetch($scope.week)
       .then(function (response) {
         $scope.week = response.data.week;
         $scope.boxScores = response.data.boxScores;
+        $scope.setLastUpdated(response.data.lastUpdated);
 
         ScoreboardService.currentWeek($scope.week);
       }).finally(function () {
-       // Stop the ion-refresher from spinning
-       $scope.$broadcast('scroll.refreshComplete');
+        $scope.ajaxing = false;
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
      });
   };
 
-  $scope.$on("$ionicView.enter", $scope.setLeague);
+  $scope.setLeague();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
 })
 
-.controller("GameController", function ($scope, $stateParams, GameService) {
+.controller("GameController", function ($scope, $interval, $filter, $stateParams, GameService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.gameId = $stateParams.gameId || "";
@@ -129,11 +215,23 @@ angular.module('starter.controllers', [])
     return data;
   }
 
+  $scope.setLastUpdated = function (date) {
+    if (date) {
+      $scope.lastUpdated = date;
+    }
+
+    if (!$scope.lastUpdated) { return; }
+
+    $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
+  }
+
   $scope.refresh = function () {
+    $scope.ajaxing = true;
     GameService.fetch($scope.week, $scope.gameId)
       .then(function (response) {
         $scope.homeTeam = response.data.homeTeam;
         $scope.awayTeam = response.data.awayTeam;
+        $scope.setLastUpdated(response.data.lastUpdated);
 
         if (!("playerScores" in $scope.homeTeam && "playerScores" in $scope.awayTeam)) {
           return;
@@ -141,12 +239,24 @@ angular.module('starter.controllers', [])
 
         $scope.playerScoringData = reformatPlayerData($scope.homeTeam.playerScores, $scope.awayTeam.playerScores);
       }).finally(function () {
-       // Stop the ion-refresher from spinning
-       $scope.$broadcast('scroll.refreshComplete');
+        $scope.ajaxing = false;
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
      });
   };
 
-  $scope.$on("$ionicView.enter", $scope.refresh);
+  $scope.refresh();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
 })
 
 .filter("range", function () {
@@ -159,6 +269,12 @@ angular.module('starter.controllers', [])
     }
 
     return input;
+  };
+})
+
+.filter("humanReadableDateSince", function () {
+  return function (dateString) {
+    return moment(dateString).fromNow(true);
   };
 })
 
