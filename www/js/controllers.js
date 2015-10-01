@@ -65,7 +65,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller("LeagueController", function ($scope, $interval, $state, $stateParams, _, AppSettings, LeagueService) {
+.controller("LeagueController", function ($scope, $interval, $state, $stateParams, $filter, _, AppSettings, LeagueService) {
   $scope.leagues = [];
 
   $scope.setLastUpdated = function (date) {

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cordova build --release android
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ../reality-sports-app.keystore platforms/android/build/outputs/apk/android-release-unsigned.apk alias_name
+rm RealitySportsApp.apk
+zipalign -v 4 platforms/android/build/outputs/apk/android-release-unsigned.apk RealitySportsApp.apk
+cp RealitySportsApp.apk apk/RealitySportsApp_`date +"%Y-%m-%dT%H:%M:%SZ"`.apk

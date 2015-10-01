@@ -111,7 +111,7 @@ angular.module('starter', [
     })
 
     .state("app.login", {
-      url: "/leagues",
+      url: "/login",
       views: {
         "menuContent": {
           templateUrl: "templates/login.html",
