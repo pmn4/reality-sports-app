@@ -103,6 +103,10 @@ angular.module('starter.controllers', [])
   $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
+    if (!$scope.leagues || !$scope.leagues.length) {
+      $scope.refresh();
+    }
+
     $scope.setLastUpdated();
   });
   $scope._intervalUpdated = $interval(function () {

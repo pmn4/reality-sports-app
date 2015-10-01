@@ -27,7 +27,7 @@
         <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
       </div>
     </div>
-    <ion-list>
+    <ion-list class="scoreboards">
       <div class="item" ng-repeat="boxScore in boxScores" ui-sref="app.game({ leagueId: leagueId, week: boxScore.week, gameId: boxScore.gameId })">
         <div class="scoreboard">
           <div class="row row-middle">

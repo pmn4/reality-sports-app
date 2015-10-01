@@ -27,6 +27,13 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	font-size: ceil($font-size-base * 1.25); // just like an h4
 }
 
+.scoreboards {
+	.item {
+		padding-top: $item-padding / 4;
+		padding-bottom: $item-padding / 4;
+	}
+}
+
 .team-name {
 	overflow: hidden;
 	text-overflow: ellipsis;
