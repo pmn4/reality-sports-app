@@ -87,7 +87,7 @@ angular.module('starter.controllers', [])
 
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
-        $state.go("app.scoreboards-for-this-week", {
+        $state.go("app.scoreboards-for-current-week", {
           leagueId: $scope.leagues[0].leagueId
         });
       }, function (response) {
@@ -113,9 +113,19 @@ angular.module('starter.controllers', [])
   });
 })
 
+.controller("CurrentLeagueController", function ($scope, $state, LeagueService) {
+  var leagueId = LeagueService.currentLeagueId();
+
+  if (leagueId) {
+    $state.go("app.scoreboards-for-current-week", { leagueId: leagueId });
+  } else {
+    $state.go("app.leagues");
+  }
+})
+
 .controller("ScoreboardController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
   $scope.leagueId = $stateParams.leagueId;
-  $scope.week = $stateParams.week || "";
+  $scope.week = $stateParams.week || ScoreboardService.currentWeek();
   $scope.boxScores = [];
 
   $scope.setLeague = function () {
@@ -264,6 +274,12 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.beforeLeave", function () {
     $interval.cancel($scope._intervalUpdated);
   });
+})
+
+.controller("PlayerController", function () {
+})
+
+.controller("NewsController", function () {
 })
 
 .controller("SupportController", function () {

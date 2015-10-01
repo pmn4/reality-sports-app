@@ -1,6 +1,6 @@
-<ion-view view-title="🏈 Game">
+<ion-view view-title="Game"> <!-- teams?  scores? -->
   <ion-nav-buttons side="primary">
-    <button class="button button-icon button-clear ion-ios-list-outline" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
+    <button class="button button-icon button-clear ion-trophy" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
   </ion-nav-buttons>
   <ion-nav-buttons side="secondary">
     <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>

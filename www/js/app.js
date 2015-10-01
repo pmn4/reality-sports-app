@@ -70,12 +70,22 @@ angular.module('starter', [
       }
     })
 
-    .state("app.scoreboards-for-this-week", {
+    .state("app.scoreboards-for-current-week", {
       url: "/leagues/:leagueId/scoreboards",
       views: {
         "menuContent": {
           templateUrl: "templates/scoreboard.html",
           controller: "ScoreboardController"
+        }
+      }
+    })
+
+    .state("app.scoreboards-for-current-league", {
+      url: "/leagues/current",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -86,6 +96,26 @@ angular.module('starter', [
         "menuContent": {
           templateUrl: "templates/leagues.html",
           controller: "LeagueController"
+        }
+      }
+    })
+
+    .state("app.players", {
+      url: "/leagues/:leagueId/players",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/players.html",
+          controller: "PlayerController"
+        }
+      }
+    })
+
+    .state("app.news", {
+      url: "/leagues/:leagueId/news",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/news.html",
+          controller: "NewsController"
         }
       }
     })

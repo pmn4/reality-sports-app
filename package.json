@@ -23,7 +23,18 @@
     {
       "locator": "https://github.com/driftyco/ionic-plugins-deploy",
       "id": "ionic-plugin-deploy"
-    }
+    },
+    {
+      "locator": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
+      "id": "cordova-plugin-x-toast"
+    },
+    "org.apache.cordova.network-information",
+    {
+      "locator": "https://github.com/katzer/cordova-plugin-local-notifications.git",
+      "id": "de.appplant.cordova.plugin.local-notification"
+    },
+    "org.apache.cordova.statusbar",
+    "org.apache.cordova.vibration"
   ],
   "cordovaPlatforms": [
     "android"

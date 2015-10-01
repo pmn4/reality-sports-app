@@ -17,24 +17,41 @@
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-stable">
-      <h1 class="title">Menu</h1>
+      <h1 class="title">Menu</h1> <!-- current league name -->
     </ion-header-bar>
     <ion-content has-footer="true">
       <ion-list>
         <ion-item menu-close ui-sref="app.entry">
-          Leagues
+          <i class="icon ion-arrow-swap"></i>
+          Switch Leagues
         </ion-item>
+        <ion-item menu-close ui-sref="app.scoreboards-for-current-league">
+          <i class="icon ion-trophy"></i>
+          Scoreboard
+        </ion-item>
+        <ion-item menu-close ui-sref="app.players">
+          <i class="icon ion-person-stalker"></i>
+          Players
+        </ion-item>
+        <ion-item menu-close ui-sref="app.news">
+          <i class="icon ion-ios-paper-outline"></i>
+          My News
+        </ion-item>
+        <ion-item class="item-divider"></ion-item>
         <ion-item menu-close ui-sref="app.help">
+          <i class="icon ion-ios-help-outline energized"></i>
           Help
         </ion-item>
         <ion-item menu-close ui-sref="app.support">
+          <i class="icon ion-cash balanced"></i>
           Take my money, please
         </ion-item>
         <ion-item menu-close ui-sref="app.updates">
+          <i class="icon ion-ios-cloud-download-outline positive"></i>
           Check for app updates
         </ion-item>
-        <ion-item class="item-divider"></ion-item>
         <ion-item menu-close ui-sref="app.login">
+          <i class="icon ion-log-in"></i>
           Login
         </ion-item>
       </ion-list>
