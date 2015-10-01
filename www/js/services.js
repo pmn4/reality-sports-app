@@ -25,10 +25,10 @@ angular.module("starter.services", [])
 	}
 
 	function set (leagueId, force) {
-		// // this call is expensive, so 200 OK! if it's a repeat request
-		// if (leagueId === currentLeagueId() && !force) {
-		// 	return $q.resolve();
-		// }
+		// this call is expensive, so 200 OK! if it's a repeat request
+		if (leagueId === currentLeagueId() && !force) {
+			return $q.resolve();
+		}
 
 		return $http({
 			method: "PUT",

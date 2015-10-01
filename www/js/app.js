@@ -143,4 +143,12 @@ angular.module('starter', [
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise("/app/leagues");
-});
+})
+
+.constant("_", window._)
+
+.constant("AppSettings", {
+  refreshRate: 15000, // 15 seconds
+  highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
+})
+;

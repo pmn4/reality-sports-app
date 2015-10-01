@@ -6,7 +6,7 @@
     <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <ion-refresher pulling-text="Pull to refresh... <small>(once per {{ settings.refreshRate / 1000 }} sec)</small>" on-refresh="refresh()"></ion-refresher>
     <div id="game-summary" class="row">
       <div class="col col-50 left-side">
         <h4 class="team-name one-liner">
@@ -27,7 +27,7 @@
             </div>
           </div>
           <div class="col-25 team-image">
-            <img src="http://www.realitysportsonline.com/{{ awayTeam.imageUrl }}" width="90%" />
+            <img ng-src="http://www.realitysportsonline.com/{{ awayTeam.imageUrl }}" width="90%" />
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
         </h4>
         <div class="row scoring-summary">
           <div class="col-25 team-image">
-            <img src="http://www.realitysportsonline.com/{{ homeTeam.imageUrl }}" width="90%" />
+            <img ng-src="http://www.realitysportsonline.com/{{ homeTeam.imageUrl }}" width="90%" />
           </div>
           <div class="col-75 scoring-values">
             <div class="scoring-total title">
@@ -69,9 +69,9 @@
           {{ status }}
         </div>
         <div class="player-score" ng-repeat="(position, players) in positions">
-          <div class="item" ng-repeat="playerData in players">
+          <div class="item" ng-repeat="playerData in players track by $index">
             <div class="row row-center player-comparison">
-              <div class="col col-player" toggle-class="detail-view">
+              <div class="col col-player" toggle-class="detail-view" highlighter="playerData.away.points">
                 <div class="row">
                   <div class="col player-name one-liner">
                     {{ playerData.away.name|| '&nbsp;' }}
@@ -101,7 +101,7 @@
               <div class="col col-position player-position">
                 {{ position }}
               </div>
-              <div class="col col-player" toggle-class="detail-view">
+              <div class="col col-player" toggle-class="detail-view" highlighter="playerData.home.points">
                 <div class="row">
                   <div class="col player-name one-liner">
                     {{ playerData.home.name }}

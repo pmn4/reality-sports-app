@@ -214,3 +214,13 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	font-size: 75%;
 	@include opacity(0.5);
 }
+
+.highlightable {
+	@include transition(background-color 1s ease-out);
+
+	&.highlight {
+		background-color: lightyellow;
+
+		@include transition(background-color 0.25s ease-out);
+	}
+}

@@ -1,6 +1,7 @@
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($scope, $ionicModal, AuthService) {
+.controller("AppController", function ($scope, AppSettings) {
+  $scope.settings = AppSettings;
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -64,7 +65,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller("LeagueController", function ($scope, $interval, $state, $stateParams, LeagueService) {
+.controller("LeagueController", function ($scope, $interval, $state, $stateParams, _, AppSettings, LeagueService) {
   $scope.leagues = [];
 
   $scope.setLastUpdated = function (date) {
@@ -77,12 +78,12 @@ angular.module('starter.controllers', [])
     $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
   }
 
-  $scope.refresh = function () {
+  $scope.refresh = _.throttle(function () {
     $scope.ajaxing = true;
     LeagueService.list()
       .then(function (response) {
         $scope.leagues = response.data;
-        $scope.setLastUpdated(response.data.lastUpdated);
+        $scope.setLastUpdated(new Date());
 
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
@@ -97,7 +98,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  };
+  }, AppSettings.refreshRate);
 
   $scope.refresh();
 
@@ -112,7 +113,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardController", function ($scope, $interval, $filter, $stateParams, LeagueService, ScoreboardService) {
+.controller("ScoreboardController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week || "";
   $scope.boxScores = [];
@@ -138,13 +139,13 @@ angular.module('starter.controllers', [])
     $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
   }
 
-  $scope.refresh = function () {
+  $scope.refresh = _.throttle(function () {
     $scope.ajaxing = true;
     ScoreboardService.fetch($scope.week)
       .then(function (response) {
         $scope.week = response.data.week;
         $scope.boxScores = response.data.boxScores;
-        $scope.setLastUpdated(response.data.lastUpdated);
+        $scope.setLastUpdated(new Date());
 
         ScoreboardService.currentWeek($scope.week);
       }).finally(function () {
@@ -153,7 +154,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  };
+  }, AppSettings.refreshRate);
 
   $scope.setLeague();
 
@@ -168,7 +169,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("GameController", function ($scope, $interval, $filter, $stateParams, GameService) {
+.controller("GameController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, GameService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.gameId = $stateParams.gameId || "";
@@ -231,13 +232,13 @@ angular.module('starter.controllers', [])
     $scope.lastUpdatedAgo = $filter("humanReadableDateSince")($scope.lastUpdated);
   }
 
-  $scope.refresh = function () {
+  $scope.refresh = _.throttle(function () {
     $scope.ajaxing = true;
     GameService.fetch($scope.week, $scope.gameId)
       .then(function (response) {
         $scope.homeTeam = response.data.homeTeam;
         $scope.awayTeam = response.data.awayTeam;
-        $scope.setLastUpdated(response.data.lastUpdated);
+        $scope.setLastUpdated(new Date());
 
         if (!("playerScores" in $scope.homeTeam && "playerScores" in $scope.awayTeam)) {
           return;
@@ -250,7 +251,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  };
+  }, AppSettings.refreshRate);
 
   $scope.refresh();
 
@@ -297,6 +298,28 @@ angular.module('starter.controllers', [])
         } else {
           element.addClass(attrs.toggleClass);
         }
+      });
+    }
+  };
+})
+
+.directive("highlighter", function ($timeout, AppSettings) {
+  return {
+    restrict: "A",
+    scope: {
+      model: "=highlighter"
+    },
+    link: function(scope, element) {
+      element.addClass("highlightable");
+
+      scope.$watch("model", function (nv, ov) {
+        if (nv === ov) { return; }
+
+        element.addClass("highlight");
+
+        $timeout(function () {
+          element.removeClass("highlight");
+        }, AppSettings.highlightDuration);
       });
     }
   };
