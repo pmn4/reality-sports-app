@@ -1,8 +1,5 @@
-// var API_HOST = "http://localhost:1212";
-var API_HOST = "http://reality-sports-app.herokuapp.com";
-
 angular.module("starter.services", [])
-.service("LeagueService", function ($http, $q, AuthService /*, $localStorage */) {
+.service("LeagueService", function ($http, $q, /* $localStorage, */ AppSettings, AuthService) {
 	var STORE_KEY_CURRENT_LEAGUE;
 
 	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.LeagueService>currentLeagueId";
@@ -16,7 +13,7 @@ angular.module("starter.services", [])
 	function list () {
 		return $http({
 			method: "GET",
-			url: API_HOST + "/v1/leagues",
+			url: AppSettings.apiHost + "/v1/leagues",
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -32,7 +29,7 @@ angular.module("starter.services", [])
 
 		return $http({
 			method: "PUT",
-			url: API_HOST + "/v1/leagues/" + leagueId,
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -54,7 +51,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("AuthService", function (/* $localStorage, */ $http) {
+.service("AuthService", function (/* $localStorage, */ $http, AppSettings) {
 	var STORE_KEY_TOKEN, STORE_KEY_SESSION, STORE_KEY_CURRENT_EMAIL;
 
 	STORE_KEY_TOKEN = "realitySportsApp.AuthService>token";
@@ -95,7 +92,7 @@ angular.module("starter.services", [])
 	function login (data) {
 		return $http({
 			method: "POST",
-			url: API_HOST + "/v1/tokens",
+			url: AppSettings.apiHost + "/v1/tokens",
 			data: data,
 			headers: {
 				"X-RSO-Session": session()
@@ -107,7 +104,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("ScoreboardService", function ($http, AuthService, LeagueService) {
+.service("ScoreboardService", function ($http, AppSettings, AuthService, LeagueService) {
 	var STORE_KEY_CURRENT_WEEK;
 
 	STORE_KEY_CURRENT_WEEK = "realitySportsApp.ScoreboardService>currentWeek";
@@ -124,7 +121,7 @@ angular.module("starter.services", [])
 
 		return $http({
 			method: "GET",
-			url: API_HOST + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
+			url: AppSettings.apiHost + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -141,7 +138,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("GameService", function ($http, AuthService, LeagueService) {
+.service("GameService", function ($http, AppSettings, AuthService, LeagueService) {
 	return {
 		fetch: fetch
 	};
@@ -149,7 +146,7 @@ angular.module("starter.services", [])
 	function fetch (week, gameId) {
 		return $http({
 			method: "GET",
-			url: API_HOST + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
+			url: AppSettings.apiHost + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -158,7 +155,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("HelpService", function ($http) {
+.service("HelpService", function ($http, AppSettings) {
 	return {
 		submitFeedback: submitFeedback
 	};
@@ -166,7 +163,7 @@ angular.module("starter.services", [])
 	function submitFeedback (data) {
 		return $http({
 			method: "POST",
-			url: API_HOST + "/v1/feedback",
+			url: AppSettings.apiHost + "/v1/feedback",
 			data: data
 		});
 	}

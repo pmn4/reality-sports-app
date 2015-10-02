@@ -178,6 +178,8 @@ angular.module('starter', [
 .constant("_", window._)
 
 .constant("AppSettings", {
+  // apiHost: "http://localhost:1212",
+  apiHost: "http://reality-sports-app.herokuapp.com",
   refreshRate: 15000, // 15 seconds
   highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
 })
