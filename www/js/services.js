@@ -65,7 +65,7 @@ angular.module("starter.services", [])
 		token: token,
 		session: session,
 		login: login,
-		currentEmail, currentEmail
+		currentEmail: currentEmail
 	};
 
 	function token (t) {
