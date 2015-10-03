@@ -37,6 +37,7 @@
     "org.apache.cordova.vibration"
   ],
   "cordovaPlatforms": [
-    "android"
+    "android",
+    "ios"
   ]
 }
