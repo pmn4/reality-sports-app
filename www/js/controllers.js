@@ -310,6 +310,8 @@ angular.module('starter.controllers', [])
 
 .filter("dowPlusTime", function () {
   return function (dateString) {
+    if (!dateString) { return ""; }
+
     return moment(dateString)
       .year(new Date().getFullYear())
       .format("ddd h:mm");
