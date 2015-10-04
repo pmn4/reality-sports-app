@@ -308,6 +308,14 @@ angular.module('starter.controllers', [])
   };
 })
 
+.filter("dowPlusTime", function () {
+  return function (dateString) {
+    return moment(dateString)
+      .year(new Date().getFullYear())
+      .format("ddd h:mm");
+  };
+})
+
 .directive("toggleClass", function() {
   return {
     restrict: "A",

@@ -141,6 +141,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	.player-points {
 		font-size: 125%;
 		font-weight: bold;
+
+		color: $balanced;
 	}
 
 	.player-position {
@@ -165,6 +167,19 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	.player-team,
 	.player-stats {
 		font-size: 75%;
+	}
+
+	.yet-to-play {
+		background-color: $stable;
+
+		.player-points {
+			color: $light;
+		}
+	}
+	.is-final {
+		.player-points {
+			color: $positive;
+		}
 	}
 }
 

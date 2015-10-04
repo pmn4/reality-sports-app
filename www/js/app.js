@@ -172,7 +172,7 @@ angular.module('starter', [
   ;
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise("/app/leagues");
+  $urlRouterProvider.otherwise("/app/entry");
 })
 
 .constant("_", window._)
