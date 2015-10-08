@@ -150,7 +150,7 @@ angular.module('starter.controllers', [])
 .controller("LeagueController", function ($scope, $state, $stateParams, LeagueService) {
   $scope.setLeague = Mixins.setLeague($scope, LeagueService);
 
-  $state.go = function () {
+  $scope.$on("$ionicView.enter", function () {
     if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
       $scope.leagueId = $stateParams.leagueId;
       $scope.setLeague();
@@ -165,9 +165,7 @@ angular.module('starter.controllers', [])
     } else {
       $state.go("app.leagues");
     }
-  };
-
-  $scope.$on("$ionicView.enter", $scope.go);
+  });
 })
 
 .controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
