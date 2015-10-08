@@ -148,25 +148,26 @@ angular.module('starter.controllers', [])
 })
 
 .controller("LeagueController", function ($scope, $state, $stateParams, LeagueService) {
-  var leagueId;
   $scope.setLeague = Mixins.setLeague($scope, LeagueService);
 
-  if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
-    $scope.leagueId = $stateParams.leagueId;
-    $scope.setLeague();
-  } else {
-    $scope.leagueId = LeagueService.currentLeagueId();
-  }
+  $state.go = function () {
+    if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
+      $scope.leagueId = $stateParams.leagueId;
+      $scope.setLeague();
+    } else {
+      $scope.leagueId = LeagueService.currentLeagueId();
+    }
 
-console.log($state, $stateParams);
+    var whereTo = $state.current.name.replace("-for-current-league", "");
 
-  var whereTo = $state.current.name.replace("-for-current-league", "");
+    if ($scope.leagueId) {
+      $state.go(whereTo || "app.standings", { leagueId: $scope.leagueId });
+    } else {
+      $state.go("app.leagues");
+    }
+  };
 
-  if ($scope.leagueId) {
-    $state.go(whereTo || "app.standings", { leagueId: $scope.leagueId });
-  } else {
-    $state.go("app.leagues");
-  }
+  $scope.$on("$ionicView.enter", $state.go);
 })
 
 .controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
@@ -303,7 +304,6 @@ console.log($state, $stateParams);
   }
 
   $scope.playerInfo = function (player) {
-console.log("player", player);
     $ionicActionSheet.show({
       buttons: [
         { text: 'More Info' },
@@ -312,13 +312,12 @@ console.log("player", player);
       titleText: '<h3>' + player.name + '</h3><p>' + player.statLine + '</p>',
       cancelText: 'Close',
       buttonClicked: function (index) {
-console.log("button clicked", arguments);
         switch (index) {
           case 0:
             $state.go("app.player", { leagueId: $scope.leagueId, playerId: $scope.playerId })
             break;
           case 1:
-            $scope.launch("twitter://search?q=" + player.name);
+            $scope.launch("twitter://search?query=" + player.name);
             break;
         }
         return true;
