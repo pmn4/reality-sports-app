@@ -1,0 +1,43 @@
+<ion-view view-title="Standings">
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
+  </ion-nav-buttons>
+  <ion-content has-subheader>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="subheader">
+      <div class="row stable-bg">
+        <div class="col col-10 standing-rank">
+          &nbsp;
+        </div>
+        <div class="col col-50 team-name standing-team">
+          <strong>Team</strong>
+        </div>
+        <div class="col col-25 standing-record text-center">
+          <strong>Record</strong>
+        </div>
+        <div class="col col-15 standing-points text-right">
+          <strong>Pts</strong>
+        </div>
+      </div>
+    </div>
+    <div ng-repeat="standing in standings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
+      <div class="row" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.max }">
+        <div class="col col-10 standing-rank text-right">
+          {{ $index + 1 }}
+        </div>
+        <div class="col col-50 team-name standing-team">
+          {{ standing.team.name }}
+        </div>
+        <div class="col col-25 standing-record text-center">
+          {{ standing | teamRecord }}
+        </div>
+        <div class="col col-15 standing-points text-right">
+          {{ standing.points }}
+        </div>
+      </div>
+    </div>
+    <p class="last-updated">
+      <em>points leader is highlighted</em>
+    </p>
+  </ion-content>
+</ion-view>

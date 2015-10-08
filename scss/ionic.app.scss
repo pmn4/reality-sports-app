@@ -106,6 +106,12 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 			padding-right: $content-padding;
 
 			@include transition(all 0.3s ease-in-out);
+
+			.twitter-search {
+				@include opacity(1); // see below
+
+				@include transition(opacity 0.3s ease-in-out);
+			}
 		}
 
 		&:last-child {
@@ -113,6 +119,17 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 			&.detail-view {
 				right: 0;
+			}
+		}
+
+		.twitter-search {
+			position: absolute;
+			right: $content-padding; // see above .col-player.detail-view
+			top: $grid-padding-width / 2; // == .row padding
+			@include opacity(0);
+
+			&.button-icon.icon:before {
+				font-size: $button-small-font-size;
 			}
 		}
 	}

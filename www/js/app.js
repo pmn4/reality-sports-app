@@ -60,32 +60,62 @@ angular.module('starter', [
       }
     })
 
-    .state("app.scoreboards-for-week", {
-      url: "/leagues/:leagueId/scoreboards/:week",
+    .state("app.standings-for-current-league", {
+      url: "/leagues/default/standings",
       views: {
         "menuContent": {
-          templateUrl: "templates/scoreboard.html",
-          controller: "ScoreboardController"
+          templateUrl: "templates/redirecting.html",
+          controller: "LeagueController"
         }
       }
     })
 
-    .state("app.scoreboards-for-current-week", {
-      url: "/leagues/:leagueId/scoreboards",
+    .state("app.standings", {
+      url: "/leagues/:leagueId/standings",
       views: {
         "menuContent": {
-          templateUrl: "templates/scoreboard.html",
-          controller: "ScoreboardController"
+          templateUrl: "templates/standings.html",
+          controller: "StandingsController"
         }
       }
     })
 
     .state("app.scoreboards-for-current-league", {
-      url: "/leagues/current",
+      url: "/leagues/default/scoreboards",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "CurrentLeagueController"
+          controller: "LeagueController"
+        }
+      }
+    })
+
+    .state("app.scoreboards", {
+      url: "/leagues/:leagueId/scoreboards/:week?",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/scoreboards.html",
+          controller: "ScoreboardsController"
+        }
+      }
+    })
+
+    .state("app.current-league", {
+      url: "/leagues/default",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "LeagueController"
+        }
+      }
+    })
+
+    .state("app.league", {
+      url: "/leagues/:leagueId",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "LeagueController"
         }
       }
     })
@@ -95,7 +125,17 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/leagues.html",
-          controller: "LeagueController"
+          controller: "LeaguesController"
+        }
+      }
+    })
+
+    .state("app.team", {
+      url: "/leagues/:leagueId/teams/:teamId",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/team.html",
+          controller: "TeamController"
         }
       }
     })
@@ -105,6 +145,16 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/players.html",
+          controller: "PlayersController"
+        }
+      }
+    })
+
+    .state("app.player", {
+      url: "/leagues/:leagueId/players/:playerId",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/player.html",
           controller: "PlayerController"
         }
       }
@@ -178,8 +228,8 @@ angular.module('starter', [
 .constant("_", window._)
 
 .constant("AppSettings", {
-  // apiHost: "http://localhost:1212",
-  apiHost: "http://reality-sports-app.herokuapp.com",
+  apiHost: "http://localhost:1212",
+  // apiHost: "http://reality-sports-app.herokuapp.com",
   refreshRate: 15000, // 15 seconds
   highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
 })

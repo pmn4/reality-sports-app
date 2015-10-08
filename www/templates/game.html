@@ -1,6 +1,6 @@
 <ion-view view-title="Game"> <!-- teams?  scores? -->
   <ion-nav-buttons side="primary">
-    <button class="button button-icon button-clear ion-trophy" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
+    <button class="button button-icon button-clear ion-ios-calendar-outline" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
   </ion-nav-buttons>
   <ion-nav-buttons side="secondary">
     <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
@@ -71,7 +71,7 @@
         <div class="player-score" ng-repeat="(position, players) in positions">
           <div class="item" ng-repeat="playerData in players track by $index">
             <div class="row row-center player-comparison">
-              <div class="col col-player" toggle-class="detail-view" highlighter="playerData.away.points" ng-class="{ 'yet-to-play': playerData.away.gameStatus.date, 'is-final': playerData.away.gameStatus.timeRemaining == 'Final' }">
+              <div class="col col-player" ng-click="playerInfo(playerData.away)" highlighter="playerData.away.points" ng-class="{ 'yet-to-play': playerData.away.gameStatus.date, 'is-final': playerData.away.gameStatus.timeRemaining == 'Final' }">
                 <div class="row">
                   <div class="col player-name one-liner">
                     {{ playerData.away.name || '&nbsp;' }}
@@ -102,7 +102,7 @@
               <div class="col col-position player-position">
                 {{ position }}
               </div>
-              <div class="col col-player" toggle-class="detail-view" highlighter="playerData.home.points" ng-class="{ 'yet-to-play': playerData.home.gameStatus.date, 'is-final': playerData.home.gameStatus.timeRemaining == 'Final' }">
+              <div class="col col-player" ng-click="playerInfo(playerData.home)" highlighter="playerData.home.points" ng-class="{ 'yet-to-play': playerData.home.gameStatus.date, 'is-final': playerData.home.gameStatus.timeRemaining == 'Final' }">
                 <div class="row">
                   <div class="col player-name one-liner">
                     {{ playerData.home.name }}

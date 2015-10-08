@@ -104,7 +104,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("ScoreboardService", function ($http, AppSettings, AuthService, LeagueService) {
+.service("ScoreboardService", function ($http, AppSettings, AuthService) {
 	var STORE_KEY_CURRENT_WEEK;
 
 	STORE_KEY_CURRENT_WEEK = "realitySportsApp.ScoreboardService>currentWeek";
@@ -114,14 +114,14 @@ angular.module("starter.services", [])
 		currentWeek: currentWeek
 	};
 
-	function fetch (week, gameId) {
+	function fetch (leagueId, week, gameId) {
 		if (!week) {
 			week = currentWeek() || "";
 		}
 
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week,
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
@@ -138,15 +138,32 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("GameService", function ($http, AppSettings, AuthService, LeagueService) {
+.service("StandingsService", function ($http, AppSettings, AuthService) {
 	return {
 		fetch: fetch
 	};
 
-	function fetch (week, gameId) {
+	function fetch (leagueId) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + LeagueService.currentLeagueId() + "/scoreboards/" + week + "/game_summaries/" + gameId,
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings",
+			headers: {
+				"X-RSO-Auth-Token": AuthService.token(),
+				"X-RSO-Session": AuthService.session()
+			}
+		});
+	}
+})
+
+.service("GameService", function ($http, AppSettings, AuthService) {
+	return {
+		fetch: fetch
+	};
+
+	function fetch (leagueId, week, gameId) {
+		return $http({
+			method: "GET",
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId,
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()

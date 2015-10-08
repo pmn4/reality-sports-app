@@ -9,7 +9,7 @@
         <div class="button-bar button-bar-inline">
           <div class="button button-clear">Week</div>
           <a ng-repeat="weekNumber in [] | range:1:16"
-            ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: weekNumber })"
+            ui-sref="app.scoreboards({ leagueId: leagueId, week: weekNumber })"
             ui-sref-opts="{ location: 'replace' }"
             class="button"
             ng-class="{ 'button-positive': weekNumber == week }"
