@@ -96,17 +96,17 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, _, AppSettings, LeagueService) {
+.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, LeagueService) {
   $scope.leagues = [];
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  $scope.refresh = _.throttle(function () {
+  $scope.refresh = function (force) {
     $scope.ajaxing = true;
-    LeagueService.list()
-      .then(function (response) {
-        $scope.leagues = response.data;
-        $scope.setLastUpdated(new Date());
+    LeagueService.list(force)
+      .then(function (data) {
+        $scope.leagues = data.leagues;
+        $scope.setLastUpdated(data.lastUpdated);
 
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
@@ -121,7 +121,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  }, AppSettings.refreshRate);
+  };
 
   $scope.refresh();
 

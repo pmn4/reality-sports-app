@@ -1,13 +1,13 @@
 BUGS:
 
 TODO:
-- cache leagues (sloooow)
 - on login, leagues not refreshing
 - send to login on 401
 - do something with device info
 - email formatting (mailchimp)
 - refresh interval
 - Fan Duel
+- move "lastUpdated" logic to services
 
 BACKLOG:
 - help form
@@ -25,3 +25,4 @@ DONE:
 - logo
 - links to email/twitter not working
 - app updates not working
+- cache leagues (sloooow)

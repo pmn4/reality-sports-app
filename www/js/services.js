@@ -1,8 +1,9 @@
 angular.module("starter.services", [])
 .service("LeagueService", function ($http, $q, /* $localStorage, */ AppSettings, AuthService) {
-	var STORE_KEY_CURRENT_LEAGUE;
+	var STORE_KEY_CURRENT_LEAGUE, STORE_KEY_LEAGUES;
 
 	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.LeagueService>currentLeagueId";
+	STORE_KEY_LEAGUES = "realitySportsApp.LeagueService>leagues";
 
 	return {
 		list: list,
@@ -10,15 +11,40 @@ angular.module("starter.services", [])
 		currentLeagueId: currentLeagueId
 	};
 
-	function list () {
-		return $http({
+	function leagues(leaguesData) {
+		if (leaguesData) {
+			localStorage.setItem(STORE_KEY_LEAGUES, JSON.stringify(leaguesData));
+		}
+
+		return JSON.parse(localStorage.getItem(STORE_KEY_LEAGUES) || "[]");
+	}
+
+	function list (force) {
+		var leaguesData = leagues(), deferred;
+
+		if (!force && leaguesData && leaguesData.leagues && leaguesData.leagues.length) {
+			return $q.resolve(leaguesData);
+		}
+
+		deferred = $q.defer();
+
+		$http({
 			method: "GET",
 			url: AppSettings.apiHost + "/v1/leagues",
 			headers: {
 				"X-RSO-Auth-Token": AuthService.token(),
 				"X-RSO-Session": AuthService.session()
 			}
+		}).then(function (response) {
+			deferred.resolve(leagues({
+				lastUpdated: new Date(),
+				leagues: response.data
+			}));
+		}, function () {
+			deferred.reject.apply(deferred, arguments);
 		});
+
+		return deferred.promise;
 	}
 
 	function set (leagueId, force) {
