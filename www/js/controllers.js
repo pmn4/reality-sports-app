@@ -167,7 +167,7 @@ angular.module('starter.controllers', [])
     }
   };
 
-  $scope.$on("$ionicView.enter", $state.go);
+  $scope.$on("$ionicView.enter", $scope.go);
 })
 
 .controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
