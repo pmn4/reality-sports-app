@@ -2,7 +2,9 @@
   <ion-side-menu-content>
     <ion-nav-bar class="bar-stable">
       <ion-nav-buttons side="left">
-        <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+        <button class="button button-icon button-clear ion-navicon notifiable" menu-toggle="left" ng-class="{ notify: hasAppUpdate }">
+          <i class="notifier stable"></i>
+        </button>
       </ion-nav-buttons>
     </ion-nav-bar>
     <ion-nav-view name="menuContent"></ion-nav-view>
@@ -30,7 +32,7 @@
           Standings
         </ion-item>
         <ion-item menu-close ui-sref="app.scoreboards-for-current-league">
-          <i class="icon ion-ios-calendar-outline"></i>
+          <i class="icon ion-ios-list-outline"></i>
           Scoreboard
         </ion-item>
         <ion-item menu-close ui-sref="app.players">
@@ -52,7 +54,13 @@
         </ion-item>
         <ion-item menu-close ui-sref="app.updates">
           <i class="icon ion-ios-cloud-download-outline positive"></i>
-          Check for app updates
+          <span ng-show="hasAppUpdate">
+            New features are waiting
+          </span>
+          <span ng-hide="hasAppUpdate">
+            Check for app updates
+          </span>
+          <span class="badge badge-assertive" ng-show="hasAppUpdate">1</span>
         </ion-item>
         <ion-item menu-close ui-sref="app.login">
           <i class="icon ion-log-in"></i>

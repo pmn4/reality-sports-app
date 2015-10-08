@@ -263,3 +263,39 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		@include transition(background-color 0.25s ease-out);
 	}
 }
+
+// @include keyframes(notify) {
+// 	0% {
+// 		transform: scale(0.0);
+// 	}
+// 	75% {
+// 		transform: scale(1.25);
+// 	}
+// 	100% {
+// 		transform: scale(1.0);
+// 	}
+// }
+
+.notifiable {
+	position: relative;
+
+	.notifier {
+		display: none;
+	}
+
+	&.notify .notifier {
+		position: absolute;
+		top: 0;
+		right: $button-large-icon-size / -8;
+		display: block;
+		border: 2px solid currentColor;
+		border-radius: 100%;
+		background: $assertive;
+		height: $button-large-icon-size / 2;
+		width: $button-large-icon-size / 2;
+		transform: translateZ(0);
+
+		// @include animation(notify 0.3s ease-out);
+		@include animation(superScaleIn 0.3s ease-out);
+	}
+}

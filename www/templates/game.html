@@ -1,8 +1,13 @@
 <ion-view view-title="Game"> <!-- teams?  scores? -->
-  <ion-nav-buttons side="primary">
-    <button class="button button-icon button-clear ion-ios-calendar-outline" ui-sref="app.scoreboards-for-week({ leagueId: leagueId, week: week })"></button>
+  <ion-nav-buttons side="left">
+    <!-- copy/paste from menu -->
+    <button class="button button-icon button-clear ion-navicon notifiable" menu-toggle="left" ng-class="{ notify: hasAppUpdate }">
+      <i class="notifier stable"></i>
+    </button>
+
+    <button class="button button-icon button-clear ion-android-arrow-back" ui-sref="app.scoreboards({ leagueId: leagueId, week: week })"></button>
   </ion-nav-buttons>
-  <ion-nav-buttons side="secondary">
+  <ion-nav-buttons side="right">
     <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
   </ion-nav-buttons>
   <ion-content>
