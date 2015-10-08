@@ -27,7 +27,7 @@ var Mixins = {
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($scope, $ionicDeploy, AppSettings) {
+.controller("AppController", function ($scope, AppSettings) {
   $scope.settings = AppSettings;
 
   // With the new view caching in Ionic, Controllers are only called
@@ -44,13 +44,6 @@ angular.module('starter.controllers', [])
   $scope.launchRsoPage = function (url) {
     window.open("http://www.realitysportsonline.com/" + url, '_system');
   };
-
-  $ionicDeploy.check()
-    .then(function (hasUpdate) {
-      $scope.hasAppUpdate = hasUpdate;
-    }, function () {
-      $scope.hasAppUpdate = false;
-    });
 })
 
 .controller("LoginController", function ($scope, $state, AuthService, LeagueService) {

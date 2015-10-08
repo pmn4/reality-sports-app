@@ -12,7 +12,7 @@ angular.module('starter', [
   'starter.services'
 ])
 
-.run(function($ionicPlatform, $ionicAnalytics) {
+.run(function ($rootScope, $ionicPlatform, $ionicAnalytics, $ionicDeploy) {
   $ionicPlatform.ready(function () {
     $ionicAnalytics.register();
 
@@ -27,6 +27,13 @@ angular.module('starter', [
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    $ionicDeploy.check()
+      .then(function (hasUpdate) {
+        $rootScope.hasAppUpdate = hasUpdate;
+      }, function () {
+        $rootScope.hasAppUpdate = false;
+      });
   });
 })
 
