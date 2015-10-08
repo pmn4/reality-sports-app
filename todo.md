@@ -1,6 +1,7 @@
 BUGS:
 
 TODO:
+- cache leagues (sloooow)
 - on login, leagues not refreshing
 - send to login on 401
 - do something with device info

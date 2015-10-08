@@ -117,7 +117,7 @@ angular.module('starter.controllers', [])
 
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
-        $state.go("app.scoreboards-for-current-week", {
+        $state.go("app.scoreboards", {
           leagueId: $scope.leagues[0].leagueId
         });
       }, function (response) {
