@@ -1,13 +1,13 @@
 var Mixins = {
-  setLeague: function ($scope, LeagueService) {
+  setLeague: function ($scope, LeagueService, force) {
     return function () {
-      $scope.ajaxing = true;
-      LeagueService.set($scope.leagueId)
+      $scope.ajaxing = $scope.indicateAjaxing(true);
+      LeagueService.set($scope.leagueId, force)
         .then(function (_response) {
           $scope.refresh();
         })
         .finally(function () {
-          $scope.ajaxing = false;
+          $scope.ajaxing = $scope.indicateAjaxing(false);
         });
     };
   },
@@ -21,13 +21,24 @@ var Mixins = {
 
       $scope.lastUpdatedAgo = moment($scope.lastUpdated).fromNow(true);
     };
+  },
+  throttle: function ($scope, fn, refreshRate) {
+    var throttled = _.throttle(function () {
+      $scope.blocked = false;
+      fn();
+    }, refreshRate);
+
+    return function () {
+      $scope.blocked = true;
+      throttled();
+    };
   }
 };
 
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($scope, AppSettings) {
+.controller("AppController", function ($rootScope, $scope, $state, AppSettings, AuthTokenStore) {
   $scope.settings = AppSettings;
 
   // With the new view caching in Ionic, Controllers are only called
@@ -37,6 +48,21 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
+  $rootScope.indicators = {
+    offline: false,
+    ajaxing: 0
+  };
+
+  $scope.indicateAjaxing = function (isAjaxing) {
+    if (isAjaxing) {
+      $rootScope.indicators.ajaxing++;
+    } else {
+      $rootScope.indicators.ajaxing = Math.max(0, $rootScope.indicators.ajaxing - 1);
+    }
+
+    return isAjaxing;
+  };
+
   $scope.launch = function (url) {
     window.open(url, '_system');
   };
@@ -44,54 +70,88 @@ angular.module('starter.controllers', [])
   $scope.launchRsoPage = function (url) {
     window.open("http://www.realitysportsonline.com/" + url, '_system');
   };
+
+  $scope.retryOnRsoError = function (response) {
+    // @todo: TOAST something went wrong... retrying
+    // @todo: only 401?
+    $state.go("app.entry");
+  };
+
+  $scope.loggedIn = function (loggedIn) {
+    $scope.loggedInState = loggedIn;
+  };
+  $scope.loggedIn(!!AuthTokenStore.token());
 })
 
-.controller("LoginController", function ($scope, $state, AuthService, LeagueService) {
+.controller("LoginController", function ($scope, $state, AuthService, AppStateService) {
   // Form data for the login modal
   $scope.loginData = {
-    username: AuthService.currentEmail(),
+    username: AppStateService.currentEmail(),
     optIn: true
   };
 
   $scope.login = function () {
-    $scope.ajaxing = true;
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     AuthService.login($scope.loginData)
       .then(function (response) {
-        AuthService.currentEmail($scope.loginData.username);
-        LeagueService.currentLeagueId("reset");
+        AppStateService.currentEmail($scope.loginData.username);
+        AppStateService.clearCurrentLeagueId();
+        $scope.loggedIn(true);
 
         $state.go("app.leagues");
       }, function (response) {
+        $scope.loggedIn(false);
         // $scope.errorMessage = response.data;
         $scope.errorMessage = "Login Failed";
       })
       .finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
       });
   };
 })
 
-.controller("EntryController", function ($scope, $state, AuthService) {
+.controller("LogoutController", function ($scope, $state, AuthTokenStore) {
   $scope.$on("$ionicView.enter", function () {
-    if (AuthService.token()) {
-      $state.go("app.leagues");
-    } else {
-      $state.go("app.login");
-    }
+    AuthTokenStore.clearToken();
+    AuthTokenStore.clearSession();
+    $scope.loggedIn(false);
+
+    $state.go("app.entry");
   });
 })
 
-.controller("HelpController", function ($scope, $window, HelpService, AuthService) {
+.controller("EntryController", function ($scope, $state, AuthService, AuthTokenStore, AppStateService) {
+  $scope.$on("$ionicView.enter", function () {
+    AppStateService.clearCurrentLeagueId();
+
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    AuthService.refreshSession()
+      .then(function () {
+        if (AuthTokenStore.token()) {
+          $state.go("app.leagues");
+        } else {
+          $state.go("app.login");
+        }
+      }, function () {
+        $state.go("app.login");
+      })
+      .finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+      });
+  });
+})
+
+.controller("HelpController", function ($scope, $window, HelpService, AppStateService) {
   $scope.helpData = {
-    email: AuthService.currentEmail(),
+    email: AppStateService.currentEmail(),
     respondViaEmail: true
   };
 
   $scope.submitForm = function () {
-    $scope.ajaxing = true;
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     HelpService.submitFeedback($scope.helpData)
       .finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
       });
   }
 })
@@ -102,7 +162,7 @@ angular.module('starter.controllers', [])
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = function (force) {
-    $scope.ajaxing = true;
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     LeagueService.list(force)
       .then(function (data) {
         $scope.leagues = data.leagues;
@@ -114,9 +174,10 @@ angular.module('starter.controllers', [])
           leagueId: $scope.leagues[0].leagueId
         });
       }, function (response) {
-        $state.go("app.login");
+        // @todo: TOAST something went wrong... retrying
+        $state.go("app.entry");
       }).finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
 
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
@@ -140,15 +201,15 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("LeagueController", function ($scope, $state, $stateParams, LeagueService) {
-  $scope.setLeague = Mixins.setLeague($scope, LeagueService);
+.controller("LeagueController", function ($scope, $state, $stateParams, LeagueService, AppStateService) {
+  $scope.setLeague = Mixins.setLeague($scope, LeagueService, true);
 
   $scope.$on("$ionicView.enter", function () {
     if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
       $scope.leagueId = $stateParams.leagueId;
       $scope.setLeague();
     } else {
-      $scope.leagueId = LeagueService.currentLeagueId();
+      $scope.leagueId = AppStateService.currentLeagueId();
     }
 
     var whereTo = $state.current.name.replace("-for-current-league", "");
@@ -161,25 +222,27 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService) {
+.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
-  $scope.week = $stateParams.week || ScoreboardService.currentWeek();
+  $scope.week = $stateParams.week || AppStateService.currentWeek();
   $scope.boxScores = [];
 
   $scope.setLeague = Mixins.setLeague($scope, LeagueService);
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  $scope.refresh = _.throttle(function () {
-    $scope.ajaxing = true;
+  $scope.refresh = Mixins.throttle($scope, function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     ScoreboardService.fetch($scope.leagueId, $scope.week)
       .then(function (response) {
         $scope.week = response.data.week;
         $scope.boxScores = response.data.boxScores;
         $scope.setLastUpdated(new Date());
 
-        ScoreboardService.currentWeek($scope.week);
+        AppStateService.currentWeek($scope.week);
+      }, function (response) {
+        $scope.retryOnRsoError(response);
       }).finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
 
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
@@ -190,6 +253,12 @@ angular.module('starter.controllers', [])
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
+
+    if ($scope.boxScores && $scope.boxScores.length) { return; }
+
+    // this shouldn't often happen, but sometimes we re-load a view
+    // which failed to refresh the first time.
+    $scope.setLeague();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -201,7 +270,7 @@ angular.module('starter.controllers', [])
 
 .controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, StandingsService) {
   $scope.leagueId = $stateParams.leagueId;
-  $scope.boxScores = [];
+  $scope.standings = [];
 
   $scope.setLeague = Mixins.setLeague($scope, LeagueService);
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
@@ -212,16 +281,18 @@ angular.module('starter.controllers', [])
     };
   }
 
-  $scope.refresh = _.throttle(function () {
-    $scope.ajaxing = true;
-    StandingsService.fetch($scope.week)
+  $scope.refresh = Mixins.throttle($scope, function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    StandingsService.fetch($scope.leagueId, $scope.week)
       .then(function (response) {
         $scope.standings = response.data;
         $scope.setLastUpdated(new Date());
 
         $scope.summary = summarizeStandings(response.data);
+      }, function (response) {
+        $scope.retryOnRsoError(response);
       }).finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
 
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
@@ -232,6 +303,12 @@ angular.module('starter.controllers', [])
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
+
+    if ($scope.standings && $scope.standings.length) { return; }
+
+    // this shouldn't often happen, but sometimes we re-load a view
+    // which failed to refresh the first time.
+    $scope.setLeague();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -318,8 +395,8 @@ angular.module('starter.controllers', [])
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  $scope.refresh = _.throttle(function () {
-    $scope.ajaxing = true;
+  $scope.refresh = Mixins.throttle($scope, function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     GameService.fetch($scope.leagueId, $scope.week, $scope.gameId)
       .then(function (response) {
         $scope.homeTeam = response.data.homeTeam;
@@ -331,8 +408,10 @@ angular.module('starter.controllers', [])
         }
 
         $scope.playerScoringData = reformatPlayerData($scope.homeTeam.playerScores, $scope.awayTeam.playerScores);
+      }, function (response) {
+        $scope.retryOnRsoError(response);
       }).finally(function () {
-        $scope.ajaxing = false;
+        $scope.ajaxing = $scope.indicateAjaxing(false);
 
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
@@ -367,6 +446,18 @@ angular.module('starter.controllers', [])
 })
 
 .controller("SupportController", function () {
+})
+
+.filter("none", function () {
+  return function (arr) {
+    return !arr || !arr.length;
+  };
+})
+
+.filter("any", function () {
+  return function (arr) {
+    return arr && arr.length;
+  };
 })
 
 .filter("range", function () {
@@ -455,7 +546,7 @@ angular.module('starter.controllers', [])
 
   // Check Ionic Deploy for new code
   $scope.checkForUpdates = function () {
-    $scope.ajaxing = true;
+    $scope.ajaxing = $scope.indicateAjaxing(true);
     $ionicDeploy.check().then(function (hasUpdate) {
       $scope.hasUpdate = hasUpdate;
 
@@ -465,7 +556,7 @@ angular.module('starter.controllers', [])
     }, function (err) {
       console.error('Ionic Deploy: Unable to check for updates', err);
     }).finally(function () {
-      $scope.ajaxing = false;
+      $scope.ajaxing = $scope.indicateAjaxing(false);
     });
   }
 

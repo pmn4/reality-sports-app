@@ -6,14 +6,14 @@
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="subheader">
       <ion-scroll direction="x" class="wide-as-needed">
-        <div class="button-bar button-bar-inline">
-          <div class="button button-clear">Week</div>
+        <div class="button-bar button-bar-inline week-picker">
           <a ng-repeat="weekNumber in [] | range:1:16"
             ui-sref="app.scoreboards({ leagueId: leagueId, week: weekNumber })"
             ui-sref-opts="{ location: 'replace' }"
             class="button"
             ng-class="{ 'button-positive': weekNumber == week }"
           >
+            <span class="tiny label">Week</span>
             {{ weekNumber }}
           </a>
         </div>
@@ -23,11 +23,20 @@
       <div ng-show="ajaxing">
         loading...
       </div>
-      <div ng-hide="ajaxing || !lastUpdatedAgo">
+      <div ng-show="blocked">
+        hold yer horses there cowboy (1 per {{ settings.refreshRate / 1000 }}sec)
+      </div>
+      <div ng-hide="blocked || ajaxing || !lastUpdatedAgo">
         <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
       </div>
     </div>
     <ion-list class="scoreboards">
+      <div class="loading-page-content" ng-show="boxScores | none">
+        <h3>Loading...</h3>
+        <p>
+          this can take a little while the first time the page loads
+        </p>
+      </div>
       <div class="item" ng-repeat="boxScore in boxScores" ui-sref="app.game({ leagueId: leagueId, week: boxScore.week, gameId: boxScore.gameId })">
         <div class="scoreboard">
           <div class="row row-middle">

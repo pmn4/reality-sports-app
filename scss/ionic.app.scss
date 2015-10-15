@@ -23,6 +23,40 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "../www/lib/ionic/scss/ionic";
 
+@mixin keyframes($name) {
+	@-webkit-keyframes #{$name} {
+		@content;
+	}
+	@-moz-keyframes #{$name} {
+		@content;
+	}
+	@-ms-keyframes #{$name} {
+		@content;
+	}
+	@keyframes #{$name} {
+		@content;
+	}
+}
+
+@include keyframes(rainbow-border-color) {
+	0%   { border-color: hsl(  0, 100%, 50%); }
+	33%  { border-color: hsl(120, 100%, 50%); }
+	67%  { border-color: hsl(240, 100%, 50%); }
+	100% { border-color: hsl(360, 100%, 50%); }
+}
+
+.action-indicator-bar {
+	border-bottom: 1px solid transparent;
+
+	$duration: 4s;
+	$initial-color: hsl(0, 100%, 50%);
+	.performing-action &,
+	&.performing-action {
+		border-bottom-color: $initial-color;
+		@include animation(rainbow-border-color $duration linear infinite);
+	}
+}
+
 .scoreboard {
 	font-size: ceil($font-size-base * 1.25); // just like an h4
 }
@@ -209,6 +243,33 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	}
 }
 
+.loading-page-content {
+	width: 60%;
+	margin: 20%;
+	padding: 20px;
+	text-align: center;
+
+	background: $bar-stable-bg;
+	color: $bar-stable-text;
+	border: 1px solid $bar-stable-border;
+}
+
+.week-picker {
+	.button {
+		position: relative;
+	}
+	.label.tiny {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		text-transform: uppercase;
+		font-size: 50%;
+		line-height: 2;
+		@include opacity(0.5);
+	}
+}
 .ad-banner {
 	position: relative;
 	height: 100%;

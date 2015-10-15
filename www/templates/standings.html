@@ -20,24 +20,32 @@
         </div>
       </div>
     </div>
-    <div ng-repeat="standing in standings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
-      <div class="row" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.max }">
-        <div class="col col-10 standing-rank text-right">
-          {{ $index + 1 }}
-        </div>
-        <div class="col col-50 team-name standing-team">
-          {{ standing.team.name }}
-        </div>
-        <div class="col col-25 standing-record text-center">
-          {{ standing | teamRecord }}
-        </div>
-        <div class="col col-15 standing-points text-right">
-          {{ standing.points }}
+    <div class="loading-page-content" ng-show="standings | none">
+      <h3>Loading...</h3>
+      <p>
+        this can take a little while the first time the page loads
+      </p>
+    </div>
+    <div ng-show="standings | any">
+      <div ng-repeat="standing in standings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
+        <div class="row" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.max }">
+          <div class="col col-10 standing-rank text-right">
+            {{ $index + 1 }}
+          </div>
+          <div class="col col-50 team-name standing-team">
+            {{ standing.team.name }}
+          </div>
+          <div class="col col-25 standing-record text-center">
+            {{ standing | teamRecord }}
+          </div>
+          <div class="col col-15 standing-points text-right">
+            {{ standing.points }}
+          </div>
         </div>
       </div>
+      <p class="last-updated">
+        <em>points leader is highlighted</em>
+      </p>
     </div>
-    <p class="last-updated">
-      <em>points leader is highlighted</em>
-    </p>
   </ion-content>
 </ion-view>

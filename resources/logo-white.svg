@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="147.9304"
+   height="148.02115"
+   viewBox="0 0 147.9304 148.02114"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="logo-white.svg"
+   inkscape:export-filename="/Users/pmn/code/personal/reality-sports-app/resources/icon-white-75x75.png"
+   inkscape:export-xdpi="45.629559"
+   inkscape:export-ydpi="45.629559">
+  <defs
+     id="defs4">
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect7684"
+       is_visible="true"
+       pattern="m 0,348.70079 c 0,-2.76 2.24,-5 5,-5 2.76,0 5,2.24 5,5 0,2.76 -2.24,5 -5,5 -2.76,0 -5,-2.24 -5,-5 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#808080"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.28"
+     inkscape:cx="82.111575"
+     inkscape:cy="39.006201"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1280"
+     inkscape:window-height="751"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-26.03478,-878.35173)">
+    <g
+       id="g7711"
+       transform="translate(-27.768981,11.517762)">
+      <path
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.49999976;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 123.41016 0 C 100.47891 8.8309187e-06 65.624581 3.3408692 39.904297 22.007812 L 47.166016 35.869141 L 62.683594 33.490234 L 51.712891 44.716797 L 58.769531 58.740234 L 44.701172 51.775391 L 35.671875 60.714844 L 33.544922 62.820312 L 35.822266 47.287109 L 21.869141 40.089844 L 37.34375 37.455078 L 39.869141 22.035156 C 36.47729 24.499557 33.237943 27.218173 30.212891 30.244141 C -9.6265584 70.096311 1.4003906 146.59766 1.4003906 146.59766 C 1.4003906 146.59766 10.648702 148.02148 24.521484 148.02148 C 50.488481 148.02148 91.75175 143.75228 117.71875 117.77734 C 157.55749 77.924464 146.53125 1.4238281 146.53125 1.4238281 C 146.53125 1.4238281 137.28294 1e-05 123.41016 0 z M 95.664062 7.1171875 L 140.83984 52.306641 L 139.77148 58.710938 L 89.259766 8.1835938 L 95.664062 7.1171875 z M 40.886719 28.193359 L 39.089844 39.1875 L 28.107422 41.056641 L 38.007812 46.164062 L 36.390625 57.189453 L 44.308594 49.349609 L 54.292969 54.292969 L 49.285156 44.341797 L 57.070312 36.375 L 46.058594 38.060547 L 40.886719 28.193359 z M 94.240234 29.888672 L 118.07422 53.728516 L 114.16016 57.998047 L 103.8457 47.679688 L 96.019531 55.863281 L 106.33398 65.826172 L 102.06641 70.097656 L 92.105469 59.777344 L 83.925781 67.962891 L 94.240234 77.925781 L 89.972656 82.195312 L 80.011719 71.876953 L 71.832031 80.060547 L 82.146484 90.023438 L 77.878906 94.292969 L 67.917969 83.974609 L 59.736328 92.158203 L 70.052734 102.12109 L 65.785156 106.39062 L 55.824219 96.072266 L 47.642578 103.90039 L 57.958984 114.21875 L 53.689453 118.13281 L 29.857422 94.292969 L 33.769531 90.023438 L 44.085938 100.3418 L 51.912109 92.158203 L 41.595703 82.195312 L 45.865234 77.925781 L 55.824219 88.244141 L 64.005859 80.060547 L 53.689453 70.097656 L 57.958984 65.828125 L 67.917969 76.146484 L 76.099609 67.962891 L 65.783203 58 L 70.052734 53.728516 L 80.011719 64.048828 L 88.193359 55.863281 L 77.878906 45.900391 L 82.146484 41.630859 L 92.107422 51.949219 L 100.28711 44.121094 L 89.972656 33.802734 L 94.240234 29.888672 z M 8.1582031 89.310547 L 58.669922 139.83789 L 52.267578 140.9043 L 7.0917969 95.714844 L 8.1582031 89.310547 z "
+         transform="translate(53.803761,866.83396)"
+         id="path7682" />
+      <path
+         style="opacity:1;fill:#eb302e;fill-opacity:1;stroke:none;stroke-width:1.99999976;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 40.886719 28.193359 L 39.089844 39.1875 L 28.107422 41.056641 L 38.007812 46.164062 L 36.390625 57.189453 L 44.308594 49.349609 L 54.292969 54.292969 L 49.285156 44.341797 L 57.070312 36.375 L 46.058594 38.060547 L 40.886719 28.193359 z "
+         transform="translate(53.803761,866.83396)"
+         id="path7709" />
+    </g>
+  </g>
+</svg>

@@ -1,26 +1,14 @@
 angular.module("starter.services", [])
-.service("LeagueService", function ($http, $q, /* $localStorage, */ AppSettings, AuthService) {
-	var STORE_KEY_CURRENT_LEAGUE, STORE_KEY_LEAGUES;
-
-	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.LeagueService>currentLeagueId";
-	STORE_KEY_LEAGUES = "realitySportsApp.LeagueService>leagues";
+.service("LeagueService", function ($http, $q, AppSettings, AppStateService, CacheService, AuthTokenStore) {
+	var previousSession;
 
 	return {
 		list: list,
-		set: set,
-		currentLeagueId: currentLeagueId
+		set: set
 	};
 
-	function leagues(leaguesData) {
-		if (leaguesData) {
-			localStorage.setItem(STORE_KEY_LEAGUES, JSON.stringify(leaguesData));
-		}
-
-		return JSON.parse(localStorage.getItem(STORE_KEY_LEAGUES) || "[]");
-	}
-
 	function list (force) {
-		var leaguesData = leagues(), deferred;
+		var leaguesData = CacheService.leagues(), deferred;
 
 		if (!force && leaguesData && leaguesData.leagues && leaguesData.leagues.length) {
 			return $q.resolve(leaguesData);
@@ -30,13 +18,9 @@ angular.module("starter.services", [])
 
 		$http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues",
-			headers: {
-				"X-RSO-Auth-Token": AuthService.token(),
-				"X-RSO-Session": AuthService.session()
-			}
+			url: AppSettings.apiHost + "/v1/leagues"
 		}).then(function (response) {
-			deferred.resolve(leagues({
+			deferred.resolve(CacheService.leagues({
 				lastUpdated: new Date(),
 				leagues: response.data
 			}));
@@ -49,47 +33,25 @@ angular.module("starter.services", [])
 
 	function set (leagueId, force) {
 		// this call is expensive, so 200 OK! if it's a repeat request
-		if (leagueId === currentLeagueId() && !force) {
+		if (leagueId === AppStateService.currentLeagueId() && previousSession === AuthTokenStore.session() && !force) {
 			return $q.resolve();
 		}
 
 		return $http({
 			method: "PUT",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId,
-			headers: {
-				"X-RSO-Auth-Token": AuthService.token(),
-				"X-RSO-Session": AuthService.session()
-			}
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId
 		}).then(function (response) {
-			currentLeagueId(leagueId);
-
-			AuthService.token(response.data.token);
-			AuthService.session(response.data.session);
+			AppStateService.currentLeagueId(leagueId);
+			previousSession = AuthTokenStore.session();
 		});
-	}
-
-	function currentLeagueId (leagueId) {
-		if (leagueId) {
-			localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, leagueId);
-		}
-
-		return localStorage.getItem(STORE_KEY_CURRENT_LEAGUE);
 	}
 })
 
-.service("AuthService", function (/* $localStorage, */ $http, AppSettings) {
-	var STORE_KEY_TOKEN, STORE_KEY_SESSION, STORE_KEY_CURRENT_EMAIL;
+.factory("AuthTokenStore", function (/* $localStorage */) {
+	var STORE_KEY_TOKEN, STORE_KEY_SESSION;
 
 	STORE_KEY_TOKEN = "realitySportsApp.AuthService>token";
 	STORE_KEY_SESSION = "realitySportsApp.AuthService>session";
-	STORE_KEY_CURRENT_EMAIL = "realitySportsApp.AuthService>currentEmail";
-
-	return {
-		token: token,
-		session: session,
-		login: login,
-		currentEmail: currentEmail
-	};
 
 	function token (t) {
 		if (t) {
@@ -97,6 +59,10 @@ angular.module("starter.services", [])
 		}
 
 		return localStorage.getItem(STORE_KEY_TOKEN);
+	}
+
+	function clearToken () {
+		localStorage.setItem(STORE_KEY_TOKEN, "");
 	}
 
 	function session (s) {
@@ -107,52 +73,85 @@ angular.module("starter.services", [])
 		return localStorage.getItem(STORE_KEY_SESSION);
 	}
 
-	function currentEmail (e) {
-		if (e) {
-			localStorage.setItem(STORE_KEY_CURRENT_EMAIL, e);
-		}
+	function clearSession () {
+		localStorage.setItem(STORE_KEY_SESSION, "");
+	}
 
-		return localStorage.getItem(STORE_KEY_CURRENT_EMAIL);
+	return {
+		token: token,
+		session: session,
+		clearToken: clearToken,
+		clearSession: clearSession
+	};
+})
+
+.service("AuthService", function ($http, AppSettings, AuthTokenStore) {
+	return {
+		refreshSession: refreshSession,
+		login: login
+	};
+
+	function refreshSession () {
+		AuthTokenStore.clearSession();
+
+		return $http({
+			method: "GET",
+			url: AppSettings.apiHost + "/v1/tokens"
+		});
 	}
 
 	function login (data) {
 		return $http({
 			method: "POST",
 			url: AppSettings.apiHost + "/v1/tokens",
-			data: data,
-			headers: {
-				"X-RSO-Session": session()
-			}
-		}).then(function (response) {
-			token(response.data.token);
-			session(response.data.session);
+			data: data
 		});
 	}
 })
 
-.service("ScoreboardService", function ($http, AppSettings, AuthService) {
-	var STORE_KEY_CURRENT_WEEK;
+.service("CacheService", function (/* $localStorage */) {
+	var STORE_KEY_LEAGUES;
 
-	STORE_KEY_CURRENT_WEEK = "realitySportsApp.ScoreboardService>currentWeek";
+	STORE_KEY_LEAGUES = "realitySportsApp.Cache>leagues";
 
 	return {
-		fetch: fetch,
-		currentWeek: currentWeek
+		leagues: leagues
 	};
 
-	function fetch (leagueId, week, gameId) {
-		if (!week) {
-			week = currentWeek() || "";
+	function leagues(leaguesData) {
+		if (leaguesData) {
+			localStorage.setItem(STORE_KEY_LEAGUES, JSON.stringify(leaguesData));
 		}
 
-		return $http({
-			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week,
-			headers: {
-				"X-RSO-Auth-Token": AuthService.token(),
-				"X-RSO-Session": AuthService.session()
-			}
-		});
+		return JSON.parse(localStorage.getItem(STORE_KEY_LEAGUES) || "[]");
+	}
+})
+
+.service("AppStateService", function () {
+	var STORE_KEY_CURRENT_LEAGUE, STORE_KEY_LEAGUES, STORE_KEY_CURRENT_WEEK, STORE_KEY_CURRENT_EMAIL;
+
+	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.AppState>currentLeagueId";
+	STORE_KEY_LEAGUES = "realitySportsApp.AppState>leagues";
+	STORE_KEY_CURRENT_WEEK = "realitySportsApp.AppState>currentWeek";
+	STORE_KEY_CURRENT_EMAIL = "realitySportsApp.AppState>currentEmail";
+
+	return {
+		currentLeagueId: currentLeagueId,
+		clearCurrentLeagueId: clearCurrentLeagueId,
+		currentWeek: currentWeek,
+		currentEmail: currentEmail
+	};
+
+	function currentLeagueId (leagueId) {
+		if (leagueId) {
+			localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, leagueId);
+		}
+
+		return localStorage.getItem(STORE_KEY_CURRENT_LEAGUE);
+	}
+
+	function clearCurrentLeagueId() {
+		localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, "");
 	}
 
 	function currentWeek (leagueId) {
@@ -162,9 +161,34 @@ angular.module("starter.services", [])
 
 		return localStorage.getItem(STORE_KEY_CURRENT_WEEK);
 	}
+
+	function currentEmail (e) {
+		if (e) {
+			localStorage.setItem(STORE_KEY_CURRENT_EMAIL, e);
+		}
+
+		return localStorage.getItem(STORE_KEY_CURRENT_EMAIL);
+	}
 })
 
-.service("StandingsService", function ($http, AppSettings, AuthService) {
+.service("ScoreboardService", function ($http, AppSettings, AppStateService) {
+	return {
+		fetch: fetch
+	};
+
+	function fetch (leagueId, week, gameId) {
+		if (!week) {
+			week = AppStateService.currentWeek() || "";
+		}
+
+		return $http({
+			method: "GET",
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week
+		});
+	}
+})
+
+.service("StandingsService", function ($http, AppSettings) {
 	return {
 		fetch: fetch
 	};
@@ -172,16 +196,12 @@ angular.module("starter.services", [])
 	function fetch (leagueId) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings",
-			headers: {
-				"X-RSO-Auth-Token": AuthService.token(),
-				"X-RSO-Session": AuthService.session()
-			}
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings"
 		});
 	}
 })
 
-.service("GameService", function ($http, AppSettings, AuthService) {
+.service("GameService", function ($http, AppSettings) {
 	return {
 		fetch: fetch
 	};
@@ -189,11 +209,7 @@ angular.module("starter.services", [])
 	function fetch (leagueId, week, gameId) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId,
-			headers: {
-				"X-RSO-Auth-Token": AuthService.token(),
-				"X-RSO-Session": AuthService.session()
-			}
+			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
 		});
 	}
 })

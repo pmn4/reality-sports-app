@@ -37,7 +37,9 @@ angular.module('starter', [
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
+  $httpProvider.interceptors.push("authHeaderTokenInterceptor");
+
   $stateProvider
 
     .state('app', {
@@ -207,6 +209,16 @@ angular.module('starter', [
       }
     })
 
+    .state("app.logout", {
+      url: "/logout",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "LogoutController"
+        }
+      }
+    })
+
     .state("app.updates", {
       url: "/updates",
       views: {
@@ -237,7 +249,58 @@ angular.module('starter', [
 .constant("AppSettings", {
   // apiHost: "http://localhost:1212",
   apiHost: "http://reality-sports-app.herokuapp.com",
-  refreshRate: 15000, // 15 seconds
+  refreshRate: 20000, // 20 seconds
   highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
+})
+
+.factory("authHeaderTokenInterceptor", function (AppSettings, AuthTokenStore, AppStateService) {
+  return {
+    request: function (config) {
+      var token = AuthTokenStore.token(), session = AuthTokenStore.session();
+
+      if (!token && !session) { return config; }
+      if (!config.url || !config.url.startsWith(AppSettings.apiHost)) {
+        return config;
+      }
+
+      config.headers = config.headers || {};
+      // add token to request headers
+
+      if (token) {
+        config.headers["X-RSO-Auth-Token"] = token;
+      }
+      if (session) {
+        config.headers["X-RSO-Session"] = session;
+      }
+
+      return config;
+    },
+
+    response: function (response) {
+      var token, session;
+
+      if (!response && !response.headers) { return response; }
+      if (!response.config.url || !response.config.url.startsWith(AppSettings.apiHost)) {
+        return response;
+      }
+
+      if (response.status === 401) {
+        AuthTokenStore.clearSession(session);
+        AppStateService.clearCurrentLeagueId();
+      }
+
+      token = response.headers("X-RSO-Auth-Token");
+      session = response.headers("X-RSO-Session");
+
+      if (token) {
+        AuthTokenStore.token(token);
+      }
+      if (session) {
+        AuthTokenStore.session(session);
+      }
+
+      return response;
+    }
+  };
 })
 ;

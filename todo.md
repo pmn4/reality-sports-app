@@ -1,6 +1,7 @@
 BUGS:
 
 TODO:
+- Error handling (no network, server error vs proxy errors)
 - on login, leagues not refreshing
 - send to login on 401
 - do something with device info
