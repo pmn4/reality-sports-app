@@ -259,7 +259,7 @@ angular.module('starter', [
       var token = AuthTokenStore.token(), session = AuthTokenStore.session();
 
       if (!token && !session) { return config; }
-      if (!config.url || !config.url.startsWith(AppSettings.apiHost)) {
+      if (!config.url || config.url.indexOf(AppSettings.apiHost) !== 0) {
         return config;
       }
 
@@ -280,7 +280,7 @@ angular.module('starter', [
       var token, session;
 
       if (!response && !response.headers) { return response; }
-      if (!response.config.url || !response.config.url.startsWith(AppSettings.apiHost)) {
+      if (!response.config.url || response.config.url.indexOf(AppSettings.apiHost) !== 0) {
         return response;
       }
 
