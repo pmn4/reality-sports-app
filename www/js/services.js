@@ -3,32 +3,15 @@ angular.module("starter.services", [])
 	var previousSession;
 
 	return {
-		list: list,
-		set: set
+		list: list
 	};
 
 	function list (force) {
-		var leaguesData = CacheService.leagues(), deferred;
-
-		if (!force && leaguesData && leaguesData.leagues && leaguesData.leagues.length) {
-			return $q.resolve(leaguesData);
-		}
-
-		deferred = $q.defer();
-
-		$http({
+		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues"
-		}).then(function (response) {
-			deferred.resolve(CacheService.leagues({
-				lastUpdated: new Date(),
-				leagues: response.data
-			}));
-		}, function () {
-			deferred.reject.apply(deferred, arguments);
+			// url: AppSettings.apiHost + "/v1/leagues"
+			url: AppSettings.apiHost + "/v2/leagues"
 		});
-
-		return deferred.promise;
 	}
 
 	function set (leagueId, force) {
@@ -103,7 +86,8 @@ angular.module("starter.services", [])
 	function login (data) {
 		return $http({
 			method: "POST",
-			url: AppSettings.apiHost + "/v1/tokens",
+			// url: AppSettings.apiHost + "/v1/tokens",
+			url: AppSettings.apiHost + "/v2/tokens",
 			data: data
 		});
 	}
@@ -183,7 +167,8 @@ angular.module("starter.services", [])
 
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week
+			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/scoreboards/" + week
 		});
 	}
 })
@@ -209,7 +194,8 @@ angular.module("starter.services", [])
 	function fetch (leagueId, week, gameId) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
+			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
 		});
 	}
 })

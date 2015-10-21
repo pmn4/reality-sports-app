@@ -1,16 +1,4 @@
 var Mixins = {
-  setLeague: function ($scope, LeagueService, force) {
-    return function () {
-      $scope.ajaxing = $scope.indicateAjaxing(true);
-      LeagueService.set($scope.leagueId, force)
-        .then(function (_response) {
-          $scope.refresh();
-        })
-        .finally(function () {
-          $scope.ajaxing = $scope.indicateAjaxing(false);
-        });
-    };
-  },
   setLastUpdated: function ($scope) {
     return function (date) {
       if (date) {
@@ -122,22 +110,14 @@ angular.module('starter.controllers', [])
 
 .controller("EntryController", function ($scope, $state, AuthService, AuthTokenStore, AppStateService) {
   $scope.$on("$ionicView.enter", function () {
+    // ok to remove?
     AppStateService.clearCurrentLeagueId();
 
-    $scope.ajaxing = $scope.indicateAjaxing(true);
-    AuthService.refreshSession()
-      .then(function () {
-        if (AuthTokenStore.token()) {
-          $state.go("app.leagues");
-        } else {
-          $state.go("app.login");
-        }
-      }, function () {
-        $state.go("app.login");
-      })
-      .finally(function () {
-        $scope.ajaxing = $scope.indicateAjaxing(false);
-      });
+    if (AuthTokenStore.token()) {
+      $state.go("app.leagues");
+    } else {
+      $state.go("app.login");
+    }
   });
 })
 
@@ -162,20 +142,26 @@ angular.module('starter.controllers', [])
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = function (force) {
+    var fnError = function (message) {
+      // @todo: TOAST something went wrong... retrying
+      console.log(message);
+    };
     $scope.ajaxing = $scope.indicateAjaxing(true);
     LeagueService.list(force)
-      .then(function (data) {
-        $scope.leagues = data.leagues;
-        $scope.setLastUpdated(data.lastUpdated);
+      .then(function (response) {
+        $scope.leagues = response.data;
+        $scope.setLastUpdated(new Date());
 
+        if (!$scope.leagues || !$scope.leagues.length) {
+          return fnError('No leagues found');
+        }
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
         $state.go("app.scoreboards", {
           leagueId: $scope.leagues[0].leagueId
         });
       }, function (response) {
-        // @todo: TOAST something went wrong... retrying
-        $state.go("app.entry");
+        fnError(response);
       }).finally(function () {
         $scope.ajaxing = $scope.indicateAjaxing(false);
 
@@ -187,11 +173,11 @@ angular.module('starter.controllers', [])
   $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
-    if (!$scope.leagues || !$scope.leagues.length) {
-      $scope.refresh();
-    }
-
     $scope.setLastUpdated();
+
+    if ($scope.leagues && $scope.leagues.length || $scope.ajaxing) { return; }
+
+    $scope.refresh();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -201,13 +187,10 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("LeagueController", function ($scope, $state, $stateParams, LeagueService, AppStateService) {
-  $scope.setLeague = Mixins.setLeague($scope, LeagueService, true);
-
+.controller("LeagueController", function ($scope, $state, $stateParams, AppStateService) {
   $scope.$on("$ionicView.enter", function () {
     if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
       $scope.leagueId = $stateParams.leagueId;
-      $scope.setLeague();
     } else {
       $scope.leagueId = AppStateService.currentLeagueId();
     }
@@ -222,12 +205,11 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, ScoreboardService, AppStateService) {
+.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week || AppStateService.currentWeek();
   $scope.boxScores = [];
 
-  $scope.setLeague = Mixins.setLeague($scope, LeagueService);
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = Mixins.throttle($scope, function () {
@@ -249,16 +231,14 @@ angular.module('starter.controllers', [])
      });
   }, AppSettings.refreshRate);
 
-  $scope.setLeague();
+  $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
 
-    if ($scope.boxScores && $scope.boxScores.length) { return; }
+    if ($scope.boxScores && $scope.boxScores.length || $scope.ajaxing) { return; }
 
-    // this shouldn't often happen, but sometimes we re-load a view
-    // which failed to refresh the first time.
-    $scope.setLeague();
+    $scope.refresh();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -268,16 +248,15 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, LeagueService, StandingsService) {
+.controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, StandingsService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.standings = [];
 
-  $scope.setLeague = Mixins.setLeague($scope, LeagueService);
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   function summarizeStandings (standings) {
     return {
-      max: _.chain(standings).pluck("points").max().value()
+      max: _.chain(standings).pluck("points").max().value() // @todo: parseInt. need .value()?
     };
   }
 
@@ -299,16 +278,16 @@ angular.module('starter.controllers', [])
      });
   }, AppSettings.refreshRate);
 
-  $scope.setLeague();
+  $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
 
-    if ($scope.standings && $scope.standings.length) { return; }
+    if ($scope.standings && $scope.standings.length || $scope.ajaxing) { return; }
 
     // this shouldn't often happen, but sometimes we re-load a view
     // which failed to refresh the first time.
-    $scope.setLeague();
+    $scope.refresh();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -328,7 +307,7 @@ angular.module('starter.controllers', [])
 
   function reformatPlayerData(homePlayers, awayPlayers) {
     // underscorejs, get in here!
-    var i, p, data = {};
+    var i, p, pos, data = {};
 
     for (i = 0; i < homePlayers.length; i++) {
       p = homePlayers[i];
@@ -337,14 +316,16 @@ angular.module('starter.controllers', [])
         data[p.status] = {};
       }
 
-      if (!data[p.status][p.position]) {
-        data[p.status][p.position] = [];
-        data[p.status][p.position].homeCount = 0;
-        data[p.status][p.position].awayCount = 0;
+      pos = p.player.position;
+
+      if (!data[p.status][pos]) {
+        data[p.status][pos] = [];
+        data[p.status][pos].homeCount = 0;
+        data[p.status][pos].awayCount = 0;
       }
 
-      data[p.status][p.position].push({ home: p });
-      data[p.status][p.position].homeCount++;
+      data[p.status][pos].push({ home: p });
+      data[p.status][pos].homeCount++;
     }
 
     for (i = 0; i < awayPlayers.length; i++) {
@@ -354,38 +335,56 @@ angular.module('starter.controllers', [])
         data[p.status] = {};
       }
 
-      if (!data[p.status][p.position]) {
-        data[p.status][p.position] = [];
-        data[p.status][p.position].homeCount = 0;
-        data[p.status][p.position].awayCount = 0;
+      pos = p.player.position;
+
+      if (!data[p.status][pos]) {
+        data[p.status][pos] = [];
+        data[p.status][pos].homeCount = 0;
+        data[p.status][pos].awayCount = 0;
       }
 
-      if (data[p.status][p.position].awayCount < data[p.status][p.position].homeCount) {
-        data[p.status][p.position][data[p.status][p.position].awayCount].away = p;
+      if (data[p.status][pos].awayCount < data[p.status][pos].homeCount) {
+        data[p.status][pos][data[p.status][pos].awayCount].away = p;
       } else {
-        data[p.status][p.position].push({ away: p });
+        data[p.status][pos].push({ away: p });
       }
-      data[p.status][p.position].awayCount++;
+      data[p.status][pos].awayCount++;
     }
 
     return data;
   }
 
-  $scope.playerInfo = function (player) {
+  $scope.playerInfo = function (playerData) {
     $ionicActionSheet.show({
       buttons: [
         { text: 'More Info' },
         { text: 'Twitter Search' }
       ],
-      titleText: '<h3>' + player.name + '</h3><p>' + player.statLine + '</p>',
+      titleText: [
+        "<h3>",
+        $filter("playerFullName")(playerData.player),
+        // " <span class='player-team'>(",
+        // playerData.player.position,
+        // " ",
+        // playerData.player.nflTeam,
+        // ")</span>",
+        "</h3><p>",
+        $filter("nflGameSummary")(playerData.game),
+        "</p><p>",
+        playerData.statLine,
+        "</p>"
+      ].join(""),
       cancelText: 'Close',
       buttonClicked: function (index) {
         switch (index) {
           case 0:
-            $state.go("app.player", { leagueId: $scope.leagueId, playerId: $scope.playerId })
+            $state.go("app.player", {
+              leagueId: $scope.leagueId,
+              playerId: $scope.playerId
+            });
             break;
           case 1:
-            $scope.launch("twitter://search?query=" + player.name);
+            $scope.launch("twitter://search?query=" + $filter("playerFullName")(playerData));
             break;
         }
         return true;
@@ -422,6 +421,12 @@ angular.module('starter.controllers', [])
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
+
+    if ($scope.homeTeam && $scope.awayTeam || $scope.ajaxing) { return; }
+
+    // this shouldn't often happen, but sometimes we re-load a view
+    // which failed to refresh the first time.
+    $scope.refresh();
   });
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -483,11 +488,115 @@ angular.module('starter.controllers', [])
   };
 })
 
+.filter("nflGameYetToStart", function () {
+  var FUTURE_GAME_RE = /^\w+ \d+ \d+:\d+$/i;
+  return function (game) {
+    if (!game) { return ""; }
+
+    return FUTURE_GAME_RE.test(game.gameStatus);
+  };
+})
+
 .filter("teamRecord", function () {
   return function (standing) {
     if (!standing) { return ""; }
 
     return [standing.wins, standing.losses, standing.ties].join("-");
+  };
+})
+
+.filter("toFixed", function () {
+  return function (total, digits) {
+    if (total == null) { return; }
+
+    return total.toFixed(digits);
+  };
+})
+
+.filter("playerFullName", function () {
+  return function (player) {
+    if (!player) { return; }
+
+    return [player.firstName, player.lastName].join(" ");
+  };
+})
+
+.filter("playerDisplayName", function () {
+  return function (player) {
+    var str;
+
+    if (!player) { return; }
+
+    if (player.position === "DF") { return player.firstName; }
+
+    if (player.firstName) {
+      if (player.firstName[1] === ".") {
+        str = player.firstName;
+      } else {
+        str = player.firstName[0] + ".";
+      }
+    }
+
+    return str + " " + player.lastName;
+  };
+})
+
+.filter("nflTeam", function () {
+  return function (player) {
+    if (!player) { return; }
+
+    return player.nflTeam;
+  };
+})
+
+.filter("isGameFinal", function () {
+  return function (game) {
+    if (!game) { return; }
+
+    return game.gameStatus === "Final";
+  };
+})
+
+.filter("isByeWeek", function () {
+  return function (game) {
+    if (!game) { return; }
+
+    return game.opponent === "BYE";
+  };
+})
+
+.filter("nflGameSummary", function ($filter) {
+  return function (game) {
+    var tokens = [];
+    if (!game) { return; }
+
+    if (game.opponent === "BYE") {
+      return game.opponent;
+    }
+
+    // {{ playerData.home.game.gameStatus.date | dowPlusTime }}
+    // {{ playerData.home.game.gameStatus }}
+    // {{ playerData.home.game.teamScore }}
+    // {{ playerData.home.game.team }}
+    // :
+    // {{ playerData.home.game.opponent }}
+    // {{ playerData.home.game.opponentScore }}
+    // {{ playerData.home.game.timeRemaining || playerData.home.game.gameStatus }}
+
+    if (game.timeRemaining) {
+      tokens.push(game.timeRemaining);
+    } else {
+      tokens.push($filter("dowPlusTime")(game.gameStatus));
+    }
+
+    if (!$filter("nflGameYetToStart")(game)) {
+      tokens.push(game.teamScore);
+      tokens.push("-");
+      tokens.push(game.opponentScore);
+    }
+    tokens.push(game.opponent);
+
+    return tokens.join(" ");
   };
 })
 

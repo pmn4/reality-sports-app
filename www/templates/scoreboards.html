@@ -41,18 +41,18 @@
         <div class="scoreboard">
           <div class="row row-middle">
             <div class="col col-75 team-name">
-              {{ boxScore.awayTeam.name }}
+              {{ boxScore.awayTeam.team.name }}
             </div>
             <div class="col col-25 number">
-              {{ boxScore.awayTeam.summary.totalPoints }}
+              {{ boxScore.awayTeam.summary.totalPoints | toFixed:2 }}
             </div>
           </div>
           <div class="row">
             <div class="col col-75 team-name">
-              {{ boxScore.homeTeam.name }}
+              {{ boxScore.homeTeam.team.name }}
             </div>
             <div class="col col-25 number">
-              {{ boxScore.homeTeam.summary.totalPoints }}
+              {{ boxScore.homeTeam.summary.totalPoints | toFixed:2 }}
             </div>
           </div>
         </div>

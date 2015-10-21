@@ -244,15 +244,6 @@ angular.module('starter', [
   $urlRouterProvider.otherwise("/app/entry");
 })
 
-.constant("_", window._)
-
-.constant("AppSettings", {
-  // apiHost: "http://localhost:1212",
-  apiHost: "http://reality-sports-app.herokuapp.com",
-  refreshRate: 20000, // 20 seconds
-  highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
-})
-
 .factory("authHeaderTokenInterceptor", function (AppSettings, AuthTokenStore, AppStateService) {
   return {
     request: function (config) {
@@ -302,5 +293,14 @@ angular.module('starter', [
       return response;
     }
   };
+})
+
+.constant("_", window._)
+
+.constant("AppSettings", {
+  // apiHost: "http://localhost:1212",
+  apiHost: "http://reality-sports-app.herokuapp.com",
+  refreshRate: 20000, // 20 seconds
+  highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
 })
 ;

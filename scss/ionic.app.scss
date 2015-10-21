@@ -232,6 +232,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 			color: $positive;
 		}
 	}
+	.on-bye {
+		.player-points {
+			display: none;
+		}
+	}
 }
 
 .wide-as-needed {

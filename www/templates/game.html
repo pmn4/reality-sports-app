@@ -1,4 +1,4 @@
-<ion-view view-title="Game"> <!-- teams?  scores? -->
+<ion-view view-title="Week {{ week }}">
   <ion-nav-buttons side="left">
     <!-- copy/paste from menu -->
     <button class="button button-icon button-clear ion-navicon notifiable" menu-toggle="left" ng-class="{ notify: hasAppUpdate }">
@@ -15,7 +15,7 @@
     <div id="game-summary" class="row">
       <div class="col col-50 left-side">
         <h4 class="team-name one-liner">
-          {{ awayTeam.name }}
+          {{ awayTeam.team.name }}
         </h4>
         <div class="row scoring-summary">
           <div class="col-75 scoring-values">
@@ -24,11 +24,11 @@
                 ({{ awayTeam.summary.playerTimeRemaining }})
               </span>
               <span class="">
-                {{ awayTeam.summary.totalPoints }}
+                {{ awayTeam.summary.totalPoints | toFixed:2 }}
               </span>
             </div>
             <div class="scoring-projected">
-              {{ awayTeam.summary.projectedPoints }}
+              {{ awayTeam.summary.projectedPoints | toFixed:2 }}
             </div>
           </div>
           <div class="col-25 team-image">
@@ -38,7 +38,7 @@
       </div>
       <div class="col col-50 right-side">
         <h4 class="team-name one-liner">
-          {{ homeTeam.name }}
+          {{ homeTeam.team.name }}
         </h4>
         <div class="row scoring-summary">
           <div class="col-25 team-image">
@@ -47,14 +47,14 @@
           <div class="col-75 scoring-values">
             <div class="scoring-total title">
               <span class="">
-                {{ homeTeam.summary.totalPoints }}
+                {{ homeTeam.summary.totalPoints | toFixed:2 }}
               </span>
               <span class="remaining">
                 ({{ homeTeam.summary.playerTimeRemaining }})
               </span>
             </div>
             <div class="scoring-projected">
-              {{ homeTeam.summary.projectedPoints }}
+              {{ homeTeam.summary.projectedPoints | toFixed:2 }}
             </div>
           </div>
         </div>
@@ -76,25 +76,22 @@
         <div class="player-score" ng-repeat="(position, players) in positions">
           <div class="item" ng-repeat="playerData in players track by $index">
             <div class="row row-center player-comparison">
-              <div class="col col-player" ng-click="playerInfo(playerData.away)" highlighter="playerData.away.points" ng-class="{ 'yet-to-play': playerData.away.gameStatus.date, 'is-final': playerData.away.gameStatus.timeRemaining == 'Final' }">
+              <div class="col col-player" ng-click="playerInfo(playerData.away)" highlighter="playerData.away.points" ng-class="{ 'yet-to-play': (playerData.away.game | nflGameYetToStart), 'is-final': (playerData.away.game | isGameFinal), 'on-bye': (playerData.away.game | isByeWeek) }">
                 <div class="row">
                   <div class="col player-name one-liner">
-                    {{ playerData.away.name || '&nbsp;' }}
+                    {{ (playerData.away.player | playerDisplayName) || '&nbsp;' }}
                     <span class="player-team">
-                      {{ playerData.away.team }}
+                      {{ playerData.away.player | nflTeam }}
                     </span>
                   </div>
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-points player-points number positive">
-                    {{ playerData.away.points || '&nbsp;' }}
+                    {{ (playerData.away.points | toFixed:2) || '&nbsp;' }}
                   </div>
                   <div class="col col-name">
                     <div class="player-game-status one-liner dark">
-                      {{ playerData.away.gameStatus.date | dowPlusTime }}
-                      {{ playerData.away.gameStatus.opponent }}
-                      {{ playerData.away.gameStatus.score }}
-                      {{ playerData.away.gameStatus.timeRemaining }}
+                      {{ playerData.away.game | nflGameSummary }}
                     </div>
                   </div>
                 </div>
@@ -107,26 +104,23 @@
               <div class="col col-position player-position">
                 {{ position }}
               </div>
-              <div class="col col-player" ng-click="playerInfo(playerData.home)" highlighter="playerData.home.points" ng-class="{ 'yet-to-play': playerData.home.gameStatus.date, 'is-final': playerData.home.gameStatus.timeRemaining == 'Final' }">
+              <div class="col col-player" ng-click="playerInfo(playerData.home)" highlighter="playerData.home.points" ng-class="{ 'yet-to-play': (playerData.home.game | nflGameYetToStart), 'is-final': (playerData.home.game | isGameFinal), 'on-bye': (playerData.home.game | isByeWeek) }">
                 <div class="row">
                   <div class="col player-name one-liner">
-                    {{ playerData.home.name }}
+                    {{ (playerData.home.player | playerDisplayName) || '&nbsp;' }}
                     <span class="player-team">
-                      {{ playerData.home.team }}
+                      {{ playerData.home.player | nflTeam }}
                     </span>
                   </div>
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-name">
                     <div class="player-game-status one-liner dark">
-                      {{ playerData.home.gameStatus.date | dowPlusTime }}
-                      {{ playerData.home.gameStatus.opponent }}
-                      {{ playerData.home.gameStatus.score }}
-                      {{ playerData.home.gameStatus.timeRemaining }}
+                      {{ playerData.home.game | nflGameSummary }}
                     </div>
                   </div>
                   <div class="col col-points player-points number">
-                    {{ playerData.home.points || '&nbsp;' }}
+                    {{ (playerData.home.points | toFixed:2) || '&nbsp;' }}
                   </div>
                 </div>
                 <div class="row">
