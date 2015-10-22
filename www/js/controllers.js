@@ -60,9 +60,12 @@ angular.module('starter.controllers', [])
   };
 
   $scope.retryOnRsoError = function (response) {
-    // @todo: TOAST something went wrong... retrying
-    // @todo: only 401?
-    $state.go("app.entry");
+    if (response.status === 401) {
+      $state.go("app.logout");
+    } else {
+      // @todo: TOAST something went wrong... retrying
+
+    }
   };
 
   $scope.loggedIn = function (loggedIn) {
@@ -142,10 +145,6 @@ angular.module('starter.controllers', [])
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = function (force) {
-    var fnError = function (message) {
-      // @todo: TOAST something went wrong... retrying
-      console.log(message);
-    };
     $scope.ajaxing = $scope.indicateAjaxing(true);
     LeagueService.list(force)
       .then(function (response) {
@@ -153,7 +152,10 @@ angular.module('starter.controllers', [])
         $scope.setLastUpdated(new Date());
 
         if (!$scope.leagues || !$scope.leagues.length) {
-          return fnError('No leagues found');
+          return $scope.retryOnRsoError({
+            status: 404,
+            data: 'No leagues found'
+          });
         }
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
@@ -161,7 +163,7 @@ angular.module('starter.controllers', [])
           leagueId: $scope.leagues[0].leagueId
         });
       }, function (response) {
-        fnError(response);
+        $scope.retryOnRsoError(response);
       }).finally(function () {
         $scope.ajaxing = $scope.indicateAjaxing(false);
 
