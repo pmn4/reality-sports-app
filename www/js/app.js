@@ -9,7 +9,8 @@ angular.module('starter', [
   'ionic.service.core','ionic.service.analytics',
   'ionic.service.deploy',
   'starter.controllers',
-  'starter.services'
+  'starter.services',
+  'ngCordova'
 ])
 
 .run(function ($rootScope, $ionicPlatform, $ionicAnalytics, $ionicDeploy) {

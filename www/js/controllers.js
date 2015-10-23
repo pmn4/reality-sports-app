@@ -26,7 +26,7 @@ var Mixins = {
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($rootScope, $scope, $state, AppSettings, AuthTokenStore) {
+.controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore) {
   $scope.settings = AppSettings;
 
   // With the new view caching in Ionic, Controllers are only called
@@ -63,8 +63,7 @@ angular.module('starter.controllers', [])
     if (response.status === 401) {
       $state.go("app.logout");
     } else {
-      // @todo: TOAST something went wrong... retrying
-
+      $cordovaToast.show(response.data || "Request failed", "short", "bottom");
     }
   };
 
@@ -74,7 +73,7 @@ angular.module('starter.controllers', [])
   $scope.loggedIn(!!AuthTokenStore.token());
 })
 
-.controller("LoginController", function ($scope, $state, AuthService, AppStateService) {
+.controller("LoginController", function ($scope, $state, $cordovaToast, AuthService, AppStateService) {
   // Form data for the login modal
   $scope.loginData = {
     username: AppStateService.currentEmail(),
@@ -92,8 +91,8 @@ angular.module('starter.controllers', [])
         $state.go("app.leagues");
       }, function (response) {
         $scope.loggedIn(false);
-        // $scope.errorMessage = response.data;
-        $scope.errorMessage = "Login Failed";
+        $scope.errorMessage = response.data || "Login Failed";
+        $cordovaToast.show(response.data || "Login Failed", "long", "bottom");
       })
       .finally(function () {
         $scope.ajaxing = $scope.indicateAjaxing(false);
@@ -481,8 +480,9 @@ angular.module('starter.controllers', [])
 })
 
 .filter("dowPlusTime", function () {
+  var DATE_STRING_RE = /^\w+ \d+ \d+:\d+$/i;
   return function (dateString) {
-    if (!dateString) { return ""; }
+    if (!DATE_STRING_RE.test(dateString)) { return dateString; }
 
     return moment(dateString)
       .year(new Date().getFullYear())
@@ -623,7 +623,7 @@ angular.module('starter.controllers', [])
     scope: {
       model: "=highlighter"
     },
-    link: function(scope, element) {
+    link: function (scope, element) {
       element.addClass("highlightable");
 
       scope.$watch("model", function (nv, ov) {
