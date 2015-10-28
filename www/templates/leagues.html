@@ -19,7 +19,7 @@
       <div class="item" ng-repeat="league in leagues" ui-sref="app.scoreboards({ leagueId: league.leagueId })">
         <div class="league">
           {{ league.name }}
-          ({{ league.teamName }})
+          ({{ league.team.name }})
         </div>
         <!-- <pre>{{ league | json }}</pre> -->
       </div>
