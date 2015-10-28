@@ -1,4 +1,54 @@
 angular.module("starter.services", [])
+
+.service("ImageCache", function (/* $localStorage, */ _) {
+	var STORE_KEY_TEAM_LOGOS;
+
+	STORE_KEY_TEAM_LOGOS = "realitySportsApp.ImageCache>logos";
+
+	function logosFromBoxScores(boxScores) {
+		var teamLogos;
+
+		teamLogos = _.reduce(boxScores, function (logos, boxScore) {
+			logos[boxScore.awayTeam.team.teamId] =
+				boxScore.awayTeam.imageUrl;
+
+			logos[boxScore.homeTeam.team.teamId] =
+				boxScore.homeTeam.imageUrl;
+
+			return logos;
+		}, {});
+
+		return logos(teamLogos);
+	}
+
+	function logos (l) {
+		if (l) {
+			localStorage.setItem(STORE_KEY_TEAM_LOGOS, JSON.stringify(l));
+		}
+
+		return JSON.parse(localStorage.getItem(STORE_KEY_TEAM_LOGOS) || "[]");
+	}
+
+	function teamLogo(team) {
+		var teamLogos = logos();
+
+		if (!team || !teamLogos) { return ""; }
+
+		return teamLogos[team.teamId];
+	}
+
+	function clearLogos () {
+		localStorage.setItem(STORE_KEY_TEAM_LOGOS, "");
+	}
+
+	return {
+		logos: logos,
+		clearLogos: clearLogos,
+		logosFromBoxScores: logosFromBoxScores,
+		teamLogo: teamLogo
+	};
+})
+
 .service("LeagueService", function ($http, $q, AppSettings, AppStateService, CacheService, AuthTokenStore) {
 	var previousSession;
 

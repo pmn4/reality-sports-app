@@ -206,7 +206,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService) {
+.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week || AppStateService.currentWeek();
   $scope.boxScores = [];
@@ -222,6 +222,8 @@ angular.module('starter.controllers', [])
         $scope.setLastUpdated(new Date());
 
         AppStateService.currentWeek($scope.week);
+
+        ImageCache.logosFromBoxScores($scope.boxScores);
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
@@ -317,7 +319,7 @@ angular.module('starter.controllers', [])
         data[p.status] = {};
       }
 
-      pos = p.player.position;
+      pos = p.position;
 
       if (!data[p.status][pos]) {
         data[p.status][pos] = [];
@@ -336,7 +338,7 @@ angular.module('starter.controllers', [])
         data[p.status] = {};
       }
 
-      pos = p.player.position;
+      pos = p.position;
 
       if (!data[p.status][pos]) {
         data[p.status][pos] = [];
@@ -371,6 +373,8 @@ angular.module('starter.controllers', [])
         // ")</span>",
         "</h3><p>",
         $filter("nflGameSummary")(playerData.game),
+        "</p><p>Projected: ",
+        playerData.projectedPoints,
         "</p><p>",
         playerData.statLine,
         "</p>"
@@ -385,7 +389,7 @@ angular.module('starter.controllers', [])
             });
             break;
           case 1:
-            $scope.launch("twitter://search?query=" + $filter("playerFullName")(playerData));
+            $scope.launch("twitter://search?query=" + $filter("playerFullName")(playerData.player));
             break;
         }
         return true;
@@ -600,6 +604,14 @@ angular.module('starter.controllers', [])
 
     return tokens.join(" ");
   };
+})
+
+.filter("teamLogo", function (ImageCache) {
+  return function (team) {
+    if (!team) { return ""; }
+
+    return ImageCache.teamLogo(team);
+  }
 })
 
 .directive("toggleClass", function() {

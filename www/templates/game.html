@@ -27,12 +27,12 @@
                 {{ awayTeam.summary.totalPoints | toFixed:2 }}
               </span>
             </div>
-            <div class="scoring-projected">
+            <div class="projected-points">
               {{ awayTeam.summary.projectedPoints | toFixed:2 }}
             </div>
           </div>
           <div class="col-25 team-image">
-            <img ng-src="http://www.realitysportsonline.com/{{ awayTeam.imageUrl }}" width="90%" />
+            <img ng-src="{{ awayTeam.team | teamLogo }}" width="90%" />
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@
         </h4>
         <div class="row scoring-summary">
           <div class="col-25 team-image">
-            <img ng-src="http://www.realitysportsonline.com/{{ homeTeam.imageUrl }}" width="90%" />
+            <img ng-src="{{ homeTeam.team | teamLogo }}" width="90%" />
           </div>
           <div class="col-75 scoring-values">
             <div class="scoring-total title">
@@ -53,7 +53,7 @@
                 ({{ homeTeam.summary.playerTimeRemaining }})
               </span>
             </div>
-            <div class="scoring-projected">
+            <div class="projected-points">
               {{ homeTeam.summary.projectedPoints | toFixed:2 }}
             </div>
           </div>
@@ -70,7 +70,7 @@
     </div>
     <div id="player-scoring">
       <div class="list" ng-repeat="(status, positions) in playerScoringData">
-        <div class="item item-divider">
+        <div class="item item-divider text-center">
           {{ status }}
         </div>
         <div class="player-score" ng-repeat="(position, players) in positions">
@@ -87,7 +87,12 @@
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-points player-points number positive">
-                    {{ (playerData.away.points | toFixed:2) || '&nbsp;' }}
+                    <span class="total-points">
+                      {{ (playerData.away.points | toFixed:2) || '&nbsp;' }}
+                    </span>
+                    <span class="projected-points">
+                      {{ (playerData.away.projectedPoints | toFixed:2) || '&nbsp;' }}
+                    </span>
                   </div>
                   <div class="col col-name">
                     <div class="player-game-status one-liner dark">
@@ -120,7 +125,12 @@
                     </div>
                   </div>
                   <div class="col col-points player-points number">
-                    {{ (playerData.home.points | toFixed:2) || '&nbsp;' }}
+                    <span class="total-points">
+                      {{ (playerData.home.points | toFixed:2) || '&nbsp;' }}
+                    </span>
+                    <span class="projected-points">
+                      {{ (playerData.home.projectedPoints | toFixed:2) || '&nbsp;' }}
+                    </span>
                   </div>
                 </div>
                 <div class="row">

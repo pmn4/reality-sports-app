@@ -8,6 +8,7 @@
       </ion-nav-buttons>
     </ion-nav-bar>
     <ion-nav-view name="menuContent"></ion-nav-view>
+<!--
     <ion-footer-bar class="dark ad-banner-draft-kings">
       <a href="http://partners.draftkings.com/aff_c?offer_id=124&amp;aff_id=593752" target="_blank" class="block ad-banner">
         <img src="https://www.draftkings.com/_raptor/images/dk-logo-new.png" height="57" />
@@ -15,13 +16,15 @@
         tap here the next time you add to your Draft Kings account
       </a>
     </ion-footer-bar>
+-->
   </ion-side-menu-content>
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-stable">
       <h1 class="title">Menu</h1> <!-- current league name -->
     </ion-header-bar>
-    <ion-content has-footer="true">
+    <ion-content>
+    <!-- <ion-content has-footer="true"> -->
       <ion-list>
         <ion-item menu-close ui-sref="app.entry">
           <i class="icon ion-arrow-swap"></i>
@@ -53,10 +56,12 @@
           <i class="icon ion-ios-help-outline assertive"></i>
           Help
         </ion-item>
+<!--
         <ion-item menu-close ui-sref="app.support">
           <i class="icon ion-cash balanced"></i>
           Take my money, please
         </ion-item>
+-->
         <ion-item menu-close ui-sref="app.updates">
           <i class="icon ion-ios-cloud-download-outline positive"></i>
           <span ng-show="hasAppUpdate">
