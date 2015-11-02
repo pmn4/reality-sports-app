@@ -56,7 +56,7 @@ angular.module("starter.services", [])
 		list: list
 	};
 
-	function list (force) {
+	function list(force) {
 		return $http({
 			method: "GET",
 			// url: AppSettings.apiHost + "/v1/leagues"
@@ -64,7 +64,7 @@ angular.module("starter.services", [])
 		});
 	}
 
-	function set (leagueId, force) {
+	function set(leagueId, force) {
 		// this call is expensive, so 200 OK! if it's a repeat request
 		if (leagueId === AppStateService.currentLeagueId() && previousSession === AuthTokenStore.session() && !force) {
 			return $q.resolve();
@@ -161,7 +161,7 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("AppStateService", function () {
+.service("AppStateService", function (moment) {
 	var STORE_KEY_CURRENT_LEAGUE, STORE_KEY_LEAGUES, STORE_KEY_CURRENT_WEEK, STORE_KEY_CURRENT_EMAIL;
 
 	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.AppState>currentLeagueId";
@@ -169,11 +169,15 @@ angular.module("starter.services", [])
 	STORE_KEY_CURRENT_WEEK = "realitySportsApp.AppState>currentWeek";
 	STORE_KEY_CURRENT_EMAIL = "realitySportsApp.AppState>currentEmail";
 
+	var OPENING_NIGHT = moment("2015-09-09");
+	var WEEK  = 24 * 60 * 60 * 1000;
+
 	return {
 		currentLeagueId: currentLeagueId,
 		clearCurrentLeagueId: clearCurrentLeagueId,
 		currentWeek: currentWeek,
-		currentEmail: currentEmail
+		currentEmail: currentEmail,
+		guessCurrentWeek: guessCurrentWeek
 	};
 
 	function currentLeagueId (leagueId) {
@@ -196,6 +200,10 @@ angular.module("starter.services", [])
 		return localStorage.getItem(STORE_KEY_CURRENT_WEEK);
 	}
 
+	function guessCurrentWeek () {
+		return Math.floor(OPENING_NIGHT.diff(moment()) / (-7 * WEEK)) + 1;
+	}
+
 	function currentEmail (e) {
 		if (e) {
 			localStorage.setItem(STORE_KEY_CURRENT_EMAIL, e);
@@ -210,7 +218,7 @@ angular.module("starter.services", [])
 		fetch: fetch
 	};
 
-	function fetch (leagueId, week, gameId) {
+	function fetch(leagueId, week, gameId) {
 		if (!week) {
 			week = AppStateService.currentWeek() || "";
 		}
@@ -218,7 +226,7 @@ angular.module("starter.services", [])
 		return $http({
 			method: "GET",
 			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week
-			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/scoreboards/" + week
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/weeks/" + week + "/scoreboards"
 		});
 	}
 })
@@ -228,10 +236,11 @@ angular.module("starter.services", [])
 		fetch: fetch
 	};
 
-	function fetch (leagueId) {
+	function fetch(leagueId, week) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings"
+			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings"
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/weeks/" + week + "/standings"
 		});
 	}
 })
@@ -241,11 +250,11 @@ angular.module("starter.services", [])
 		fetch: fetch
 	};
 
-	function fetch (leagueId, week, gameId) {
+	function fetch(leagueId, week, gameId) {
 		return $http({
 			method: "GET",
 			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
-			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/scoreboards/" + week + "/game_summaries/" + gameId
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/weeks/" + week + "/game_summaries/" + gameId
 		});
 	}
 })

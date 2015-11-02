@@ -26,7 +26,7 @@ var Mixins = {
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore) {
+.controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
   $scope.settings = AppSettings;
 
   // With the new view caching in Ionic, Controllers are only called
@@ -71,6 +71,10 @@ angular.module('starter.controllers', [])
     $scope.loggedInState = loggedIn;
   };
   $scope.loggedIn(!!AuthTokenStore.token());
+
+  if (!AppStateService.currentWeek()) {
+    AppStateService.currentWeek(AppStateService.guessCurrentWeek());
+  }
 })
 
 .controller("LoginController", function ($scope, $state, $cordovaToast, AuthService, AppStateService) {
@@ -138,7 +142,7 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, LeagueService) {
+.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, LeagueService, AppStateService) {
   $scope.leagues = [];
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
@@ -158,9 +162,7 @@ angular.module('starter.controllers', [])
         }
         if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
 
-        $state.go("app.scoreboards", {
-          leagueId: $scope.leagues[0].leagueId
-        });
+        $scope.gotoLeague($scope.leagues[0]);
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
@@ -169,6 +171,15 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
+  };
+
+  $scope.gotoLeague = function (league) {
+    AppStateService.currentLeagueId(league.leagueId);
+
+    $state.go("app.scoreboards", {
+      leagueId: league.leagueId,
+      week: AppStateService.currentWeek()
+    });
   };
 
   $scope.refresh();
@@ -196,10 +207,19 @@ angular.module('starter.controllers', [])
       $scope.leagueId = AppStateService.currentLeagueId();
     }
 
+    if ($stateParams.week && $stateParams.week !== "default") {
+      $scope.week = $stateParams.week;
+    } else {
+      $scope.week = AppStateService.currentWeek();
+    }
+
     var whereTo = $state.current.name.replace("-for-current-league", "");
 
     if ($scope.leagueId) {
-      $state.go(whereTo || "app.standings", { leagueId: $scope.leagueId });
+      $state.go(whereTo || "app.standings", {
+        leagueId: $scope.leagueId,
+        week: $scope.week
+      });
     } else {
       $state.go("app.leagues");
     }
@@ -208,10 +228,14 @@ angular.module('starter.controllers', [])
 
 .controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
   $scope.leagueId = $stateParams.leagueId;
-  $scope.week = $stateParams.week || AppStateService.currentWeek();
+  $scope.week = $stateParams.week;
   $scope.boxScores = [];
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  if (!$scope.week || $scope.week === "default") {
+    $scope.week = AppStateService.currentWeek();
+  }
 
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
@@ -251,9 +275,14 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, StandingsService) {
+.controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, StandingsService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
+  $scope.week = $stateParams.week;
   $scope.standings = [];
+
+  if (!$scope.week || $scope.week === "default") {
+    $scope.week = AppStateService.currentWeek();
+  }
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
@@ -483,7 +512,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.filter("dowPlusTime", function () {
+.filter("dowPlusTime", function (moment) {
   var DATE_STRING_RE = /^\w+ \d+ \d+:\d+$/i;
   return function (dateString) {
     if (!DATE_STRING_RE.test(dateString)) { return dateString; }

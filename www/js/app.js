@@ -53,7 +53,7 @@ angular.module('starter', [
     })
 
     .state("app.game", {
-      url: "/leagues/:leagueId/scoreboards/:week/games/:gameId",
+      url: "/leagues/:leagueId/weeks/:week/games/:gameId",
       views: {
         "menuContent": {
           templateUrl: "templates/game.html",
@@ -62,8 +62,9 @@ angular.module('starter', [
       }
     })
 
+    // not sure this works
     .state("app.my-game", {
-      url: "/leagues/:leagueId/scoreboards/:week/games",
+      url: "/leagues/:leagueId/weeks/:week/games",
       views: {
         "menuContent": {
           templateUrl: "templates/game.html",
@@ -73,7 +74,7 @@ angular.module('starter', [
     })
 
     .state("app.standings-for-current-league", {
-      url: "/leagues/default/standings",
+      url: "/leagues/default/weeks/default/standings",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
@@ -83,7 +84,7 @@ angular.module('starter', [
     })
 
     .state("app.standings", {
-      url: "/leagues/:leagueId/standings",
+      url: "/leagues/:leagueId/weeks/:week/standings",
       views: {
         "menuContent": {
           templateUrl: "templates/standings.html",
@@ -93,7 +94,7 @@ angular.module('starter', [
     })
 
     .state("app.scoreboards-for-current-league", {
-      url: "/leagues/default/scoreboards",
+      url: "/leagues/default/weeks/default/scoreboards",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
@@ -103,7 +104,7 @@ angular.module('starter', [
     })
 
     .state("app.scoreboards", {
-      url: "/leagues/:leagueId/scoreboards/:week?",
+      url: "/leagues/:leagueId/weeks/:week/scoreboards",
       views: {
         "menuContent": {
           templateUrl: "templates/scoreboards.html",
@@ -299,6 +300,8 @@ angular.module('starter', [
 })
 
 .constant("_", window._)
+
+.constant("moment", window.moment)
 
 .constant("AppSettings", {
   // apiHost: "http://localhost:1212",

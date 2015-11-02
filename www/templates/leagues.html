@@ -16,7 +16,7 @@
       <div class="item item-divider">
         Choose your league:
       </div>
-      <div class="item" ng-repeat="league in leagues" ui-sref="app.scoreboards({ leagueId: league.leagueId })">
+      <div class="item" ng-repeat="league in leagues" ng-click="gotoLeague(league)">
         <div class="league">
           {{ league.name }}
           ({{ league.team.name }})

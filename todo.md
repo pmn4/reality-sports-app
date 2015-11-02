@@ -1,14 +1,12 @@
 BUGS:
+- Initial Load: Request fails w/o Week
 
 TODO:
+- Scroll Week Selector
+- Standings
 - Error handling (no network, server error vs proxy errors)
-- on login, leagues not refreshing
-- send to login on 401
 - do something with device info
-- email formatting (mailchimp)
 - refresh interval
-- Fan Duel
-- move "lastUpdated" logic to services
 
 BACKLOG:
 - help form
@@ -27,3 +25,5 @@ DONE:
 - links to email/twitter not working
 - app updates not working
 - cache leagues (sloooow)
+- email formatting (mailchimp)
+- send to login on 401
