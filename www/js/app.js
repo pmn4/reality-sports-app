@@ -6,7 +6,9 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', [
   'ionic',
-  'ionic.service.core','ionic.service.analytics',
+  'ngIOS9UIWebViewPatch',
+  'ionic.service.core',
+  'ionic.service.analytics',
   'ionic.service.deploy',
   'starter.controllers',
   'starter.services',
