@@ -12,34 +12,48 @@
         <div class="col col-50 team-name standing-team">
           <strong>Team</strong>
         </div>
-        <div class="col col-25 standing-record text-center">
+        <div class="col col-20 standing-record text-center">
           <strong>Record</strong>
         </div>
-        <div class="col col-15 standing-points text-right">
+        <div class="col col-20 standing-points text-right">
           <strong>Pts</strong>
         </div>
       </div>
     </div>
-    <div class="loading-page-content" ng-show="standings | none">
+    <div class="loading-page-content" ng-show="divisionStandings | none">
       <h3>Loading...</h3>
       <p>
         this can take a little while the first time the page loads
       </p>
     </div>
-    <div ng-show="standings | any">
-      <div ng-repeat="standing in standings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
-        <div class="row" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.max }">
-          <div class="col col-10 standing-rank text-right">
-            {{ $index + 1 }}
+    <div ng-show="divisionStandings | any">
+      <div ng-repeat="division in divisionStandings">
+        <div class="row" ng-show="summary.hasDivisions">
+          <div class="col text-center">
+            <strong>{{ division.division.name }}</strong>
           </div>
-          <div class="col col-50 team-name standing-team">
-            {{ standing.team.name }}
-          </div>
-          <div class="col col-25 standing-record text-center">
-            {{ standing | teamRecord }}
-          </div>
-          <div class="col col-15 standing-points text-right">
-            {{ standing.points }}
+        </div>
+        <div ng-repeat="standing in division.teamStandings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
+          <div class="row row-center" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.maxPoints }">
+            <div class="col col-10 standing-rank text-right">
+              {{ standing.rank }}
+            </div>
+            <div class="col col-50 team-name standing-team one-liner">
+              <div class="row row-center row-no-padding">
+                <div class="col col-1-6 team-image">
+                  <img ng-src="{{ standing.team | teamLogo }}" width="90%" />
+                </div>
+                <div class="col col-5-6">
+                  <strong>{{ standing.team.name }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col col-20 standing-record text-center">
+              {{ standing | teamRecord:summary.hasTies }}
+            </div>
+            <div class="col col-20 standing-points text-right">
+              {{ standing.points | toFixed:2 | separateThousands }}
+            </div>
           </div>
         </div>
       </div>

@@ -278,7 +278,7 @@ angular.module('starter.controllers', [])
 .controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, StandingsService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
-  $scope.standings = [];
+  $scope.divisionStandings = [];
 
   if (!$scope.week || $scope.week === "default") {
     $scope.week = AppStateService.currentWeek();
@@ -286,20 +286,16 @@ angular.module('starter.controllers', [])
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  function summarizeStandings (standings) {
-    return {
-      max: _.chain(standings).pluck("points").max().value() // @todo: parseInt. need .value()?
-    };
-  }
-
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     StandingsService.fetch($scope.leagueId, $scope.week)
       .then(function (response) {
-        $scope.standings = response.data;
-        $scope.setLastUpdated(new Date());
+        if (!response.data) { return; }
 
-        $scope.summary = summarizeStandings(response.data);
+        $scope.divisionStandings = response.data.divisionStandings;
+        $scope.summary = response.data.meta;
+
+        $scope.setLastUpdated(new Date());
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
@@ -315,7 +311,8 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
 
-    if ($scope.standings && $scope.standings.length || $scope.ajaxing) { return; }
+    if ($scope.ajaxing) { return; }
+    if ($scope.divisionStandings && $scope.divisionStandings.length) { return; }
 
     // this shouldn't often happen, but sometimes we re-load a view
     // which failed to refresh the first time.
@@ -514,10 +511,10 @@ angular.module('starter.controllers', [])
 
 .filter("dowPlusTime", function (moment) {
   var DATE_STRING_RE = /^\w+ \d+ \d+:\d+$/i;
-  return function (dateString) {
+  return function (dateString, format) {
     if (!DATE_STRING_RE.test(dateString)) { return dateString; }
 
-    return moment(dateString)
+    return moment(dateString, "MMM D h:mm")
       .year(new Date().getFullYear())
       .format("ddd h:mm");
   };
@@ -533,10 +530,18 @@ angular.module('starter.controllers', [])
 })
 
 .filter("teamRecord", function () {
-  return function (standing) {
+  return function (standing, hasTies) {
+    var pieces;
+
     if (!standing) { return ""; }
 
-    return [standing.wins, standing.losses, standing.ties].join("-");
+    pieces = [standing.wins, standing.losses];
+
+    if (hasTies) {
+      pieces.push(standing.ties);
+    }
+
+    return pieces.join("-");
   };
 })
 
@@ -545,6 +550,14 @@ angular.module('starter.controllers', [])
     if (total == null) { return; }
 
     return total.toFixed(digits);
+  };
+})
+
+.filter("separateThousands", function () {
+  return function (num) {
+    if (num == null) { return; }
+
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 })
 

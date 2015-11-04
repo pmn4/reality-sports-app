@@ -1,10 +1,9 @@
 BUGS:
-- Initial Load: Request fails w/o Week
 
 TODO:
 - Scroll Week Selector
-- Standings
-- Error handling (no network, server error vs proxy errors)
+- Get Weeks on Bootstrap
+- Weeks for Standings
 - do something with device info
 - refresh interval
 
@@ -27,3 +26,6 @@ DONE:
 - cache leagues (sloooow)
 - email formatting (mailchimp)
 - send to login on 401
+- Initial Load: Request fails w/o Week
+- Standings
+- Error handling (no network, server error vs proxy errors)

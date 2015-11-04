@@ -57,6 +57,12 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	max-width: $pct;
 }
 
+.col-5-6 {
+	$pct: 500% / 6.0;
+	@include flex(0, 0, $pct);
+	max-width: $pct;
+}
+
 
 .action-indicator-bar {
 	border-bottom: 1px solid transparent;
