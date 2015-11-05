@@ -45,7 +45,8 @@
             <strong>{{ division.division.name }}</strong>
           </div>
         </div>
-        <div ng-repeat="standing in division.teamStandings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings">
+        <!-- <div ng-repeat="standing in division.teamStandings track by $index" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })" class="standings"> -->
+        <div ng-repeat="standing in division.teamStandings track by $index" class="standings">
           <div class="row row-center" ng-class="{ 'stable-bg': $index % 2, 'highlightable highlight': standing.points == summary.maxPoints }">
             <div class="col col-10 standing-rank text-right">
               {{ standing.rank }}
