@@ -1,9 +1,9 @@
 BUGS:
+- Week Chooser Directive
 
 TODO:
 - Scroll Week Selector
 - Get Weeks on Bootstrap
-- Weeks for Standings
 - do something with device info
 - refresh interval
 
@@ -29,3 +29,5 @@ DONE:
 - Initial Load: Request fails w/o Week
 - Standings
 - Error handling (no network, server error vs proxy errors)
+- Standings
+  - Not Available Message

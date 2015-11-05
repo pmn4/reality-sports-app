@@ -1,8 +1,25 @@
-<ion-view view-title="Standings">
+<ion-view view-title="Standings for Week {{ week }}">
   <ion-nav-buttons side="secondary">
     <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
   </ion-nav-buttons>
   <ion-content has-subheader>
+    <div class="subheader">
+      <!-- <week-chooser on-choose-week="setWeek({ week: weekNumber })"></week-chooser> -->
+      <!-- make this a directive -->
+      <ion-scroll direction="x" class="wide-as-needed">
+        <div class="button-bar button-bar-inline week-picker">
+          <a ng-repeat="weekNumber in [] | range:1:16"
+            ui-sref="app.standings({ leagueId: leagueId, week: weekNumber })"
+            ui-sref-opts="{ location: 'replace' }"
+            class="button"
+            ng-class="{ 'button-positive': weekNumber == week }"
+          >
+            <span class="tiny label">Week</span>
+            {{ weekNumber }}
+          </a>
+        </div>
+      </ion-scroll>
+    </div>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="subheader">
       <div class="row stable-bg">
@@ -24,6 +41,15 @@
       <h3>Loading...</h3>
       <p>
         this can take a little while the first time the page loads
+      </p>
+    </div>
+    <div class="info-page-content" ng-show="summary.available === false">
+      <h3>Nope</h3>
+      <p ng-show="week > 1">
+        standings are only available once all week {{ week }} games have completed
+      </p>
+      <p ng-show="week <= 1">
+        no standings before week 1
       </p>
     </div>
     <div ng-show="divisionStandings | any">
@@ -57,7 +83,7 @@
           </div>
         </div>
       </div>
-      <p class="last-updated">
+      <p class="last-updated" ng-show="summary.available">
         <em>points leader is highlighted</em>
       </p>
     </div>

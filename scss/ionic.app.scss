@@ -290,14 +290,23 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	}
 }
 
+.info-page-content,
+.error-page-content,
 .loading-page-content {
 	width: 60%;
 	margin: 20%;
 	padding: 20px;
 	text-align: center;
+}
 
+.loading-page-content {
 	background: $bar-stable-bg;
 	color: $bar-stable-text;
+	border: 1px solid $bar-stable-border;
+}
+.info-page-content {
+	background: $bar-stable-bg;
+	color: $calm;
 	border: 1px solid $bar-stable-border;
 }
 

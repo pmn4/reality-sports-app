@@ -5,6 +5,8 @@
   <ion-content has-subheader>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="subheader">
+      <!-- <week-chooser on-choose-week="setWeek({ week: weekNumber })"></week-chooser> -->
+      <!-- make this a directive -->
       <ion-scroll direction="x" class="wide-as-needed">
         <div class="button-bar button-bar-inline week-picker">
           <a ng-repeat="weekNumber in [] | range:1:16"

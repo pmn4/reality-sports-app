@@ -288,7 +288,7 @@ angular.module('starter.controllers', [])
 
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
-    StandingsService.fetch($scope.leagueId, $scope.week)
+    StandingsService.fetch($scope.leagueId, $scope.week - 1)
       .then(function (response) {
         if (!response.data) { return; }
 
