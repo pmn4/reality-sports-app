@@ -226,7 +226,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
+.controller("ScoreboardsController", function ($scope, $state, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.boxScores = [];
@@ -258,6 +258,13 @@ angular.module('starter.controllers', [])
      });
   }, AppSettings.refreshRate);
 
+  $scope.setWeek = function (week) {
+    $state.go("app.scoreboards", {
+      leagueId: $scope.leagueId,
+      week: week
+    });
+  };
+
   $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
@@ -275,7 +282,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("StandingsController", function ($scope, $interval, $filter, $stateParams, _, AppSettings, StandingsService, AppStateService) {
+.controller("StandingsController", function ($scope, $state, $interval, $filter, $stateParams, _, AppSettings, StandingsService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.divisionStandings = [];
@@ -294,8 +301,9 @@ angular.module('starter.controllers', [])
 
         $scope.divisionStandings = response.data.divisionStandings;
         $scope.summary = response.data.meta;
-
         $scope.setLastUpdated(new Date());
+
+        AppStateService.currentWeek($scope.week);
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
@@ -305,6 +313,13 @@ angular.module('starter.controllers', [])
         $scope.$broadcast('scroll.refreshComplete');
      });
   }, AppSettings.refreshRate);
+
+  $scope.setWeek = function (week) {
+    $state.go("app.standings", {
+      leagueId: $scope.leagueId,
+      week: week
+    });
+  };
 
   $scope.refresh();
 
@@ -728,5 +743,49 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     $scope.checkForUpdates();
   });
+})
+
+.directive("rsaWeekChooser", function ($ionicScrollDelegate, $timeout) {
+  return {
+    restrict: "E",
+    scope: {
+      week: "=",
+      firstWeek: "=",
+      lastWeek: "=",
+      onChooseWeek: "&"
+    },
+    templateUrl: "templates/directives/week-chooser.html",
+    link: function (scope, element, attrs) {
+      if (!scope.firstWeek) {
+        scope.firstWeek = 1;
+      }
+      if (!scope.lastWeek) {
+        scope.lastWeek = 16;
+      }
+
+      $timeout(function () { // "ensure" the chooser is rendered
+        scope.$watch(attrs.week, function (value) {
+          var query, scrollPosition;
+
+          if (!element || !element[0]) { return; }
+
+          query = element[0].querySelectorAll("[data-week='" + scope.week + "']");
+
+          if (!query || !query[0]) { return; }
+
+          if (element[0].children && element[0].children[0]) {
+            // can't sort out how to make rsa-week-chooser have a width
+            scrollPosition = element[0].children[0].clientWidth;
+          }
+
+          scrollPosition = query[0].clientWidth / 2 + query[0].offsetLeft - scrollPosition / 2;
+
+          $ionicScrollDelegate
+            .$getByHandle("week-chooser")
+            .scrollTo(scrollPosition, 0, true);
+        });
+      });
+    }
+  }
 })
 ;

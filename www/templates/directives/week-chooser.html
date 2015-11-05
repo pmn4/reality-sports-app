@@ -1,0 +1,13 @@
+<ion-scroll direction="x" delegate-handle="week-chooser" class="wide-as-needed">
+  <div class="button-bar button-bar-inline week-picker">
+    <button ng-repeat="weekNumber in [] | range:firstWeek:lastWeek"
+      ng-click="onChooseWeek({ week: weekNumber })"
+      class="button"
+      ng-class="{ 'button-positive': weekNumber == week }"
+      data-week="{{ weekNumber }}"
+    >
+      <span class="tiny label">Week</span>
+      {{ weekNumber }}
+    </button>
+  </div>
+</ion-scroll>
