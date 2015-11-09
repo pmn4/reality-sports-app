@@ -568,6 +568,60 @@ angular.module('starter.controllers', [])
   };
 })
 
+.filter("adjustment", function () {
+  return function (summary, digits) {
+    var adjustment;
+
+    if (summary == null || !summary.adjustedPoints || !summary.projectedPoints) {
+      return;
+    }
+
+    adjustment = summary.adjustedPoints - summary.projectedPoints;
+
+    return (adjustment >= 0 ? "+" : "") + adjustment.toFixed(digits);
+  };
+})
+
+.filter("summaryAdjustmentClass", function () {
+  return function (summary) {
+    var adjustment;
+
+    if (summary == null || !summary.adjustedPoints || !summary.projectedPoints) {
+      return;
+    }
+
+    adjustment = summary.adjustedPoints / summary.projectedPoints;
+
+    if (adjustment > 1.50) { return "adjustment-plus-3"; }
+    if (adjustment > 1.25) { return "adjustment-plus-2"; }
+    if (adjustment > 1.05) { return "adjustment-plus-1"; }
+    if (adjustment > 0.95) { return "adjustment-in-line"; }
+    if (adjustment > 0.75) { return "adjustment-minus-1"; }
+    if (adjustment > 0.50) { return "adjustment-minus-2"; }
+    return "adjustment-minus-3";
+  };
+})
+
+.filter("playerAdjustmentClass", function () {
+  return function (summary) {
+    var adjustment;
+
+    if (summary == null || !summary.adjustedPoints || !summary.projectedPoints) {
+      return;
+    }
+
+    adjustment = summary.adjustedPoints / summary.projectedPoints;
+
+    if (adjustment > 2.00) { return "adjustment-plus-3"; }
+    if (adjustment > 1.55) { return "adjustment-plus-2"; }
+    if (adjustment > 1.25) { return "adjustment-plus-1"; }
+    if (adjustment > 0.75) { return "adjustment-in-line"; }
+    if (adjustment > 0.75) { return "adjustment-minus-1"; }
+    if (adjustment > 0.50) { return "adjustment-minus-2"; }
+    return "adjustment-minus-3";
+  };
+})
+
 .filter("separateThousands", function () {
   return function (num) {
     if (num == null) { return; }

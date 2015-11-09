@@ -28,6 +28,9 @@
               </span>
             </div>
             <div class="projected-points">
+              <span ng-show="awayTeam.summary.adjustedPoints" class="adjustment {{ homeTeam.summary | summaryAdjustmentClass }}">
+                ({{ awayTeam.summary | adjustment:2 }})
+              </span>
               {{ awayTeam.summary.projectedPoints | toFixed:2 }}
             </div>
           </div>
@@ -55,6 +58,9 @@
             </div>
             <div class="projected-points">
               {{ homeTeam.summary.projectedPoints | toFixed:2 }}
+              <span ng-show="homeTeam.summary.adjustedPoints" class="adjustment {{ homeTeam.summary | summaryAdjustmentClass }}">
+                ({{ homeTeam.summary | adjustment:2 }})
+              </span>
             </div>
           </div>
         </div>
@@ -87,7 +93,7 @@
                 </div>
                 <div class="row row-bottom">
                   <div class="col col-points player-points number positive">
-                    <span class="total-points">
+                    <span class="total-points {{ playerData.away | playerAdjustmentClass }}">
                       {{ (playerData.away.points | toFixed:2) || '&nbsp;' }}
                     </span>
                     <span class="projected-points">
@@ -125,7 +131,7 @@
                     </div>
                   </div>
                   <div class="col col-points player-points number">
-                    <span class="total-points">
+                    <span class="total-points {{ playerData.home | playerAdjustmentClass }}">
                       {{ (playerData.home.points | toFixed:2) || '&nbsp;' }}
                     </span>
                     <span class="projected-points">
