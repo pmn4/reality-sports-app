@@ -260,8 +260,6 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	}
 
 	.yet-to-play {
-		background-color: $stable;
-
 		.player-points {
 			.total-points {
 				display: none;
@@ -275,6 +273,23 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	.on-bye {
 		.player-points {
 			display: none;
+		}
+	}
+	.is-final,
+	.on-bye {
+		background-color: $stable;
+	}
+
+	.player-game-status {
+		color: $positive;
+		font-weight: bold;
+	}
+	.yet-to-play,
+	.is-final,
+	.on-bye {
+		.player-game-status {
+			color: inherit;
+			font-weight: normal;
 		}
 	}
 }
