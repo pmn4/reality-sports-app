@@ -1,8 +1,6 @@
 BUGS:
-- Week Chooser Directive
 
 TODO:
-- Scroll Week Selector
 - Get Weeks on Bootstrap
 - do something with device info
 - refresh interval
@@ -31,3 +29,5 @@ DONE:
 - Error handling (no network, server error vs proxy errors)
 - Standings
   - Not Available Message
+- Week Chooser Directive
+- Scroll Week Selector

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.pmnewell.realitysportsapp" version="0.0.7" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Gameday</name>
+<widget id="com.pmnewell.realitysportsapp" version="0.0.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Reality Sports Online</name>
   <description>
-    Live scoring and news for your Reality Sports Online fantasy team.
+    The mobile application with Live Scoring for Reality Sports Online, the fantasy Front Office platform that enables fantasy owners to build and manage their fantasy teams like NFL general managers.
   </description>
-  <author email="realitysportsapp@gmail.com" href="http://pmnewell.com/">
-    Pat Newell
+  <author email="realitysportsapp@gmail.com" href="http://www.realitysportsonline.com/">
+    Reality Sports Online
   </author>
   <content src="index.html"/>
   <access origin="*"/>
@@ -67,12 +67,6 @@
     <splash src="resources/ios/splash/Default-Portrait~ipad.png" width="768" height="1024"/>
     <splash src="resources/ios/splash/Default@2x~iphone.png" width="640" height="960"/>
     <splash src="resources/ios/splash/Default~iphone.png" width="320" height="480"/>
-<!-- add to <appName>-Info.plist
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSAllowsArbitraryLoads</key><true/>
-    </dict>
--->
   </platform>
   <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
 </widget>
