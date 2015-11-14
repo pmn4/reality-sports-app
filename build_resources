@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cp resources/tile-icon.png resources/icon.png
+ionic resources --icon
+
+# cp resources/tile-icon.png resources/icon.png
+# ionic resources --icon
+# mv resources/ios/icon resources/ios/tile-icon
+# mv resources/android/icon resources/android/tile-icon
+
+# cp resources/tile-icon-white.png resources/icon.png
+# ionic resources --icon
+# mv resources/ios/icon resources/ios/tile-icon-white
+# mv resources/android/icon resources/android/tile-icon-white
+
+# pick the icons that we want for specific sizes
+
+ionic resources --splash
