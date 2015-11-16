@@ -20,7 +20,7 @@
         <div class="row scoring-summary">
           <div class="col-75 scoring-values">
             <div class="scoring-total title">
-              <span class="remaining">
+              <span class="remaining" ng-show="awayTeam.summary.playerTimeRemaining >= 0">
                 ({{ awayTeam.summary.playerTimeRemaining }})
               </span>
               <span class="">
@@ -28,10 +28,12 @@
               </span>
             </div>
             <div class="projected-points">
-              <span ng-show="awayTeam.summary.adjustedPoints" class="adjustment {{ homeTeam.summary | summaryAdjustmentClass }}">
-                ({{ awayTeam.summary | adjustment:2 }})
+              <span ng-show="awayTeam.summary.adjustedPoints" class="adjustment">
+                ({{ awayTeam.summary.projectedPoints | toFixed:2 }})
               </span>
-              {{ awayTeam.summary.projectedPoints | toFixed:2 }}
+              <span class="{{ awayTeam.summary | summaryAdjustmentClass }}">
+                {{ awayTeam.summary.adjustedPoints | toFixed:2 }}
+              </span>
             </div>
           </div>
           <div class="col-25 team-image">
@@ -52,14 +54,16 @@
               <span class="">
                 {{ homeTeam.summary.totalPoints | toFixed:2 }}
               </span>
-              <span class="remaining">
+              <span class="remaining" ng-show="homeTeam.summary.playerTimeRemaining >= 0">
                 ({{ homeTeam.summary.playerTimeRemaining }})
               </span>
             </div>
             <div class="projected-points">
-              {{ homeTeam.summary.projectedPoints | toFixed:2 }}
-              <span ng-show="homeTeam.summary.adjustedPoints" class="adjustment {{ homeTeam.summary | summaryAdjustmentClass }}">
-                ({{ homeTeam.summary | adjustment:2 }})
+              <span class="{{ homeTeam.summary | summaryAdjustmentClass }}">
+                {{ homeTeam.summary.adjustedPoints | toFixed:2 }}
+              </span>
+              <span ng-show="homeTeam.summary.adjustedPoints" class="adjustment">
+                ({{ homeTeam.summary.projectedPoints | toFixed:2 }})
               </span>
             </div>
           </div>
@@ -76,7 +80,7 @@
     </div>
     <div id="player-scoring">
       <div class="list" ng-repeat="(status, positions) in playerScoringData">
-        <div class="item item-divider text-center">
+        <div class="item item-divider text-center" ng-hide="status === 'Active'">
           {{ status }}
         </div>
         <div class="player-score" ng-repeat="(position, players) in positions">

@@ -592,12 +592,12 @@ angular.module('starter.controllers', [])
 
     adjustment = summary.adjustedPoints / summary.projectedPoints;
 
-    if (adjustment > 1.50) { return "adjustment-plus-3"; }
-    if (adjustment > 1.25) { return "adjustment-plus-2"; }
+    if (adjustment > 1.40) { return "adjustment-plus-3"; }
+    if (adjustment > 1.20) { return "adjustment-plus-2"; }
     if (adjustment > 1.05) { return "adjustment-plus-1"; }
-    if (adjustment > 0.95) { return "adjustment-in-line"; }
-    if (adjustment > 0.75) { return "adjustment-minus-1"; }
-    if (adjustment > 0.50) { return "adjustment-minus-2"; }
+    if (adjustment > 1 / 1.05) { return "adjustment-in-line"; }
+    if (adjustment > 1 / 1.20) { return "adjustment-minus-1"; }
+    if (adjustment > 1 / 1.05) { return "adjustment-minus-2"; }
     return "adjustment-minus-3";
   };
 })
