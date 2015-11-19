@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 output = 'www/lib/lodash/lodash.custom.min.js'
-methods = %w(chain max pluck reduce throttle value)
+methods = %w(all chain isEmpty max pluck reduce throttle value)
 
 # there is an undefined variable called freeGlobal which breaks "use strict", hence the iife
-`lodash modern include=#{ methods.join(',') } --production --output #{ output } iife="!function(window,freeGlobal,undefined){%output%}(this)"`
+`lodash modern include=#{ methods.join(',') } --production --output #{ output } iife='!function(window,freeGlobal,undefined){%output%}(this)'`

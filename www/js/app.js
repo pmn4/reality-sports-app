@@ -17,7 +17,17 @@ angular.module('starter', [
 
 .run(function ($rootScope, $ionicPlatform, $ionicAnalytics, $ionicDeploy) {
   $ionicPlatform.ready(function () {
+    // Ionic.io();
+
     $ionicAnalytics.register();
+
+    // // Register User
+    // var user = Ionic.User.current();
+
+    // if (!user.id) {
+    //   user.id = Ionic.User.anonymousId();
+    //   user.save();
+    // }
 
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -306,7 +316,9 @@ angular.module('starter', [
 .constant("AppSettings", {
   // apiHost: "http://localhost:1212",
   apiHost: "http://reality-sports-app.herokuapp.com",
-  refreshRate: 20000, // 20 seconds
-  highlightDuration: 4000 // 4 seconds (+ 1 for fade out in css)
+  throttleRate: 20 * 1000, // 20 seconds
+  gamesRefreshRate: 2 * 60 * 1000, // 2 minutes
+  scoreboardsRefreshRate: 5 * 60 * 1000, // 5 minutes
+  highlightDuration: 5 * 1000 // 5 seconds (+ 1 for fade out in css)
 })
 ;

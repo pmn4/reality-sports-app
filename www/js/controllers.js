@@ -10,6 +10,20 @@ var Mixins = {
       $scope.lastUpdatedAgo = moment($scope.lastUpdated).fromNow(true);
     };
   },
+  refreshable: function ($scope, refreshRate, properties) {
+    return function () {
+      // never updated?  true.
+      if (!$scope.lastUpdated) { return true; }
+
+      // updated, but no data?  true.
+      if (_.all(properties, function (p) { _.isEmpty($scope[p]) })) {
+        return true;
+      }
+
+      // last updated more than <refreshRage> ago?
+      return $scope.lastUpdated.getTime() + refreshRate < new Date();
+    };
+  },
   throttle: function ($scope, fn, refreshRate) {
     var throttled = _.throttle(function () {
       $scope.blocked = false;
@@ -92,6 +106,8 @@ angular.module('starter.controllers', [])
         AppStateService.clearCurrentLeagueId();
         $scope.loggedIn(true);
 
+        // initializeIonicUser();
+
         $state.go("app.leagues");
       }, function (response) {
         $scope.loggedIn(false);
@@ -102,6 +118,20 @@ angular.module('starter.controllers', [])
         $scope.ajaxing = $scope.indicateAjaxing(false);
       });
   };
+
+  // function initializeIonicUser() {
+  //   // this will give you a fresh user or the previously saved 'current user'
+  //   var user = Ionic.User.current();
+
+  //   // if the user doesn't have an id, you'll need to give it one.
+  //   if (!user.id) {
+  //     user.id = Ionic.User.anonymousId();
+  //     // user.id = 'your-custom-user-id';
+  //   }
+
+  //   //persist the user
+  //   user.save();
+  // }
 })
 
 .controller("LogoutController", function ($scope, $state, AuthTokenStore) {
@@ -232,6 +262,7 @@ angular.module('starter.controllers', [])
   $scope.boxScores = [];
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+  $scope.refreshable = Mixins.refreshable($scope, AppSettings.scoreboardsRefreshRate, ["boxScores"]);
 
   if (!$scope.week || $scope.week === "default") {
     $scope.week = AppStateService.currentWeek();
@@ -256,7 +287,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  }, AppSettings.refreshRate);
+  }, AppSettings.throttleRate);
 
   $scope.setWeek = function (week) {
     $state.go("app.scoreboards", {
@@ -270,7 +301,8 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
 
-    if ($scope.boxScores && $scope.boxScores.length || $scope.ajaxing) { return; }
+    if ($scope.ajaxing) { return; }
+    if (!$scope.refreshable()) { return; }
 
     $scope.refresh();
   });
@@ -312,7 +344,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  }, AppSettings.refreshRate);
+  }, AppSettings.throttleRate);
 
   $scope.setWeek = function (week) {
     $state.go("app.standings", {
@@ -439,6 +471,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+  $scope.refreshable = Mixins.refreshable($scope, AppSettings.gamesRefreshRate, ["homeTeam", "awayTeam"]);
 
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
@@ -461,17 +494,16 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  }, AppSettings.refreshRate);
+  }, AppSettings.throttleRate);
 
   $scope.refresh();
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
 
-    if ($scope.homeTeam && $scope.awayTeam || $scope.ajaxing) { return; }
+    if ($scope.ajaxing) { return; }
+    if (!$scope.refreshable()) { return; }
 
-    // this shouldn't often happen, but sometimes we re-load a view
-    // which failed to refresh the first time.
     $scope.refresh();
   });
   $scope._intervalUpdated = $interval(function () {
