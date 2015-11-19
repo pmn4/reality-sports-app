@@ -256,7 +256,9 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $state, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
+.controller("ScoreboardsController", function ($scope, $ionicPlatform, $state, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
+  var fnEnterEventHandler, fnExitEventHandler;
+
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.boxScores = [];
@@ -298,19 +300,34 @@ angular.module('starter.controllers', [])
 
   $scope.refresh();
 
-  $scope.$on("$ionicView.enter", function () {
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+
+  fnEnterEventHandler = function () {
     $scope.setLastUpdated();
 
     if ($scope.ajaxing) { return; }
     if (!$scope.refreshable()) { return; }
 
     $scope.refresh();
+  };
+
+  $scope.$on("$ionicView.enter", function () {
+    fnEnterEventHandler();
+
+    if (fnExitEventHandler && fnExitEventHandler.call) { return; }
+
+    // when bringing the app back into the foreground
+    fnExitEventHandler = $ionicPlatform.on("resume", fnEnterEventHandler);
   });
-  $scope._intervalUpdated = $interval(function () {
-    $scope.setLastUpdated();
-  }, 60000);
   $scope.$on("$ionicView.beforeLeave", function () {
     $interval.cancel($scope._intervalUpdated);
+
+    if (fnExitEventHandler && fnExitEventHandler.call) {
+      fnExitEventHandler();
+      fnExitEventHandler = null;
+    }
   });
 })
 
@@ -373,7 +390,9 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("GameController", function ($scope, $state, $stateParams, $interval, $filter, $ionicActionSheet, _, AppSettings, GameService) {
+.controller("GameController", function ($scope, $ionicPlatform, $state, $stateParams, $interval, $filter, $ionicActionSheet, _, AppSettings, GameService) {
+  var fnEnterEventHandler, fnExitEventHandler;
+
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.gameId = $stateParams.gameId || "";
@@ -498,19 +517,36 @@ angular.module('starter.controllers', [])
 
   $scope.refresh();
 
-  $scope.$on("$ionicView.enter", function () {
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+
+  fnEnterEventHandler = function () {
     $scope.setLastUpdated();
 
     if ($scope.ajaxing) { return; }
     if (!$scope.refreshable()) { return; }
 
     $scope.refresh();
+  };
+
+  // when navigating to this page from elsewhere in the app
+  $scope.$on("$ionicView.enter", function () {
+    fnEnterEventHandler();
+
+    if (fnExitEventHandler && fnExitEventHandler.call) { return; }
+
+    // when bringing the app back into the foreground
+    fnExitEventHandler = $ionicPlatform.on("resume", fnEnterEventHandler);
   });
-  $scope._intervalUpdated = $interval(function () {
-    $scope.setLastUpdated();
-  }, 60000);
+
   $scope.$on("$ionicView.beforeLeave", function () {
     $interval.cancel($scope._intervalUpdated);
+
+    if (fnExitEventHandler && fnExitEventHandler.call) {
+      fnExitEventHandler();
+      fnExitEventHandler = null;
+    }
   });
 })
 
