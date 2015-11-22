@@ -4,6 +4,7 @@ TODO:
 - Get Weeks on Bootstrap
 - do something with device info
 - refresh interval
+- error logging (see Ionic User registration)
 
 BACKLOG:
 - help form

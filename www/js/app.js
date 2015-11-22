@@ -17,17 +17,9 @@ angular.module('starter', [
 
 .run(function ($rootScope, $ionicPlatform, $ionicAnalytics, $ionicDeploy) {
   $ionicPlatform.ready(function () {
-    // Ionic.io();
+    Ionic.io();
 
     $ionicAnalytics.register();
-
-    // // Register User
-    // var user = Ionic.User.current();
-
-    // if (!user.id) {
-    //   user.id = Ionic.User.anonymousId();
-    //   user.save();
-    // }
 
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)

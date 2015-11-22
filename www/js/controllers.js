@@ -106,7 +106,7 @@ angular.module('starter.controllers', [])
         AppStateService.clearCurrentLeagueId();
         $scope.loggedIn(true);
 
-        // initializeIonicUser();
+        initializeIonicUser(response.data);
 
         $state.go("app.leagues");
       }, function (response) {
@@ -119,19 +119,33 @@ angular.module('starter.controllers', [])
       });
   };
 
-  // function initializeIonicUser() {
-  //   // this will give you a fresh user or the previously saved 'current user'
-  //   var user = Ionic.User.current();
+  // move to a service?
+  function initializeIonicUser(response) {
+    try {
+      if (!response) { response = {}; }
 
-  //   // if the user doesn't have an id, you'll need to give it one.
-  //   if (!user.id) {
-  //     user.id = Ionic.User.anonymousId();
-  //     // user.id = 'your-custom-user-id';
-  //   }
+      // this will give you a fresh user or the previously saved 'current user'
+      var user = Ionic.User.current();
 
-  //   //persist the user
-  //   user.save();
-  // }
+      if (response.userHash) {
+        user.id = response.userHash;
+      } else if (!user.id) {
+        // I hope this is never the case, because, then I just don't know...
+        user.id = Ionic.User.anonymousId();
+      }
+      if (response.userName) {
+        user.set("username", response.userName);
+      }
+      if (response.userId) {
+        user.set("rsoUserId", response.userId);
+      }
+
+      user.save();
+    } catch (e) {
+      // @todo: send error report?
+      console.log(e);
+    }
+  }
 })
 
 .controller("LogoutController", function ($scope, $state, AuthTokenStore) {
