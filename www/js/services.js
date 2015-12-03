@@ -61,6 +61,12 @@ angular.module("starter.services", [])
 			method: "GET",
 			// url: AppSettings.apiHost + "/v1/leagues"
 			url: AppSettings.apiHost + "/v2/leagues"
+		}).then(function (response) {
+			if (!response || !response.data) { return; }
+
+			CacheService.leagues(response.data);
+
+			return response;
 		});
 	}
 
@@ -143,13 +149,14 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("CacheService", function (/* $localStorage */) {
+.service("CacheService", function (/* $localStorage, */ _) {
 	var STORE_KEY_LEAGUES;
 
 	STORE_KEY_LEAGUES = "realitySportsApp.Cache>leagues";
 
 	return {
-		leagues: leagues
+		leagues: leagues,
+		getLeagueById: getLeagueById
 	};
 
 	function leagues(leaguesData) {
@@ -158,6 +165,14 @@ angular.module("starter.services", [])
 		}
 
 		return JSON.parse(localStorage.getItem(STORE_KEY_LEAGUES) || "[]");
+	}
+
+	function getLeagueById(leagueId) {
+		leagueId = parseInt(leagueId, 10);
+
+		return _.find(leagues(), function (l) {
+			return l.leagueId === leagueId;
+		});
 	}
 })
 

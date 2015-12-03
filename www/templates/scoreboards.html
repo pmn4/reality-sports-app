@@ -25,32 +25,13 @@
           this can take a little while the first time the page loads
         </p>
       </div>
-      <div class="item" ng-repeat="boxScore in boxScores" ui-sref="app.game({ leagueId: leagueId, week: boxScore.week, gameId: boxScore.gameId })">
-        <div class="scoreboard">
-          <div class="row row-center">
-            <div class="col col-2-15 team-image">
-              <img ng-src="{{ boxScore.awayTeam.imageUrl }}" width="90%" />
-            </div>
-            <div class="col col-67 team-name">
-              {{ boxScore.awayTeam.team.name }}
-            </div>
-            <div class="col col-20 number">
-              {{ boxScore.awayTeam.summary.totalPoints | toFixed:2 }}
-            </div>
-          </div>
-          <div class="row row-center">
-            <div class="col col-2-15 team-image">
-              <img ng-src="{{ boxScore.homeTeam.imageUrl }}" width="90%" />
-            </div>
-            <div class="col col-67 team-name">
-              {{ boxScore.homeTeam.team.name }}
-            </div>
-            <div class="col col-20 number">
-              {{ boxScore.homeTeam.summary.totalPoints | toFixed:2 }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ion-item>
+        <rsa-box-score league-id="leagueId" box-score="boxScores | boxScoreForTeam:currentLeague.team.teamId"></rsa-box-score>
+      </ion-item>
+      <ion-item class="item-divider">Around the League</ion-item>
+      <ion-item ng-repeat="boxScore in boxScores | boxScoresExceptForTeam:currentLeague.team.teamId">
+        <rsa-box-score league-id="leagueId" box-score="boxScore"></rsa-box-score>
+      </ion-item>
     </ion-list>
   </ion-content>
 </ion-view>

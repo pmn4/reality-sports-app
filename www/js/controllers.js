@@ -270,12 +270,14 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("ScoreboardsController", function ($scope, $ionicPlatform, $state, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache) {
+.controller("ScoreboardsController", function ($scope, $ionicPlatform, $state, $interval, $filter, $stateParams, _, AppSettings, ScoreboardService, AppStateService, ImageCache, CacheService) {
   var fnEnterEventHandler, fnExitEventHandler;
 
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.boxScores = [];
+
+  $scope.currentLeague = CacheService.getLeagueById($scope.leagueId);
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
   $scope.refreshable = Mixins.refreshable($scope, AppSettings.scoreboardsRefreshRate, ["boxScores"]);
@@ -807,6 +809,28 @@ angular.module('starter.controllers', [])
   }
 })
 
+.filter("boxScoreForTeam", function (_) {
+  return function (boxScores, teamId) {
+    if (!boxScores || !teamId) { return; }
+
+    return _.find(boxScores, function (boxScore) {
+      return boxScore.awayTeam.team.teamId === teamId ||
+        boxScore.homeTeam.team.teamId === teamId;
+    });
+  }
+})
+
+.filter("boxScoresExceptForTeam", function (_) {
+  return function (boxScores, teamId) {
+    if (!boxScores || !teamId) { return boxScores; }
+
+    return _.reject(boxScores, function (boxScore) {
+      return boxScore.awayTeam.team.teamId === teamId ||
+        boxScore.homeTeam.team.teamId === teamId;
+    });
+  }
+})
+
 .directive("toggleClass", function() {
   return {
     restrict: "A",
@@ -884,13 +908,16 @@ angular.module('starter.controllers', [])
 .directive("rsaWeekChooser", function ($ionicScrollDelegate, $timeout) {
   return {
     restrict: "E",
+
     scope: {
       week: "=",
       firstWeek: "=",
       lastWeek: "=",
       onChooseWeek: "&"
     },
+
     templateUrl: "templates/directives/week-chooser.html",
+
     link: function (scope, element, attrs) {
       if (!scope.firstWeek) {
         scope.firstWeek = 1;
@@ -922,6 +949,19 @@ angular.module('starter.controllers', [])
         });
       });
     }
+  }
+})
+
+.directive("rsaBoxScore", function () {
+  return {
+    restrict: "E",
+
+    scope: {
+      leagueId: "=",
+      boxScore: "="
+    },
+
+    templateUrl: "templates/directives/box-score.html"
   }
 })
 ;

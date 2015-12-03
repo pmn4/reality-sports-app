@@ -1,0 +1,24 @@
+<div class="scoreboard" ui-sref="app.game({ leagueId: leagueId, week: boxScore.week, gameId: boxScore.gameId })">
+  <div class="row row-center">
+    <div class="col col-2-15 team-image">
+      <img ng-src="{{ boxScore.awayTeam.imageUrl }}" width="90%" />
+    </div>
+    <div class="col col-67 team-name">
+      {{ boxScore.awayTeam.team.name }}
+    </div>
+    <div class="col col-20 number">
+      {{ boxScore.awayTeam.summary.totalPoints | toFixed:2 }}
+    </div>
+  </div>
+  <div class="row row-center">
+    <div class="col col-2-15 team-image">
+      <img ng-src="{{ boxScore.homeTeam.imageUrl }}" width="90%" />
+    </div>
+    <div class="col col-67 team-name">
+      {{ boxScore.homeTeam.team.name }}
+    </div>
+    <div class="col col-20 number">
+      {{ boxScore.homeTeam.summary.totalPoints | toFixed:2 }}
+    </div>
+  </div>
+</div>
