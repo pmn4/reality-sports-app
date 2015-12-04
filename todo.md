@@ -5,6 +5,7 @@ TODO:
 - do something with device info
 - refresh interval
 - error logging (see Ionic User registration)
+- add expiration to currentWeek cache
 
 BACKLOG:
 - help form

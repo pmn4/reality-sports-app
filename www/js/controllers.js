@@ -286,6 +286,17 @@ angular.module('starter.controllers', [])
     $scope.week = AppStateService.currentWeek();
   }
 
+  // assumes that all raw date has already been applied to $scope
+  $scope.repaint = function () {
+    if (!$scope.boxScores || !$scope.boxScores.length) { return; }
+    if (!$scope.currentLeague || !$scope.currentLeague.team) { return; }
+
+    $scope.boxScores = _.sortBy($scope.boxScores, function (boxScore, index) {
+      return boxScore.awayTeam.team.teamId === $scope.currentLeague.team.teamId ||
+        boxScore.homeTeam.team.teamId === $scope.currentLeague.team.teamId ? -1 : index;
+    });
+  };
+
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     ScoreboardService.fetch($scope.leagueId, $scope.week)
@@ -295,6 +306,8 @@ angular.module('starter.controllers', [])
         $scope.setLastUpdated(new Date());
 
         AppStateService.currentWeek($scope.week);
+
+        $scope.repaint();
 
         ImageCache.logosFromBoxScores($scope.boxScores);
       }, function (response) {
@@ -810,24 +823,11 @@ angular.module('starter.controllers', [])
 })
 
 .filter("boxScoreForTeam", function (_) {
-  return function (boxScores, teamId) {
-    if (!boxScores || !teamId) { return; }
+  return function (boxScore, teamId) {
+    if (!boxScore || !teamId) { return; }
 
-    return _.find(boxScores, function (boxScore) {
-      return boxScore.awayTeam.team.teamId === teamId ||
-        boxScore.homeTeam.team.teamId === teamId;
-    });
-  }
-})
-
-.filter("boxScoresExceptForTeam", function (_) {
-  return function (boxScores, teamId) {
-    if (!boxScores || !teamId) { return boxScores; }
-
-    return _.reject(boxScores, function (boxScore) {
-      return boxScore.awayTeam.team.teamId === teamId ||
-        boxScore.homeTeam.team.teamId === teamId;
-    });
+    return boxScore.awayTeam.team.teamId === teamId ||
+      boxScore.homeTeam.team.teamId === teamId;
   }
 })
 
@@ -952,16 +952,50 @@ angular.module('starter.controllers', [])
   }
 })
 
-.directive("rsaBoxScore", function () {
+.directive("rsaBoxScore", function (_, StandingsService) {
   return {
     restrict: "E",
 
     scope: {
       leagueId: "=",
+      week: "=",
       boxScore: "="
     },
 
-    templateUrl: "templates/directives/box-score.html"
+    templateUrl: "templates/directives/box-score.html",
+
+    link: function (scope, _element, attrs) {
+      if (scope.standings) { return; }
+      if (!scope.leagueId) { return; }
+      if (!scope.week) { return; }
+      if (!scope.boxScore) { return; }
+
+      StandingsService.fetch(scope.leagueId, scope.week - 1)
+        .then(function (response) {
+          standingsByTeam(response.data);
+        });
+
+      function standingsByTeam(standingsData) {
+        var flatStandings;
+
+        if (!standingsData) { return; }
+
+        flatStandings = _.chain(standingsData.divisionStandings)
+          .pluck("teamStandings")
+          .flatten()
+          .value();
+
+        scope.standingsData = {
+          away: _.find(flatStandings, function (s) {
+            return s.team.teamId === scope.boxScore.awayTeam.team.teamId;
+          }),
+          home: _.find(flatStandings, function (s) {
+            return s.team.teamId === scope.boxScore.homeTeam.team.teamId;
+          }),
+          summary: standingsData.summary
+        };
+      }
+    }
   }
 })
 ;

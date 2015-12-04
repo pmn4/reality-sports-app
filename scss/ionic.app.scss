@@ -456,3 +456,25 @@ $adjustment-minus-color: $assertive;
 .adjustment-minus-3 {
 	color: mix($adjustment-minus-color, $adjustment-base-color, 100%);
 }
+
+.box-score {
+	.rank,
+	.record {
+		font-weight: normal;
+		text-align: right;
+		font-size: 75%;
+		@include opacity(0.5);
+	}
+
+	.rank {
+		padding-right: 5px;
+	}
+
+	.record {
+		font-style: italic;
+	}
+}
+
+.current-user-box-score {
+	margin-bottom: 2px;
+}

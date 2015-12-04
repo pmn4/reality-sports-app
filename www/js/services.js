@@ -254,6 +254,7 @@ angular.module("starter.services", [])
 	function fetch(leagueId, week) {
 		return $http({
 			method: "GET",
+			cache: true,
 			// url: AppSettings.apiHost + "/v1/leagues/" + leagueId + "/standings"
 			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/weeks/" + week + "/standings"
 		});

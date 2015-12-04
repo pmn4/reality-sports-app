@@ -25,12 +25,8 @@
           this can take a little while the first time the page loads
         </p>
       </div>
-      <ion-item>
-        <rsa-box-score league-id="leagueId" box-score="boxScores | boxScoreForTeam:currentLeague.team.teamId"></rsa-box-score>
-      </ion-item>
-      <ion-item class="item-divider">Around the League</ion-item>
-      <ion-item ng-repeat="boxScore in boxScores | boxScoresExceptForTeam:currentLeague.team.teamId">
-        <rsa-box-score league-id="leagueId" box-score="boxScore"></rsa-box-score>
+      <ion-item ng-repeat="boxScore in boxScores" ng-class="{ 'current-user-box-score': (boxScore | boxScoreForTeam:currentLeague.team.teamId) }">
+        <rsa-box-score league-id="leagueId" week="week" box-score="boxScore"></rsa-box-score>
       </ion-item>
     </ion-list>
   </ion-content>
