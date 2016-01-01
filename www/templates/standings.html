@@ -4,7 +4,7 @@
   </ion-nav-buttons>
   <ion-content has-subheader>
     <div class="subheader">
-      <rsa-week-chooser on-choose-week="setWeek(week)" week="week" first-week="1" last-week="16"></rsa-week-chooser>
+      <rsa-week-chooser on-choose-week="setWeek(week)" week="week" first-week="1" last-week="17"></rsa-week-chooser>
     </div>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="subheader">
@@ -23,7 +23,7 @@
         </div>
       </div>
     </div>
-    <div class="loading-page-content" ng-show="divisionStandings | none">
+    <div class="loading-page-content" ng-show="divisionStandings == null">
       <h3>Loading...</h3>
       <p>
         this can take a little while the first time the page loads

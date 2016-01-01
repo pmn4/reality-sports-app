@@ -5,7 +5,7 @@
   <ion-content has-subheader>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="subheader">
-      <rsa-week-chooser on-choose-week="setWeek(week)" week="week" first-week="1" last-week="16"></rsa-week-chooser>
+      <rsa-week-chooser on-choose-week="setWeek(week)" week="week" first-week="1" last-week="17"></rsa-week-chooser>
     </div>
     <div class="last-updated">
       <div ng-show="ajaxing">
@@ -19,7 +19,7 @@
       </div>
     </div>
     <ion-list class="scoreboards">
-      <div class="loading-page-content" ng-show="boxScores | none">
+      <div class="loading-page-content" ng-show="boxScores == null">
         <h3>Loading...</h3>
         <p>
           this can take a little while the first time the page loads

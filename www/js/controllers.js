@@ -275,7 +275,7 @@ angular.module('starter.controllers', [])
 
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
-  $scope.boxScores = [];
+  $scope.boxScores = null;
 
   $scope.currentLeague = CacheService.getLeagueById($scope.leagueId);
 
@@ -301,8 +301,11 @@ angular.module('starter.controllers', [])
     $scope.ajaxing = $scope.indicateAjaxing(true);
     ScoreboardService.fetch($scope.leagueId, $scope.week)
       .then(function (response) {
-        $scope.week = response.data.week;
-        $scope.boxScores = response.data.boxScores;
+        var data = response.data || {};
+        if (data.week) {
+          $scope.week = data.week;
+        }
+        $scope.boxScores = data.boxScores || [];
         $scope.setLastUpdated(new Date());
 
         AppStateService.currentWeek($scope.week);
@@ -363,7 +366,7 @@ angular.module('starter.controllers', [])
 .controller("StandingsController", function ($scope, $state, $interval, $filter, $stateParams, _, AppSettings, StandingsService, AppStateService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
-  $scope.divisionStandings = [];
+  $scope.divisionStandings = null;
 
   if (!$scope.week || $scope.week === "default") {
     $scope.week = AppStateService.currentWeek();
@@ -375,10 +378,10 @@ angular.module('starter.controllers', [])
     $scope.ajaxing = $scope.indicateAjaxing(true);
     StandingsService.fetch($scope.leagueId, $scope.week - 1)
       .then(function (response) {
-        if (!response.data) { return; }
+        var data = response.data || {};
 
-        $scope.divisionStandings = response.data.divisionStandings;
-        $scope.summary = response.data.meta;
+        $scope.divisionStandings = data.divisionStandings || [];
+        $scope.summary = data.meta;
         $scope.setLastUpdated(new Date());
 
         AppStateService.currentWeek($scope.week);
@@ -923,7 +926,7 @@ angular.module('starter.controllers', [])
         scope.firstWeek = 1;
       }
       if (!scope.lastWeek) {
-        scope.lastWeek = 16;
+        scope.lastWeek = 17;
       }
 
       $timeout(function () { // "ensure" the chooser is rendered
