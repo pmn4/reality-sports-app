@@ -261,6 +261,20 @@ angular.module("starter.services", [])
 	}
 })
 
+.service("TeamService", function ($http, AppSettings) {
+	return {
+		fetch: fetch
+	};
+
+	function fetch(leagueId, teamId) {
+		return $http({
+			method: "GET",
+			cache: true,
+			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/teams/" + teamId
+		});
+	}
+})
+
 .service("GameService", function ($http, AppSettings) {
 	return {
 		fetch: fetch

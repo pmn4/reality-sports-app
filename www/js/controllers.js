@@ -94,8 +94,7 @@ angular.module('starter.controllers', [])
 .controller("LoginController", function ($scope, $state, $cordovaToast, AuthService, AppStateService) {
   // Form data for the login modal
   $scope.loginData = {
-    username: AppStateService.currentEmail(),
-    optIn: true
+    username: AppStateService.currentEmail()
   };
 
   $scope.login = function () {
@@ -582,9 +581,46 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("TeamController", function ($scope, $stateParams) {
+.controller("TeamController", function ($scope, $stateParams, $interval, AppSettings, TeamService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.teamId = $stateParams.teamId;
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.refresh = Mixins.throttle($scope, function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    TeamService.fetch($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        $scope.team = response.data || {};
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      }).finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  }, AppSettings.throttleRate);
+
+  $scope.refresh();
+
+  // $scope.$on("$ionicView.enter", function () {
+  //   $scope.setLastUpdated();
+
+  //   if ($scope.ajaxing) { return; }
+  //   if ($scope.divisionStandings && $scope.divisionStandings.length) { return; }
+
+  //   // this shouldn't often happen, but sometimes we re-load a view
+  //   // which failed to refresh the first time.
+  //   $scope.refresh();
+  // });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
 })
 
 .controller("PlayersController", function () {

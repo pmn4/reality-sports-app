@@ -14,7 +14,7 @@
     <ion-refresher pulling-text="Pull to refresh... <small>(once per {{ settings.refreshRate / 1000 }} sec)</small>" on-refresh="refresh()"></ion-refresher>
     <div id="game-summary" class="row">
       <div class="col col-50 left-side">
-        <h4 class="team-name one-liner">
+        <h4 class="team-name one-liner" ui-sref="app.team({ leagueId: leagueId, teamId: awayTeam.team.teamId })">
           {{ awayTeam.team.name }}
         </h4>
         <div class="row scoring-summary">
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="col col-50 right-side">
-        <h4 class="team-name one-liner">
+        <h4 class="team-name one-liner" ui-sref="app.team({ leagueId: leagueId, teamId: homeTeam.team.teamId })">
           {{ homeTeam.team.name }}
         </h4>
         <div class="row scoring-summary">

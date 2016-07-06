@@ -24,7 +24,6 @@ DONE:
 - links to email/twitter not working
 - app updates not working
 - cache leagues (sloooow)
-- email formatting (mailchimp)
 - send to login on 401
 - Initial Load: Request fails w/o Week
 - Standings
