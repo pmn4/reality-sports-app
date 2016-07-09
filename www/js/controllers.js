@@ -262,7 +262,7 @@ angular.module('starter.controllers', [])
       $state.go(whereTo || "app.standings", {
         leagueId: $scope.leagueId,
         week: $scope.week
-      });
+      }, { location: 'replace' });
     } else {
       $state.go("app.leagues");
     }
@@ -581,7 +581,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("TeamController", function ($scope, $stateParams, $interval, AppSettings, TeamService) {
+.controller("TeamController", function ($scope, $state, $stateParams, $interval, $ionicPopup, $q, AppSettings, AppStateService, CacheService, TeamService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.teamId = $stateParams.teamId;
 
@@ -589,6 +589,7 @@ angular.module('starter.controllers', [])
 
   $scope.refresh = Mixins.throttle($scope, function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
+
     TeamService.fetch($scope.leagueId, $scope.teamId)
       .then(function (response) {
         $scope.team = response.data || {};
@@ -604,6 +605,51 @@ angular.module('starter.controllers', [])
   }, AppSettings.throttleRate);
 
   $scope.refresh();
+
+  function currentLeagueTeamId() {
+    var league = _.find(CacheService.leagues(), function (league) {
+      // likely comparing string to int
+      return league.leagueId == AppStateService.currentLeagueId();
+    });
+
+    if (!league || !league.team) { return; }
+
+    return league.team.teamId;
+  }
+
+  $scope.$watch("team", function (team) {
+    $scope.editable = team &&
+      team.teamId == currentLeagueTeamId() &&
+      _.chain(team.startingPositions)
+        .map(function (p) { return p.player; })
+        .compact()
+        .any(function (p) { return !p.isLocked; })
+        .value();
+  })
+
+  $scope.$on("$ionicView.enter", function () {
+    var whereTo, teamId;
+
+    if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
+      $scope.leagueId = AppStateService.currentLeagueId();
+    }
+
+    if ($stateParams.teamId && $stateParams.teamId !== "default") {
+      return;
+    }
+
+    whereTo = $state.current.name.replace("-for-current-league", "");
+    teamId = currentLeagueTeamId();
+
+    if (teamId) {
+      $state.go(whereTo || "app.standings", {
+        leagueId: $scope.leagueId,
+        teamId: teamId
+      }, { location: 'replace' });
+    } else {
+      $state.go("app.leagues");
+    }
+  });
 
   // $scope.$on("$ionicView.enter", function () {
   //   $scope.setLastUpdated();
@@ -621,6 +667,87 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.beforeLeave", function () {
     $interval.cancel($scope._intervalUpdated);
   });
+
+  // end boilerplate stuff
+
+  $scope.assignPosition = function (position) {
+    var players;
+
+    if (!$scope.editable) { return; }
+
+    players = _.chain($scope.team.lineupPlayers)
+      .select(function (player) {
+        return _.contains(position.positionsAllowed, player.pos);
+      })
+      .reject(function (player) {
+        return position.player &&
+          player.playerId === position.player.playerId ||
+          player.startingSlot;
+      })
+      .value();
+
+    swapPlayer(position, players)
+      .then(function (playerId) {
+        $scope.ajaxing = $scope.indicateAjaxing(true);
+
+        TeamService.insertPlayer($scope.leagueId, $scope.teamId, position, playerId)
+          .then(function (response) {
+            $scope.refresh();
+          }, function (response) {
+            // @ todo: error message
+          }).finally(function () {
+            $scope.ajaxing = $scope.indicateAjaxing(false);
+          });
+      }, function (response) {
+      if (!response) { return; /* cancel */ }
+      });
+  };
+
+  function swapPlayer(position, players) {
+    var deferred = $q.defer(), scope = $scope.$new();
+    scope.players = players;
+    scope.swap = { player: {} };
+
+    var swapPlayerPopup = $ionicPopup.show({
+      template: '<ion-list>'+
+  '<ion-radio ng-repeat="player in players" ng-model="swap.player" ng-value="\'{{ player.playerId }}\'">' +
+    '{{ player | playerDisplayName }}' +
+    (position.positionsAllowed.length > 1 ? ', {{ player.pos }}' : '') +
+    '<span class="player-team">' +
+      ' {{ player | nflTeam }}' +
+    '</span>' +
+  '</ion-radio>' +
+'</ion-list>',
+      title: "Position: " + position.slotLabel,
+      scope: scope,
+      buttons: [
+        { text: 'Cancel' },
+        {
+          text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!scope.swap.player) {
+              e.preventDefault();
+            } else {
+              return scope.swap.player;
+            }
+          }
+        }
+      ]
+    });
+
+    swapPlayerPopup.then(function (response) {
+      if (response) {
+        deferred.resolve(response);
+      } else {
+        deferred.reject(response);
+      }
+    }, function (response) {
+      deferred.reject(response);
+    });
+
+    return deferred.promise;
+  }
 })
 
 .controller("PlayersController", function () {
@@ -644,6 +771,14 @@ angular.module('starter.controllers', [])
 .filter("any", function () {
   return function (arr) {
     return arr && arr.length;
+  };
+})
+
+.filter("nullIf", function () {
+  return function (val, condition) {
+    if ( val === condition ) { return; }
+
+    return val;
   };
 })
 
@@ -701,6 +836,14 @@ angular.module('starter.controllers', [])
     if (total == null) { return; }
 
     return total.toFixed(digits);
+  };
+})
+
+.filter("toCommaSeparated", function () {
+  return function (figure) {
+    if (figure == null) { return; }
+
+    return Number(Math.round(figure)).toLocaleString();
   };
 })
 

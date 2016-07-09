@@ -237,17 +237,6 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		}
 	}
 
-	.player-position {
-		font-size: 75%;
-		text-align: center;
-		padding: 0;
-		background: $stable;
-		@include align-self(stretch);
-		@include display-flex();
-		@include align-items(center);
-		@include justify-content(center);
-	}
-
 	.player-name {
 		font-weight: bold;
 	}
@@ -293,6 +282,84 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 			color: inherit;
 			font-weight: normal;
 		}
+	}
+}
+
+.player-position {
+	font-size: 75%;
+	text-align: center;
+	padding: 0;
+	background: $stable;
+	@include align-self(stretch);
+	@include display-flex();
+	@include align-items(center);
+	@include justify-content(center);
+}
+
+.team-player-list {
+	white-space: nowrap;
+	border-collapse: collapse;
+
+	thead {
+		td,
+		th {
+			background: $stable;
+			line-height: 1;
+		}
+	}
+
+	th,
+	td {
+		margin: 0;
+		padding: 10px;
+		vertical-align: middle;
+	}
+
+
+	th {
+		position: relative;
+		padding: 5px 10px;
+		font-size: 75%;
+		text-align: center;
+		background: $stable;
+	}
+
+	td {
+		border-bottom: 2px solid $stable;
+	}
+
+	tbody th {
+		border-bottom: 2px solid $light;
+	}
+
+	thead th {
+		border-style: solid;
+		border-color: $light;
+		border-width: 0 1px 2px 0;
+	}
+
+	.position {
+		position: relative;
+
+		.action-icon {
+			position: absolute;
+			bottom: 0;
+			right: 4px;
+		}
+	}
+
+	em.empty {
+		display: block;
+		text-align: center;
+		font-style: italic;
+	}
+
+	.rank {
+		text-align: center;
+	}
+
+	.number {
+		text-align: right;
 	}
 }
 
@@ -353,21 +420,6 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 			bottom: -5px;
 			left: 0;
 		}
-	}
-}
-.ad-banner-draft-kings {
-	background: black;
-	border-right: 0;
-	font-size: 80%;
-	line-height: 1.5;
-
-	.support {
-		color: #9bc23c;
-	}
-
-	a {
-		text-decoration: none;
-		color: white;
 	}
 }
 

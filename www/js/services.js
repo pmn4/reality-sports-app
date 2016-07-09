@@ -261,17 +261,80 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("TeamService", function ($http, AppSettings) {
+.service("TeamService", function ($http, AppSettings, _) {
 	return {
-		fetch: fetch
+		fetch: fetch,
+		insertPlayer: insertPlayer
 	};
 
 	function fetch(leagueId, teamId) {
 		return $http({
 			method: "GET",
-			cache: true,
-			url: AppSettings.apiHost + "/v2/leagues/" + leagueId + "/teams/" + teamId
+			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId
+		})
+		.then(function (response) {
+			var data, responseData = response.data, slotted = [];
+
+			data = responseData;
+
+			_.each(data.lineupPlayers, function (player) {
+				player.projectedPoints = player.projPoints;
+				player.game = {
+					opponent: player.opponent,
+					// timeRemaining:,
+					team: player.nflTeam,
+					gameStatus: player.gameStatus/*,
+					teamScore:,
+					opponentScore:*/
+				}
+			});
+
+			_.each(data.startingPositions, function (position) {
+				if (!position.positionsAllowed || !position.positionsAllowed.length) {
+					position.positionsAllowed = [position.startingSlot];
+				}
+
+				position.player = _.find(data.lineupPlayers, function (player) {
+					return (player.startingSlot || player.pos) == position.startingSlot &&
+						player.lineupStatus == 1 &&
+						!_.contains( slotted, player.playerId );
+				});
+
+				if (!position.player) { return; }
+
+				slotted.push(position.player.playerId);
+			});
+
+			data.bench = _.select(data.lineupPlayers, function (player) {
+				return player.lineupStatus == 2;
+			});
+
+			data.reserves = _.select(data.lineupPlayers, function (player) {
+				return player.lineupStatus == 3;
+			});
+
+			return { data: data };
 		});
+	}
+
+	function insertPlayer(leagueId, teamId, position, playerId) {
+		var data = [{
+			playerId: playerId,
+			lineupStatus: 1,
+			startingSlot: position.startingSlot
+		}];
+
+		if (position.player) {
+			data.push({
+				playerId: position.player.playerId,
+				lineupStatus: 2
+			});
+		}
+		return $http({
+			method: "POST",
+			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId,
+			data: { changedPlayers: data }
+		})
 	}
 })
 

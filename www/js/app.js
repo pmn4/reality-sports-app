@@ -145,6 +145,16 @@ angular.module('starter', [
       }
     })
 
+    .state("app.team-for-current-league", {
+      url: "/leagues/default/teams/default",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "TeamController"
+        }
+      }
+    })
+
     .state("app.team", {
       url: "/leagues/:leagueId/teams/:teamId",
       views: {

@@ -2,8 +2,12 @@
 
 output = 'www/lib/lodash/lodash.custom.min.js'
 methods = %w(
-	all
+  all
+	any
   chain
+  compact
+  contains
+  each
   find
   flatten
   isEmpty
@@ -13,6 +17,7 @@ methods = %w(
   pluck
   reduce
   reject
+  select
   sortBy
   throttle
   value
