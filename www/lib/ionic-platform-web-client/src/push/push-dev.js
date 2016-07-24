@@ -2,7 +2,6 @@ import { APIRequest } from "../core/request";
 import { Settings } from "../core/settings";
 import { Logger } from "../core/logger";
 import { PushToken } from "./push-token";
-import { PushMessage } from "./push-message";
 
 var settings = new Settings();
 
@@ -37,7 +36,7 @@ export class PushDevService {
     this.logger = new Logger({
       'prefix': 'Ionic Push (dev):'
     });
-    this._serviceHost = settings.getURL('push');
+    this._serviceHost = settings.getURL('platform-api') + '/push';
     this._token = false;
     this._watch = false;
   }
@@ -76,14 +75,10 @@ export class PushDevService {
 
     var requestOptions = {
       "method": 'POST',
-      "uri": this._serviceHost + '/dev/push',
-      'headers': {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      "body": JSON.stringify({
-        "dev_token": token
-      })
+      "uri": this._serviceHost + '/development',
+      "json": {
+        "token": token
+      }
     };
 
     new APIRequest(requestOptions).then(function() {
@@ -111,21 +106,16 @@ export class PushDevService {
     var self = this;
     var requestOptions = {
       'method': 'GET',
-      'uri': this._serviceHost + '/dev/push/check',
-      'headers': {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-Ionic-Dev-Token': this._token
-      },
+      'uri': self._serviceHost + '/development?token=' + self._token,
       'json': true
     };
 
     new APIRequest(requestOptions).then(function(result) {
-      if (result.payload.messages.length > 0) {
-        var message = PushMessage.fromPluginJSON({
-          'message': result.payload.messages[0],
+      if (result.payload.data.message) {
+        var message = {
+          'message': result.payload.data.message,
           'title': 'DEVELOPMENT PUSH'
-        });
+        };
 
         self.logger.warn("Ionic Push: Development Push received. Development pushes will not contain payload data.");
         self._emitter.emit("ionic_push:notification", message);

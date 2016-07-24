@@ -1050,19 +1050,25 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('UpdatesController', function ($scope, $ionicDeploy) {
+.controller('UpdatesController', function ($scope) {
+  var $ionicDeploy = new Ionic.Deploy();
+
   // Update app code with new release from Ionic Deploy
   $scope.doUpdate = function () {
     $scope.downloading = true;
     $ionicDeploy.update().then(function (res) {
+      // finally doesn't work??
+      $scope.downloading = false;
+
       console.log('Ionic Deploy: Update Success! ', res);
     }, function (err) {
+      // finally doesn't work??
+      $scope.downloading = false;
+
       console.log('Ionic Deploy: Update error! ', err);
     }, function (prog) {
       $scope.percentComplete = prog;
       console.log('Ionic Deploy: Progress... ', prog);
-    }).finally(function () {
-      $scope.downloading = false;
     });
   };
 
