@@ -1070,15 +1070,19 @@ angular.module('starter.controllers', [])
   $scope.checkForUpdates = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     $ionicDeploy.check().then(function (hasUpdate) {
+      // finally doesn't work??
+      $scope.ajaxing = $scope.indicateAjaxing(false);
+
       $scope.hasUpdate = hasUpdate;
 
       if (hasUpdate) {
         $scope.doUpdate();
       }
     }, function (err) {
-      console.error('Ionic Deploy: Unable to check for updates', err);
-    }).finally(function () {
+      // finally doesn't work??
       $scope.ajaxing = $scope.indicateAjaxing(false);
+
+      console.error('Ionic Deploy: Unable to check for updates', err);
     });
   }
 
