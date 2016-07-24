@@ -7,7 +7,7 @@
 angular.module('starter', [
   'ionic','ionic.service.core',
   'ngIOS9UIWebViewPatch',
-  
+
   'ionic.service.analytics',
   'ionic.service.deploy',
   'starter.controllers',
@@ -316,8 +316,8 @@ angular.module('starter', [
 .constant("moment", window.moment)
 
 .constant("AppSettings", {
-  apiHost: "http://localhost:9001",
-  // apiHost: "http://reality-sports-app.herokuapp.com",
+  // apiHost: "http://localhost:9001",
+  apiHost: "http://reality-sports-app.herokuapp.com",
   throttleRate: 20 * 1000, // 20 seconds
   gamesRefreshRate: 2 * 60 * 1000, // 2 minutes
   scoreboardsRefreshRate: 5 * 60 * 1000, // 5 minutes

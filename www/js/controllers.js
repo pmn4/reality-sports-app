@@ -74,10 +74,18 @@ angular.module('starter.controllers', [])
   };
 
   $scope.retryOnRsoError = function (response) {
+    var errorMessage;
+
     if (response.status === 401) {
       $state.go("app.logout");
     } else {
-      $cordovaToast.show(response.data || "Request failed", "short", "bottom");
+      errorMessage = response.data || "Request failed";
+
+      if (Array.isArray(errorMessage)) {
+        errorMessage = errorMessage.join("\n");
+      }
+
+      $cordovaToast.show(errorMessage, "short", "bottom");
     }
   };
 
@@ -111,6 +119,10 @@ angular.module('starter.controllers', [])
       }, function (response) {
         $scope.loggedIn(false);
         $scope.errorMessage = response.data || "Login Failed";
+
+        if (Array.isArray($scope.errorMessage)) {
+          $scope.errorMessage = $scope.errorMessage.join("\n");
+        }
         $cordovaToast.show(response.data || "Login Failed", "long", "bottom");
       })
       .finally(function () {
@@ -692,11 +704,13 @@ angular.module('starter.controllers', [])
 
         TeamService.insertPlayer($scope.leagueId, $scope.teamId, position, playerId)
           .then(function (response) {
-            $scope.refresh();
+            $scope.refresh()
+              .finally(function () {
+                $scope.ajaxing = $scope.indicateAjaxing(false);
+              });
           }, function (response) {
-            // @ todo: error message
-          }).finally(function () {
             $scope.ajaxing = $scope.indicateAjaxing(false);
+            // @ todo: error message
           });
       }, function (response) {
       if (!response) { return; /* cancel */ }
@@ -843,7 +857,7 @@ angular.module('starter.controllers', [])
   return function (figure) {
     if (figure == null) { return; }
 
-    return Number(Math.round(figure)).toLocaleString();
+    return Number(Math.round(figure)).toLocaleString("en");
   };
 })
 
@@ -1050,9 +1064,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('UpdatesController', function ($scope) {
-  var $ionicDeploy = new Ionic.Deploy();
-
+.controller('UpdatesController', function ($scope, $ionicDeploy) {
   // Update app code with new release from Ionic Deploy
   $scope.doUpdate = function () {
     $scope.downloading = true;
