@@ -1,12 +1,12 @@
 <ion-view view-title="Check for App Updates">
   <ion-content padding="true">
-    <div ng-show="ajaxing">
+    <div ng-show="checking || downloading || extracting">
       <p>
         Checking for updates...
       </p>
     </div>
 
-    <div ng-show="downloading">
+    <div ng-show="downloading || extracting">
       <p>
         Downloading update... ({{ downloadPercentComplete }}%)
       </p>

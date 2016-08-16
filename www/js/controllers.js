@@ -1081,13 +1081,13 @@ angular.module('starter.controllers', [])
 })
 
 .controller('UpdatesController', function ($scope, $ionicDeploy) {
+  $scope.ajaxing = $scope.indicateAjaxing(true);
+  $scope.extracting = true;
+
   $scope.doExtraction = function () {
     // Extract the updates
     $ionicDeploy.extract()
       .then(function (response) {
-        $scope.ajaxing = $scope.indicateAjaxing(true);
-        $scope.extracting = true;
-
         $ionicDeploy.load();
 
         // finally doesn't work??
