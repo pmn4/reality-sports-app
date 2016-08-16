@@ -1080,7 +1080,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('UpdatesController', function ($scope, $ionicDeploy, $location) {
+.controller('UpdatesController', function ($scope, $ionicDeploy) {
   $scope.doExtraction = function () {
     // Extract the updates
     $ionicDeploy.extract()
@@ -1088,20 +1088,22 @@ angular.module('starter.controllers', [])
         $scope.ajaxing = $scope.indicateAjaxing(true);
         $scope.extracting = true;
 
-        // Load the updated version
-        // $ionicTrack.load();
-        $location.refresh();
+        $ionicDeploy.load();
+
+        // finally doesn't work??
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.extracting = false;
 
         console.log('Ionic Deploy: Extraction Success! ', response);
       }, function (error) {
+        // finally doesn't work??
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.extracting = false;
+
         console.error('Ionic Deploy: Unable to extract update', error);
       }, function (progress) {
         // Do something with the zip extraction progress
         $scope.extractionPercentComplete = progress;
-      })
-      .finally(function () {
-        $scope.ajaxing = $scope.indicateAjaxing(false);
-        $scope.extracting = false;
       });
   };
 
@@ -1109,21 +1111,24 @@ angular.module('starter.controllers', [])
     $scope.ajaxing = $scope.indicateAjaxing(true);
     $scope.downloading = true;
 
-    // Download the updates
     $ionicDeploy.download()
-      .then(function () {
+      .then(function (response) {
         $scope.doExtraction();
+
+        // finally doesn't work??
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.downloading = false;
 
         console.log('Ionic Deploy: Download Success!', response);
       }, function (error) {
+        // finally doesn't work??
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.downloading = false;
+
         console.error('Ionic Deploy: Unable to download', error);
       }, function (progress) {
         // Do something with the download progress
         $scope.downloadPercentComplete = progress;
-      })
-      .finally(function () {
-        $scope.ajaxing = $scope.indicateAjaxing(false);
-        $scope.downloading = false;
       });
   };
 
@@ -1139,13 +1144,17 @@ angular.module('starter.controllers', [])
 
         $scope.doUpdate();
 
-        console.log('Ionic Deploy: Update Ready!', response);
-      }, function (error) {
-        console.error('Ionic Deploy: Unable to check for updates', error);
-      })
-      .finally(function () {
+        // finally doesn't work??
         $scope.ajaxing = $scope.indicateAjaxing(false);
         $scope.checking = false;
+
+        console.log('Ionic Deploy: Update Ready!', response);
+      }, function (error) {
+        // finally doesn't work??
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.checking = false;
+
+        console.error('Ionic Deploy: Unable to check for updates', error);
       });
   };
 
