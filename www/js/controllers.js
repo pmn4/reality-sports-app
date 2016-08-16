@@ -1080,48 +1080,75 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('UpdatesController', function ($scope, $ionicDeploy) {
-  // Update app code with new release from Ionic Deploy
-  $scope.doUpdate = function () {
-    $scope.downloading = true;
-    $ionicDeploy.update().then(function (res) {
-      // finally doesn't work??
-      $scope.downloading = false;
+.controller('UpdatesController', function ($scope, $ionicDeploy, $location) {
+  $scope.doExtraction = function () {
+    // Extract the updates
+    $ionicDeploy.extract()
+      .then(function (response) {
+        $scope.ajaxing = $scope.indicateAjaxing(true);
+        $scope.extracting = true;
 
-      console.log('Ionic Deploy: Update Success! ', res);
-    }, function (err) {
-      // finally doesn't work??
-      $scope.downloading = false;
+        // Load the updated version
+        // $ionicTrack.load();
+        $location.refresh();
 
-      console.log('Ionic Deploy: Update error! ', err);
-    }, function (prog) {
-      $scope.percentComplete = prog;
-      console.log('Ionic Deploy: Progress... ', prog);
-    });
+        console.log('Ionic Deploy: Extraction Success! ', response);
+      }, function (error) {
+        console.error('Ionic Deploy: Unable to extract update', error);
+      }, function (progress) {
+        // Do something with the zip extraction progress
+        $scope.extractionPercentComplete = progress;
+      })
+      .finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.extracting = false;
+      });
   };
 
-  // Check Ionic Deploy for new code
-  $scope.checkForUpdates = function () {
+  $scope.doUpdate = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
-    $ionicDeploy.check().then(function (hasUpdate) {
-      // finally doesn't work??
-      $scope.ajaxing = $scope.indicateAjaxing(false);
+    $scope.downloading = true;
 
-      $scope.hasUpdate = hasUpdate;
+    // Download the updates
+    $ionicDeploy.download()
+      .then(function () {
+        $scope.doExtraction();
+        console.log('Ionic Deploy: Download Success!', response);
+      }, function (error) {
+        console.error('Ionic Deploy: Unable to download', error);
+      }, function (progress) {
+        // Do something with the download progress
+        $scope.downloadPercentComplete = progress;
+      })
+      .finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.downloading = false;
+      });
+  };
 
-      if (hasUpdate) {
+  $scope.doCheck = function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    $scope.checking = true;
+
+    $ionicDeploy.check()
+      .then(function (response) {
+        $scope.hasUpdate = response;
+
+        if (!$scope.hasUpdate) { return; }
+
         $scope.doUpdate();
-      }
-    }, function (err) {
-      // finally doesn't work??
-      $scope.ajaxing = $scope.indicateAjaxing(false);
-
-      console.error('Ionic Deploy: Unable to check for updates', err);
-    });
-  }
+        console.log('Ionic Deploy: Update Ready!', response);
+      }, function (error) {
+        console.error('Ionic Deploy: Unable to check for updates', error);
+      })
+      .finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.checking = false;
+      });
+  };
 
   $scope.$on("$ionicView.enter", function () {
-    $scope.checkForUpdates();
+    $scope.doCheck();
   });
 })
 

@@ -5,11 +5,19 @@
         Checking for updates...
       </p>
     </div>
+
     <div ng-show="downloading">
       <p>
-        Downloading update... ({{ percentComplete }}%)
+        Downloading update... ({{ downloadPercentComplete }}%)
       </p>
     </div>
+
+    <div ng-show="extracting">
+      <p>
+        Installing update... ({{ extractionPercentComplete }}%)
+      </p>
+    </div>
+
     <div ng-show="hasUpdate == false">
       <p>
         Your app is up to date!
