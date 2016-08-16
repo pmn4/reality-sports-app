@@ -1113,6 +1113,7 @@ angular.module('starter.controllers', [])
     $ionicDeploy.download()
       .then(function () {
         $scope.doExtraction();
+
         console.log('Ionic Deploy: Download Success!', response);
       }, function (error) {
         console.error('Ionic Deploy: Unable to download', error);
@@ -1137,6 +1138,7 @@ angular.module('starter.controllers', [])
         if (!$scope.hasUpdate) { return; }
 
         $scope.doUpdate();
+
         console.log('Ionic Deploy: Update Ready!', response);
       }, function (error) {
         console.error('Ionic Deploy: Unable to check for updates', error);
