@@ -89,6 +89,15 @@ angular.module('starter.controllers', [])
     }
   };
 
+  $scope.info = function (message) {
+    if (!window.plugins) {
+      console.log("Toast not available", message);
+      return;
+    }
+
+    $cordovaToast.show(message, "short", "bottom");
+  };
+
   $scope.loggedIn = function (loggedIn) {
     $scope.loggedInState = loggedIn;
   };
@@ -593,7 +602,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("TeamController", function ($scope, $state, $stateParams, $interval, $ionicPopup, $q, AppSettings, AppStateService, CacheService, TeamService) {
+.controller("TeamController", function ($scope, $state, $stateParams, $interval, $ionicPopup, $q, $filter, AppSettings, AppStateService, CacheService, TeamService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.teamId = $stateParams.teamId;
 
@@ -609,6 +618,7 @@ angular.module('starter.controllers', [])
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
+        $scope.$broadcast("refreshed");
         $scope.ajaxing = $scope.indicateAjaxing(false);
 
         // Stop the ion-refresher from spinning
@@ -704,13 +714,16 @@ angular.module('starter.controllers', [])
 
         TeamService.insertPlayer($scope.leagueId, $scope.teamId, position, playerId)
           .then(function (response) {
-            $scope.refresh()
-              .finally(function () {
-                $scope.ajaxing = $scope.indicateAjaxing(false);
-              });
+            var removeListener = $scope.$on("refreshed", function () {
+              $scope.ajaxing = $scope.indicateAjaxing(false);
+              removeListener();
+            });
+
+            $scope.info("Lineup Set.  Refreshing...");
+            $scope.refresh();
           }, function (response) {
+            $scope.retryOnRsoError(response);
             $scope.ajaxing = $scope.indicateAjaxing(false);
-            // @ todo: error message
           });
       }, function (response) {
       if (!response) { return; /* cancel */ }
@@ -732,7 +745,8 @@ angular.module('starter.controllers', [])
     '</span>' +
   '</ion-radio>' +
 '</ion-list>',
-      title: "Position: " + position.slotLabel,
+      title: position.player ? "Replacing " + $filter("playerDisplayName")(position.player) : "",
+      subTitle: "Position: " + position.slotLabel,
       scope: scope,
       buttons: [
         { text: 'Cancel' },
@@ -931,13 +945,15 @@ angular.module('starter.controllers', [])
   };
 })
 
-.filter("playerDisplayName", function () {
+.filter("playerDisplayName", function (_) {
   return function (player) {
     var str;
 
     if (!player) { return; }
 
-    if (player.position === "DF") { return player.firstName; }
+    if (player.position === "DF" || player.pos === "DST") {
+      return player.firstName;
+    }
 
     if (player.firstName) {
       if (player.firstName[1] === ".") {
@@ -1152,6 +1168,84 @@ angular.module('starter.controllers', [])
             .scrollTo(scrollPosition, 0, true);
         });
       });
+    }
+  }
+})
+
+.directive("rsoTeamRoster", function () {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      team: "=",
+      className: "=",
+      onAssignPosition: "&"
+    },
+
+    templateUrl: "templates/directives/team-roster.html",
+
+    link: function (scope, element, attrs) {
+      element.addClass(attrs.className);
+
+      scope.assignPosition = function (position) {
+        if (!scope.onAssignPosition) { return; }
+
+        scope.onAssignPosition({ position: position });
+      }
+    }
+  }
+})
+
+.directive("rsoTeamRosterBench", function () {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      team: "=",
+      className: "=",
+      onAssignPlayer: "&"
+    },
+
+    templateUrl: "templates/directives/team-roster-bench.html",
+
+    link: function (scope, element, attrs) {
+      element.addClass(attrs.className);
+
+      scope.assignPlayer = function (player) {
+        if (!scope.onAssignPlayer) { return; }
+
+        scope.onAssignPlayer({ player: player });
+      }
+    }
+  }
+})
+
+.directive("rsoTeamRosterReserves", function () {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      team: "=",
+      className: "=",
+      onAssignPlayer: "&"
+    },
+
+    templateUrl: "templates/directives/team-roster-reserves.html",
+
+    link: function (scope, element, attrs) {
+      element.addClass(attrs.className);
+
+      scope.assignPlayer = function (player) {
+        if (!scope.onAssignPlayer) { return; }
+
+        scope.onAssignPlayer({ player: player });
+      }
     }
   }
 })

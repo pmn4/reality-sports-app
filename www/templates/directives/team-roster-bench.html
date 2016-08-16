@@ -1,0 +1,156 @@
+<table class="team-player-list">
+  <thead>
+    <tr>
+      <th class="position">
+        &nbsp;
+      </th>
+
+      <th rowspan="2" class="player">
+        Player
+      </th>
+
+      <th rowspan="2" class="team">
+        Team
+
+        <br/>
+
+        <em class="adjustment">
+          (bye)
+        </em>
+      </th>
+
+      <th rowspan="2" class="rank">
+        Rank
+      </th>
+
+      <th rowspan="2" class="opponent">
+        Opponent
+
+        <br/>
+
+        <em class="adjustment">
+          (rank)
+        </em>
+      </th>
+
+      <th colspan="3" class="points">
+        Points
+      </th>
+
+      <th rowspan="2" class="pct-owned">
+        Owned
+      </th>
+
+      <th rowspan="2" class="pct-started">
+        Started
+      </th>
+
+      <th rowspan="2" class="salary">
+        Salary
+      </th>
+    </tr>
+
+    <tr>
+      <th class="position">
+        Pos
+      </th>
+
+      <th class="points__average">
+        Average
+      </th>
+
+      <th class="points__projected">
+        Projected
+      </th>
+
+      <th class="points__last">
+        Last
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="player in team.bench" ng-hold="assignPlayer(player)">
+      <th class="position" ng-click="assignPlayer(player)" highlighter="player.playerId">
+        <div class="action-icon"><!-- ng-if="team.editable" -->
+          <i class="icon ion-locked stable" ng-if="player.isLocked"></i>
+          <i class="icon ion-arrow-swap positive" ng-if="!player.isLocked"></i>
+        </div>
+      </th>
+
+      <td class="player">
+        <span ng-if="player">
+          {{ player | playerDisplayName }}
+        </span>
+
+        <em ng-if="!player" class="empty assertive">
+          (empty)
+        </em>
+      </td>
+
+      <td class="team">
+        <span ng-if="player">
+          <span class="player-team">
+            {{ player | nflTeam }}
+
+            <em> <!-- @todo: hide once bye has passed? -->
+              ({{ player.byeWeek }})
+            </em>
+          </span>
+        </span>
+      </td>
+
+      <td class="rank">
+        <span ng-if="player" class="number">
+          {{ player.posRank | nullIf:0 }}
+        </span>
+      </td>
+
+      <td class="opponent">
+        <span ng-if="player">
+          {{ player.opponent }}
+
+          <em>
+            ({{ player.oppRank }})
+          </em>
+        </span>
+      </td>
+
+      <td class="points points__projected number">
+        <span ng-if="player">
+          {{ player.projPoints | toFixed:1 }}
+        </span>
+      </td>
+
+      <td class="points points__average number">
+        <span ng-if="player">
+          {{ player.avgPoints | toFixed:1 }}
+        </span>
+      </td>
+
+      <td class="points points__last number">
+        <span ng-if="player">
+          {{ player.lastPoints | toFixed:1 }}
+        </span>
+      </td>
+
+      <td class="number pct-owned">
+        <span ng-if="player">
+          {{ player.percentOwned | toFixed:0 }}%
+        </span>
+      </td>
+
+      <td class="number pct-started">
+        <span ng-if="player">
+          {{ player.percentStarted | toFixed:0 }}%
+        </span>
+      </td>
+
+      <td class="number salary">
+        <span ng-if="player">
+          ${{ player.salary | toCommaSeparated }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>

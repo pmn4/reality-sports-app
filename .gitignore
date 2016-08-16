@@ -9,6 +9,7 @@ plugins/
 *.cer
 *.ipa
 *.mobileprovision
+*.p12
 
 resources/android/tile-icon-white-with-background/
 resources/android/tile-icon-white/

@@ -320,7 +320,7 @@ angular.module("starter.services", [])
 	function insertPlayer(leagueId, teamId, position, playerId) {
 		var data = [{
 			playerId: playerId,
-			lineupStatus: 1,
+			lineupStatus: position.lineupStatus || 1,
 			startingSlot: position.startingSlot
 		}];
 

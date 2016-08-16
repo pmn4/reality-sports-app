@@ -326,6 +326,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 	td {
 		border-bottom: 2px solid $stable;
+
+		&.player {
+			background: $light; // opaque bg
+			border-right: 1px solid $stable;
+		}
 	}
 
 	tbody th {
@@ -360,6 +365,35 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 	.number {
 		text-align: right;
+	}
+
+	&__container {
+		position: relative;
+	}
+
+	&.team-player-list__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1; // animated-ascii-sunglasses.gif
+
+		.team,
+		.rank,
+		.opponent,
+		.points,
+		.points__average,
+		.points__projected,
+		.points__last,
+		.pct-owned,
+		.pct-started,
+		.salary {
+			display: none;
+		}
+	}
+
+	.section-divider {
+		text-align: left;
+		padding-top: 20px;
 	}
 }
 
@@ -529,4 +563,9 @@ $adjustment-minus-color: $assertive;
 
 .current-user-box-score {
 	margin-bottom: 2px;
+}
+
+// a redundant, but slightly more specific style
+.has-header.has-tabs-top {
+  top: $bar-height + $tabs-height;
 }
