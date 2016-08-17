@@ -104,10 +104,8 @@
                       {{ (playerData.away.projectedPoints | toFixed:2) || '&nbsp;' }}
                     </span>
                   </div>
-                  <div class="col col-name">
-                    <div class="player-game-status one-liner">
-                      {{ playerData.away.game | nflGameSummary }}
-                    </div>
+                  <div class="col player-game-status one-liner">
+                    {{ playerData.away.game | nflGameSummary }}
                   </div>
                 </div>
                 <div class="row">
@@ -129,10 +127,8 @@
                   </div>
                 </div>
                 <div class="row row-bottom">
-                  <div class="col col-name">
-                    <div class="player-game-status one-liner">
-                      {{ playerData.home.game | nflGameSummary }}
-                    </div>
+                  <div class="col player-game-status one-liner">
+                    {{ playerData.home.game | nflGameSummary }}
                   </div>
                   <div class="col col-points player-points number">
                     <span class="total-points {{ playerData.home | playerAdjustmentClass }}">
