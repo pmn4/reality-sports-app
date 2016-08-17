@@ -1,0 +1,147 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-positive">
+    <h1 class="title">
+      {{ player | playerFullName }}
+    </h1>
+
+    <button class="button button-clear" ng-click="closeModal()">Close</button>
+  </ion-header-bar>
+
+  <ion-content padding="true">
+    <div ng-controller="PlayerModalController" class="player-detail-modal">
+      <div ng-if="refreshing">
+        <em>Loading player data...</em>
+      </div>
+
+      <div class="row">
+        <div class="col col-33">
+          <img class="player-image" ng-src="{{ player.playerImage ? player.playerImage : 'img/bo.svg' }}" width="100%" />
+        </div>
+
+        <div class="col col-67">
+          <div class="row row-no-padding player-details">
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">AGE</span>
+                {{ (player | playerAge) || "-" }}
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">POS</span>
+                {{ player.pos }}
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">TEAM</span>
+                {{ player.nflTeam }}
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">OPP</span>
+                {{ player.opponent }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row row-no-padding player-league-stats">
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">OWNED</span>
+                {{ player.percentOwned }}%
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">RANK</span>
+                {{ player.posRank || "-" }}
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">AVG</span>
+                {{ player.avgPoints }}
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="data-point">
+                <span class="tiny label">TOTAL</span>
+                {{ player.totalPoints }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" ng-if="!player.ownedTeamId">
+        <div class="col">
+          <button class="button button-positive button-block button-small" ng-disabled="true">
+            Add {{ player.firstName }}
+            <em>(coming soon)</em>
+          </button>
+        </div>
+      </div>
+
+      <div class="row" ng-if="player.ownedTeamId">
+        <div class="col">
+          <div class="row row-no-padding row-center">
+            <div class="col col-80">
+              <div class="player-owner">
+                <span class="tiny label">
+                  OWNER
+                </span>
+
+                <img ng-src="{{ player.ownedTeamId | teamLogoById }}" height="16px" />
+                <strong>{{ player.ownedTeamName }}</strong>
+              </div>
+
+              <div class="player-salary">
+                <span class="tiny label">
+                  SALARY
+                </span>
+
+                ${{ player.salary | toCommaSeparated }}
+              </div>
+            </div>
+
+            <div class="col col-20">
+              <button class="button button-positive button-small" ng-disabled="true">
+                <i class="icon ion-arrow-swap"></i>
+                Trade
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="card-list-header">News</h4>
+
+      <div class="card" ng-repeat="report in playerData.news">
+        <div class="item item-divider">
+          <span class="item-note">
+            {{ report.releaseDateLabel }}
+          </span>
+        </div>
+
+        <div class="item item-text-wrap">
+          {{ report.report }}
+
+          <hr />
+
+          <div class="insight">
+            <span class="tiny label">INSIGHT:</span>
+            {{ report.insight }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

@@ -1,16 +1,37 @@
-<ion-view view-title="Players<sup class='assertive'>PUP</sup>">
-  <ion-content padding="true">
-    <p>
-      Coming soon.
-    </p>
-    <p>
-      I haven't built this page yet because some other pages took priority.
-      I am keeping track of the number of people who view this page.
-      The more it's viewed, the more I know it's important.
-    </p>
-    <button ng-click="launchRsoPage('FreeAgents.aspx')" class="button button-outline button-block button-positive">
-      <span class="icon ion-ios-browsers-outline"></span>
-      Open in Browser
+<ion-view view-title="Players">
+  <ion-nav-buttons side="secondary">
+    <button
+      class="button button-icon button-clear"
+      ng-class="{ 'button-dark ion-ios-settings': !filtered, 'button-balanced ion-ios-settings-strong': filtered }"
+      menu-toggle="right">
     </button>
+  </ion-nav-buttons>
+
+  <ion-content>
+    <div class="player-list__container" ng-show="playerStatsData">
+      <rso-player-search-results
+        player-stats-data="playerStatsData"
+        on-player-click="showPlayerDetails(player)"
+        on-team-click="goToTeam(teamId)"
+        class-name="player-list__overlay">
+      </rso-player-search-results>
+
+      <ion-scroll direction="x">
+        <rso-player-search-results
+          player-stats-data="playerStatsData"
+          on-player-click="showPlayerDetails(player)"
+          on-team-click="goToTeam(teamId)"
+          class-name="player-list__data">
+        </rso-player-search-results>
+      </ion-scroll>
+    </div>
+
+    <div class="item item-text-wrap">
+      <p>
+        <i class="icon ion-alert-circled energized"></i>
+        We&apos;re still working out some kinks on this page, so if you see
+        anything wrong, please <a ui-sref="app.help">contact us!</a>
+      </p>
+    </div>
   </ion-content>
 </ion-view>

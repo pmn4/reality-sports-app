@@ -1,3 +1,8 @@
+function isProduction() {
+  return window.location.host.indexOf("localhost") < 0 || // prod in browser
+    !!window.cordova; // prod in app
+}
+
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
@@ -165,6 +170,16 @@ angular.module('starter', [
       }
     })
 
+    .state("app.players-for-current-league", {
+      url: "/leagues/default/players",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "LeagueController"
+        }
+      }
+    })
+
     .state("app.players", {
       url: "/leagues/:leagueId/players",
       views: {
@@ -316,8 +331,7 @@ angular.module('starter', [
 .constant("moment", window.moment)
 
 .constant("AppSettings", {
-  // apiHost: "http://localhost:9001",
-  apiHost: "http://reality-sports-app.herokuapp.com",
+  apiHost: isProduction() ? "http://reality-sports-app.herokuapp.com" : "/api",
   throttleRate: 20 * 1000, // 20 seconds
   gamesRefreshRate: 2 * 60 * 1000, // 2 minutes
   scoreboardsRefreshRate: 5 * 60 * 1000, // 5 minutes

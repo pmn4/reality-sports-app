@@ -11,6 +11,7 @@ methods = %w(
   find
   flatten
   isEmpty
+  isEqual
   map
   max
   object

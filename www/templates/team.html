@@ -10,11 +10,11 @@
     <ion-tabs class="tabs-striped tabs-top">
       <ion-tab title="Lineup">
         <ion-content class="has-tabs-top" ng-show="team">
-          <div class="team-player-list__container">
-            <rso-team-roster class-name="team-player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
+          <div class="player-list__container">
+            <rso-team-roster class-name="player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
 
             <ion-scroll direction="x">
-              <rso-team-roster team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
+              <rso-team-roster class-name="player-list__data" team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
             </ion-scroll>
           </div>
         </ion-content>
@@ -22,11 +22,11 @@
 
       <ion-tab title="Bench">
         <ion-content class="has-tabs-top" ng-show="team">
-          <div class="team-player-list__container">
-            <rso-team-roster-bench class-name="team-player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
+          <div class="player-list__container">
+            <rso-team-roster-bench class-name="player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
 
             <ion-scroll direction="x">
-              <rso-team-roster-bench team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
+              <rso-team-roster-bench class-name="player-list__data" team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
             </ion-scroll>
           </div>
         </ion-content>
@@ -34,11 +34,11 @@
 
       <ion-tab title="IR">
         <ion-content class="has-tabs-top" ng-show="team">
-          <div class="team-player-list__container">
-            <rso-team-roster-reserve class-name="team-player-list__overlay" team="team"></rso-team-roster-reserve>
+          <div class="player-list__container">
+            <rso-team-roster-reserve class-name="player-list__overlay" team="team"></rso-team-roster-reserve>
 
             <ion-scroll direction="x">
-              <rso-team-roster-reserve team="team"></rso-team-roster-reserve>
+              <rso-team-roster-reserve class-name="player-list__data" team="team"></rso-team-roster-reserve>
             </ion-scroll>
           </div>
         </ion-tab>

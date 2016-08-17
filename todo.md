@@ -1,6 +1,7 @@
 BUGS:
 
 TODO:
+- Team Roster w/undefined league & team id??
 - view states when request errors (currently the loading page displays after an error)
 - Get Weeks on Bootstrap
 - do something with device info

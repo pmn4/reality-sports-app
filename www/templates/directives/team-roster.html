@@ -1,7 +1,7 @@
-<table class="team-player-list">
+<table class="player-list">
   <thead>
     <tr>
-      <th class="position">
+      <th class="slot">
         &nbsp;
       </th>
 
@@ -51,7 +51,7 @@
     </tr>
 
     <tr>
-      <th class="position">
+      <th class="slot">
         Pos
       </th>
 
@@ -71,7 +71,7 @@
 
   <tbody>
     <tr ng-repeat="startingPosition in team.startingPositions" ng-hold="assignPosition(startingPosition)">
-      <th class="position" ng-click="assignPosition(startingPosition)" highlighter="startingPosition.player.playerId">
+      <th class="slot" ng-click="assignPosition(startingPosition)" highlighter="startingPosition.player.playerId">
         {{ startingPosition.slotLabel }}
 
         <div class="action-icon"><!-- ng-if="team.editable" -->

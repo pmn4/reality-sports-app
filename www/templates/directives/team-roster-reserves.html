@@ -1,7 +1,7 @@
-<table class="team-player-list">
+<table class="player-list">
   <thead>
     <tr>
-      <th class="position">
+      <th class="slot">
         &nbsp;
       </th>
 
@@ -51,7 +51,7 @@
     </tr>
 
     <tr>
-      <th class="position">
+      <th class="slot">
         Pos
       </th>
 
@@ -71,9 +71,9 @@
 
   <tbody>
     <tr ng-repeat="player in team.reserves" ng-hold="assignPlayer(player)">
-      <th class="position" ng-click="assignPlayer(player)" highlighter="player.playerId">
+      <th class="slot" ng-click="assignPlayer(player)" highlighter="player.playerId">
         <div class="action-icon"><!-- ng-if="team.editable" -->
-          <i class="icon ion-locked stable" ng-if="player.isLocked"></i>
+          <i class="icon ion-locked dark" ng-if="player.isLocked"></i>
           <i class="icon ion-arrow-swap positive" ng-if="!player.isLocked"></i>
         </div>
       </th>

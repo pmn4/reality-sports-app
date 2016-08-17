@@ -1,4 +1,5 @@
-@import 'compass/css3/opacity';
+@import 'compass/css3/opacity',
+        'compass/css3/transform';
 
 /*
 To customize the look and feel of Ionic, you can override the variables
@@ -16,6 +17,7 @@ $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
 $dark:                            #444 !default;
 */
+
 $asserive: #ee2722; // rso red
 $positive: #1574c4; // rso blue
 
@@ -260,7 +262,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	@include justify-content(center);
 }
 
-.team-player-list {
+.player-list {
 	white-space: nowrap;
 	border-collapse: collapse;
 
@@ -307,7 +309,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		border-width: 0 1px 2px 0;
 	}
 
-	.position {
+	.slot,
+	.status {
 		position: relative;
 
 		.action-icon {
@@ -331,27 +334,42 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		text-align: right;
 	}
 
+	.has-button {
+		padding: 0;
+	}
+
 	&__container {
 		position: relative;
 	}
 
-	&.team-player-list__overlay {
+	&.player-list__overlay {
 		position: absolute;
 		top: 0;
 		left: 0;
 		z-index: 1; // animated-ascii-sunglasses.gif
 
+		.position,
 		.team,
+		.owner,
 		.rank,
 		.opponent,
 		.points,
 		.points__average,
+		.points__ytd,
 		.points__projected,
 		.points__last,
 		.pct-owned,
 		.pct-started,
 		.salary {
 			display: none;
+		}
+	}
+
+	&.player-list__data {
+		.player,
+		.slot,
+		.status {
+			color: transparent;
 		}
 	}
 
@@ -390,7 +408,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	border: 1px solid $bar-stable-border;
 }
 
-.week-picker {
+.week-picker,
+.data-point {
 	.button {
 		position: relative;
 	}
@@ -400,12 +419,22 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		left: 0;
 		width: 100%;
 		text-align: center;
-		text-transform: uppercase;
-		font-size: 50%;
-		line-height: 2;
-		@include opacity(0.5);
 	}
 }
+
+.label.tiny {
+	text-transform: uppercase;
+	font-size: 50%;
+	line-height: 2;
+	@include opacity(0.5);
+}
+
+.data-point {
+	position: relative;
+	padding-top: 0.75em;
+	text-align: center;
+}
+
 .ad-banner {
 	position: relative;
 	height: 100%;
@@ -419,6 +448,42 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 			left: 0;
 		}
 	}
+}
+
+.insight {
+	font-size: 90%;
+}
+
+.card-list-header {
+	margin: 0;
+
+	@extend .padding;
+
+	padding-top: 0;
+	padding-bottom: 0;
+
+	& + .card {
+		margin-top: 0;
+	}
+}
+
+.player-detail-modal {
+	.row {
+		&.player-league-stats {
+			margin-top: $grid-padding-width;
+		}
+	}
+
+	.player-salary,
+	.player-owner {
+		.label {
+			padding-right: $grid-padding-width;
+		}
+	}
+}
+
+.player-image {
+	border: 1px solid $bar-stable-border;
 }
 
 // .ajaxing-indicator {
@@ -532,4 +597,98 @@ $adjustment-minus-color: $assertive;
 // a redundant, but slightly more specific style
 .has-header.has-tabs-top {
   top: $bar-height + $tabs-height;
+}
+
+// .expandable {
+// 	position: relative;
+
+// 	.expandable__visible {
+// 		@include translateZ(1px);
+// 		@include transition(translate 500ms ease-out);
+// 		background: $light;
+// 	}
+
+// 	.expandable__expands {
+// 		position: absolute;
+// 		left: 0;
+// 		right: 0;
+// 		overflow: hidden;
+
+// 		@include translate(0, -100%);
+// 		@include transition(translate 500ms ease-out);
+// 	}
+
+// 	&.expanded {
+// 		.expandable__expands {
+// 			@include translate(0, 0);
+// 		}
+// 	}
+// }
+
+.radio-set {
+	@include display-flex;
+	@include flex-wrap(wrap);
+
+	border-color: $button-default-border;
+	border-style: solid;
+	border-width: 1px 0 0 1px;
+
+	&.items-3 {
+		.radio-item {
+			width: 33.333%;
+		}
+	}
+
+	&.items-4 {
+		.radio-item {
+			width: 25%;
+		}
+	}
+
+	&.items-5 {
+		.radio-item {
+			width: 20%;
+		}
+	}
+}
+
+.radio-item {
+	@extend .button;
+	@extend .button-stable;
+	@extend .button-small;
+
+	border-width: 0 1px 1px 0;
+	border-radius: 0;
+
+	&.checked {
+		&,
+		&:hover { // specificity battle
+			@extend .button-light;
+			color: $positive;
+			border-color: inherit;
+		}
+	}
+
+	input[type=radio] {
+		width: 0.1px;
+		height: 0.1px;
+		opacity: 0;
+		overflow: hidden;
+		position: absolute;
+		z-index: -1;
+	}
+}
+
+.input-wrapper {
+	& + & {
+		margin-top: $grid-padding-width;
+	}
+	& + .actions {
+		margin-top: 2 * $grid-padding-width;
+	}
+}
+
+.input-field-icon {
+	position: absolute;
+	right: $grid-padding-width;
 }
