@@ -1081,6 +1081,10 @@ angular.module('starter.controllers', [])
 })
 
 .controller('UpdatesController', function ($scope, $ionicDeploy) {
+  $scope.checking = false;
+  $scope.downloading = false;
+  $scope.extracting = false;
+
   $scope.doExtraction = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     $scope.extracting = true;
