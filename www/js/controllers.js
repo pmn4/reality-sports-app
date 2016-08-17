@@ -835,7 +835,7 @@ angular.module('starter.controllers', [])
 })
 
 .filter("nflGameYetToStart", function () {
-  var FUTURE_GAME_RE = /^\w+ \d+ \d+:\d+$/i;
+  var FUTURE_GAME_RE = /^\w+ \d+ \d+:\d+/i;
   return function (game) {
     if (!game) { return ""; }
 
