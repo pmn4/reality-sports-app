@@ -388,7 +388,7 @@ angular.module("starter.services", [])
 					gameStatus: player.gameStatus/*,
 					teamScore:,
 					opponentScore:*/
-				}
+				};
 			});
 
 			_.each(data.startingPositions, function (position) {
@@ -397,8 +397,8 @@ angular.module("starter.services", [])
 				}
 
 				position.player = _.find(data.lineupPlayers, function (player) {
-					return (player.startingSlot || player.pos) == position.startingSlot &&
-						player.lineupStatus == 1 &&
+					return (player.startingSlot || player.pos) === position.startingSlot &&
+						player.lineupStatus === 1 &&
 						!_.contains( slotted, player.playerId );
 				});
 
@@ -408,11 +408,11 @@ angular.module("starter.services", [])
 			});
 
 			data.bench = _.select(data.lineupPlayers, function (player) {
-				return player.lineupStatus == 2;
+				return player.lineupStatus === 2;
 			});
 
 			data.reserves = _.select(data.lineupPlayers, function (player) {
-				return player.lineupStatus == 3;
+				return player.lineupStatus === 3;
 			});
 
 			return { data: data };
@@ -443,7 +443,7 @@ angular.module("starter.services", [])
 			method: "POST",
 			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId + "/rostered_players",
 			data: { changedPlayers: data }
-		})
+		});
 	}
 
 	function listBids(leagueId, teamId) {

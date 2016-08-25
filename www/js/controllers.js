@@ -16,7 +16,7 @@ var Mixins = {
       if (!$scope.lastUpdated) { return true; }
 
       // updated, but no data?  true.
-      if (_.all(properties, function (p) { _.isEmpty($scope[p]) })) {
+      if (_.all(properties, function (p) { _.isEmpty($scope[p]); })) {
         return true;
       }
 
@@ -204,7 +204,7 @@ angular.module('starter.controllers', [])
       .finally(function () {
         $scope.ajaxing = $scope.indicateAjaxing(false);
       });
-  }
+  };
 })
 
 .controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, LeagueService, AppStateService) {
@@ -554,7 +554,7 @@ angular.module('starter.controllers', [])
         return true;
       }
     });
-  }
+  };
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
   $scope.refreshable = Mixins.refreshable($scope, AppSettings.gamesRefreshRate, ["homeTeam", "awayTeam"]);
@@ -630,7 +630,7 @@ angular.module('starter.controllers', [])
   $scope.initialize = function () {
     $scope.refresh();
     $scope.refreshNews();
-  }
+  };
 
   $scope.refresh = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
@@ -672,7 +672,7 @@ angular.module('starter.controllers', [])
   function currentLeagueTeamId() {
     var league = _.find(CacheService.leagues(), function (league) {
       // likely comparing string to int
-      return league.leagueId == AppStateService.currentLeagueId();
+      return league.leagueId === AppStateService.currentLeagueId();
     });
 
     if (!league || !league.team) { return; }
@@ -772,8 +772,7 @@ angular.module('starter.controllers', [])
 
   function currentLeagueTeamId() {
     var league = _.find(CacheService.leagues(), function (league) {
-      // likely comparing string to int
-      return league.leagueId == AppStateService.currentLeagueId();
+      return String(league.leagueId) === String(AppStateService.currentLeagueId());
     });
 
     if (!league || !league.team) { return; }
@@ -783,9 +782,9 @@ angular.module('starter.controllers', [])
 
   $scope.$watch("team", function (team) {
     $scope.editable = team &&
-      team.teamId == currentLeagueTeamId() &&
+      team.teamId === currentLeagueTeamId() &&
       team.editAllowed;
-  })
+  });
 
   $scope.$on("$ionicView.enter", function () {
     var whereTo, teamId;
@@ -1057,7 +1056,7 @@ angular.module('starter.controllers', [])
     $state.go("app.players", {
       leagueId: $scope.leagueId
     });
-  }
+  };
 
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
@@ -1084,11 +1083,11 @@ angular.module('starter.controllers', [])
 
   $scope.incrementBid = function () {
     $scope.formData.addPlayerBidAmount += increment;
-  }
+  };
 
   $scope.decrementBid = function () {
     $scope.formData.addPlayerBidAmount = Math.max($scope.bidMinimum, $scope.formData.addPlayerBidAmount - increment);
-  }
+  };
 
   if ($scope.leagueId) {
     AppStateService.currentLeagueId($scope.leagueId);
@@ -1495,7 +1494,7 @@ angular.module('starter.controllers', [])
     if (!team) { return ""; }
 
     return ImageCache.teamLogo(team.teamId);
-  }
+  };
 })
 
 .filter("teamLogoById", function (ImageCache) {
@@ -1503,7 +1502,7 @@ angular.module('starter.controllers', [])
     if (!teamId) { return ""; }
 
     return ImageCache.teamLogo(teamId);
-  }
+  };
 })
 
 .filter("boxScoreForTeam", function (_) {
@@ -1512,7 +1511,7 @@ angular.module('starter.controllers', [])
 
     return boxScore.awayTeam.team.teamId === teamId ||
       boxScore.homeTeam.team.teamId === teamId;
-  }
+  };
 })
 
 .filter("humanReadableDateSince", function (moment) {
@@ -1689,7 +1688,7 @@ angular.module('starter.controllers', [])
         });
       });
     }
-  }
+  };
 })
 
 .directive("rsoPlayerDetail", function (PlayersService, CacheService) {
@@ -1747,7 +1746,7 @@ angular.module('starter.controllers', [])
 
       refresh();
     }
-  }
+  };
 })
 
 .directive("rsoMicroPlayerDetail", function () {
@@ -1761,7 +1760,7 @@ angular.module('starter.controllers', [])
     },
 
     templateUrl: "templates/directives/micro-player-detail.html"
-  }
+  };
 })
 
 .directive("rsoPlayerCardHeader", function () {
@@ -1796,7 +1795,7 @@ angular.module('starter.controllers', [])
     link: function (scope, element, attrs) {
       element.addClass(attrs.className);
     }
-  }
+  };
 })
 
 .directive("rsoPlayerSearchFilters", function ($rootScope, $ionicSideMenuDelegate, PlayersService, PlayerPositionsService) {
@@ -1833,7 +1832,7 @@ angular.module('starter.controllers', [])
         broadcast();
 
         $ionicSideMenuDelegate.toggleRight(false);
-      }
+      };
 
       $scope.submit = function () {
         broadcast();
@@ -1841,7 +1840,7 @@ angular.module('starter.controllers', [])
         $ionicSideMenuDelegate.toggleRight(false);
       };
     }
-  }
+  };
 })
 
 .directive("rsoTeamRoster", function () {
@@ -1865,9 +1864,9 @@ angular.module('starter.controllers', [])
         if (!scope.onAssignPosition) { return; }
 
         scope.onAssignPosition({ position: position });
-      }
+      };
     }
-  }
+  };
 })
 
 .directive("rsoTeamRosterBench", function () {
@@ -1891,9 +1890,9 @@ angular.module('starter.controllers', [])
         if (!scope.onAssignPlayer) { return; }
 
         scope.onAssignPlayer({ player: player });
-      }
+      };
     }
-  }
+  };
 })
 
 .directive("rsoTeamRosterReserves", function () {
@@ -1917,9 +1916,9 @@ angular.module('starter.controllers', [])
         if (!scope.onAssignPlayer) { return; }
 
         scope.onAssignPlayer({ player: player });
-      }
+      };
     }
-  }
+  };
 })
 
 .directive("rsaBoxScore", function (_, StandingsService) {
@@ -1966,6 +1965,6 @@ angular.module('starter.controllers', [])
         };
       }
     }
-  }
+  };
 })
 ;
