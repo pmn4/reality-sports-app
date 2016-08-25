@@ -10,10 +10,12 @@ methods = %w(
   each
   find
   flatten
+  groupBy
   isEmpty
   isEqual
   map
   max
+  memoize
   object
   pluck
   reduce

@@ -150,6 +150,26 @@ angular.module('starter', [
       }
     })
 
+    .state("app.roster-for-current-league", {
+      url: "/leagues/default/teams/default/players",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "RosterController"
+        }
+      }
+    })
+
+    .state("app.roster", {
+      url: "/leagues/:leagueId/teams/:teamId/players",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/roster.html",
+          controller: "RosterController"
+        }
+      }
+    })
+
     .state("app.team-for-current-league", {
       url: "/leagues/default/teams/default",
       views: {
@@ -196,6 +216,16 @@ angular.module('starter', [
         "menuContent": {
           templateUrl: "templates/player.html",
           controller: "PlayerController"
+        }
+      }
+    })
+
+    .state("app.bid", {
+      url: "/leagues/:leagueId/team/:teamId/players/:playerId",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/bid.html",
+          controller: "BidController"
         }
       }
     })

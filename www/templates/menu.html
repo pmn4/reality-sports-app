@@ -28,19 +28,21 @@
     <ion-content>
     <!-- <ion-content has-footer="true"> -->
       <ion-list>
-        <ion-item menu-close ui-sref="app.entry">
-          <i class="icon ion-arrow-swap"></i>
-          Switch Leagues
-        </ion-item>
-
         <ion-item menu-close ui-sref="app.team-for-current-league">
           <i class="icon ion-tshirt"></i>
           My Team
         </ion-item>
 
-        <ion-item menu-close ui-sref="app.standings-for-current-league">
-          <i class="icon ion-trophy"></i>
-          Standings
+        <ion-item menu-close ui-sref="app.team-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-ios-americanfootball"></i>
+          Overview
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.roster-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-person-stalker"></i>
+          Roster
         </ion-item>
 
         <ion-item menu-close ui-sref="app.scoreboards-for-current-league">
@@ -48,16 +50,28 @@
           Scoreboard
         </ion-item>
 
+        <ion-item menu-close ui-sref="app.standings-for-current-league">
+          <i class="icon ion-trophy"></i>
+          Standings
+        </ion-item>
+
         <ion-item menu-close ui-sref="app.players-for-current-league">
           <i class="icon ion-person-stalker"></i>
-          Players
+          Player Search
         </ion-item>
+
 <!--
         <ion-item menu-close ui-sref="app.news">
           <i class="icon ion-ios-paper-outline"></i>
           My News
         </ion-item>
--->        <ion-item class="item-divider"></ion-item>
+-->
+        <ion-item menu-close ui-sref="app.entry">
+          <i class="icon ion-arrow-swap"></i>
+          Switch Leagues
+        </ion-item>
+
+        <ion-item class="item-divider"></ion-item>
         <ion-item menu-close ui-sref="app.help">
           <i class="icon ion-ios-help-outline assertive"></i>
           Help

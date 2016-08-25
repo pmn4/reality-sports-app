@@ -1,7 +1,7 @@
 <form ng-submit="submit()">
 	<div class="item item-input item-input-inset input-wrapper">
 		<label>
-			<input type="text" placeholder="Name" ng-model="filters.txtSearch">
+			<input type="text" placeholder="Name" ng-model="filters.txtSearch"> <!--  ng-model-options="{ debounce: 1000 }" -->
 		</label>
 
 		<button type="button" class="button button-icon button-clear icon-right ion-close-circled placeholder-icon input-field-icon" ng-disabled="!filters.txtSearch.length" ng-click="clearTxtSearch()"></button>
@@ -15,7 +15,7 @@
 		</label>
 	</div>
 
-	<div class="input-wrapper radio-set items-3">
+	<div class="input-wrapper radio-set items-2"> <!-- todo: I just happen to know that there are two options -->
 		<label class="radio-item" ng-repeat="(key, val) in playerFilterOptions" ng-class="{ checked: filters.playerFilter === key }">
 			<input type="radio" ng-model="filters.playerFilter" ng-value="key" ng-checked="key === filters.playerFilter">
 

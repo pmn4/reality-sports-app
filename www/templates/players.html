@@ -8,6 +8,10 @@
   </ion-nav-buttons>
 
   <ion-content>
+    <div ng-if="!playerStatsData" class="padding">
+      <span nf-show="ajaxing">loading...</span>
+    </div>
+
     <div class="player-list__container" ng-show="playerStatsData">
       <rso-player-search-results
         player-stats-data="playerStatsData"

@@ -1,0 +1,91 @@
+<ion-view view-title="Add Player">
+  <div class="bar bar-footer">
+    <div class="button-bar">
+      <button class="button button-stable" ng-click="goBack()">
+        Cancel
+      </button>
+
+      <button class="button button-balanced" ng-click="confirm()" ng-disabled="adjustableRoster.isRosterFull && dropPlayerId">
+        Place Bid
+      </button>
+    </div>
+  </div>
+
+  <ion-nav-buttons>
+    <button class="button button-clear" ng-click="goBack()">
+      <i class="icon ion-ios-arrow-back"></i>
+      Back
+    </button>
+  </ion-nav-buttons>
+
+  <ion-content padding="true" class="has-footer">
+    <rso-player-card-header player="player" show-name="true"></rso-player-card-header>
+
+    <div ng-show="error">
+      <div class="info-page-content">
+        <h3>Nope</h3>
+
+        <p class="assertive">
+          {{ error }}
+        </p>
+      </div>
+    </div>
+
+    <div ng-hide="error">
+      <h5>
+        Bid Amount:
+      </h5>
+
+      <div class="item">
+        <div class="row row-center row-no-padding">
+          <div class="col col-20 text-left">
+            <button
+              class="button button-stable"
+              ng-click="decrementBid()"
+              ng-disabled="formData.addPlayerBidAmount <= bidMinimum">
+              <i class="icon ion-minus-circled assertive"></i>
+            </button>
+          </div>
+
+          <div class="col col-60">
+            <div class="text-center">
+              <strong>
+                {{ formData.addPlayerBidAmount | toCommaSeparated }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="col col-20 text-right">
+            <button class="button button-stable" ng-click="incrementBid()">
+              <i class="icon ion-plus-circled balanced"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <h5>
+        <em ng-hide="adjustableRoster.isRosterFull">
+          (optional)
+        </em>
+
+        Player to Drop:
+      </h5>
+
+      <ion-radio
+        ng-model="formData.dropPlayerId"
+        ng-value="''"
+        ng-hide="adjustableRoster.isRosterFull">
+        <em>Do not drop a player</em>
+      </ion-radio>
+
+      <ion-list ng-repeat="(position, positionPlayers) in rosterByPosition track by position">
+        <ion-radio
+          ng-repeat="rosteredPlayer in positionPlayers | orderBy:'salary' track by rosteredPlayer.playerId"
+          ng-model="formData.dropPlayerId"
+          ng-value="rosteredPlayer.playerId">
+          <rso-micro-player-detail player="rosteredPlayer"></rso-micro-player-detail>
+        </ion-radio>
+      </ion-list>
+    </div>
+  </ion-content>
+</ion-view>

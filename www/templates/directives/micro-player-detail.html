@@ -1,0 +1,31 @@
+<div class="micro-player-detail">
+	<div class="player-name">
+		<span class="label tiny">{{ player.firstName }}</span>
+		<div class="one-liner">{{ player.lastName }}</div>
+	</div>
+
+	<div class="micro-player-detail__detail position">
+		<span class="label tiny">POS</span>
+		{{ player.pos }}
+	</div>
+
+	<div class="micro-player-detail__detail team">
+		<span class="label tiny">TEAM</span>
+		{{ player.nflTeam }}
+	</div>
+
+	<div class="micro-player-detail__detail rank">
+		<span class="label tiny">RANK</span>
+		{{ player.posRank }}
+	</div>
+
+	<div class="micro-player-detail__detail points">
+		<span class="label tiny">AVG</span>
+		{{ player.avgPoints }}
+	</div>
+
+	<div class="micro-player-detail__detail salary">
+		<span class="label tiny">SALARY</span>
+		${{ player.salary | toCommaSeparated }}
+	</div>
+</div>

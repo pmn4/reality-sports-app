@@ -59,20 +59,20 @@
         Status
       </th>
 
-      <th class="points__ytd">
-        YTD
-      </th>
-
-      <th class="points__average">
-        Average
-      </th>
-
       <th class="points__projected">
         Projected
       </th>
 
       <th class="points__last">
         Last
+      </th>
+
+      <th class="points__ytd">
+        YTD
+      </th>
+
+      <th class="points__average">
+        Average
       </th>
     </tr>
   </thead>
@@ -143,6 +143,12 @@
         </span>
       </td>
 
+      <td class="points points__last number">
+        <span ng-if="playerStats.stats">
+          {{ playerStats.stats.lastFantasyPoints | toFixed:1 }}
+        </span>
+      </td>
+
       <td class="points points__ytd number">
         <span ng-if="playerStats.stats">
           {{ playerStats.stats.ytdFantasyPoints | toFixed:1 }}
@@ -152,12 +158,6 @@
       <td class="points points__average number">
         <span ng-if="playerStats.player">
           {{ playerStats.player.avgPoints | toFixed:1 }}
-        </span>
-      </td>
-
-      <td class="points points__last number">
-        <span ng-if="playerStats.stats">
-          {{ playerStats.stats.lastFantasyPoints | toFixed:1 }}
         </span>
       </td>
 

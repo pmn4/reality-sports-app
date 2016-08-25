@@ -86,7 +86,7 @@ angular.module('starter.controllers', [])
         errorMessage = errorMessage.join("\n");
       }
 
-      $cordovaToast.show(errorMessage, "short", "bottom");
+      $scope.info(errorMessage);
     }
   };
 
@@ -268,6 +268,8 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
       $scope.leagueId = $stateParams.leagueId;
+
+      AppStateService.currentLeagueId($scope.leagueId);
     } else {
       $scope.leagueId = AppStateService.currentLeagueId();
     }
@@ -297,6 +299,10 @@ angular.module('starter.controllers', [])
   $scope.leagueId = $stateParams.leagueId;
   $scope.week = $stateParams.week;
   $scope.boxScores = null;
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
 
   $scope.currentLeague = CacheService.getLeagueById($scope.leagueId);
 
@@ -393,6 +399,10 @@ angular.module('starter.controllers', [])
     $scope.week = AppStateService.currentWeek();
   }
 
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
+
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = Mixins.throttle($scope, function () {
@@ -443,7 +453,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("GameController", function ($scope, $ionicPlatform, $state, $stateParams, $interval, $filter, $ionicActionSheet, _, AppSettings, GameService) {
+.controller("GameController", function ($scope, $ionicPlatform, $state, $stateParams, $interval, $filter, $ionicActionSheet, _, AppSettings, AppStateService, GameService) {
   var fnEnterEventHandler, fnExitEventHandler;
 
   $scope.leagueId = $stateParams.leagueId;
@@ -452,6 +462,10 @@ angular.module('starter.controllers', [])
   $scope.homeTeam = {};
   $scope.awayTeam = {};
   $scope.playerScoringData = {};
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
 
   function reformatPlayerData(homePlayers, awayPlayers) {
     // underscorejs, get in here!
@@ -603,16 +617,141 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("TeamController", function ($scope, $state, $stateParams, $interval, $ionicPopup, $q, $filter, AppSettings, AppStateService, CacheService, TeamService) {
+.controller("TeamController", function ($scope, $state, $stateParams, $interval, $q, $filter, AppSettings, AppStateService, CacheService, TeamService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.teamId = $stateParams.teamId;
 
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
+
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  $scope.refresh = Mixins.throttle($scope, function () {
+  $scope.initialize = function () {
+    $scope.refresh();
+    $scope.refreshNews();
+  }
+
+  $scope.refresh = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
 
-    TeamService.fetch($scope.leagueId, $scope.teamId)
+    TeamService.fetchAdjustableRoster($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        $scope.adjustableRoster = response.data || {};
+
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      }).finally(function () {
+        $scope.$broadcast("refreshed");
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.refreshNews = function () {
+    $scope.fetchingNews = true;
+    TeamService.news($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        $scope.news = response.data || [];
+
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+      }).finally(function () {
+        $scope.fetchingNews = false;
+     });
+  };
+
+  // Temporary until we have something to show on this page
+  // if ($scope.leagueId && $scope.teamId) {
+  //   $scope.initialize();
+  // }
+
+  function currentLeagueTeamId() {
+    var league = _.find(CacheService.leagues(), function (league) {
+      // likely comparing string to int
+      return league.leagueId == AppStateService.currentLeagueId();
+    });
+
+    if (!league || !league.team) { return; }
+
+    return league.team.teamId;
+  }
+
+  // $scope.$watch("team", function (team) {
+  //   $scope.editable = team &&
+  //     team.teamId == currentLeagueTeamId() &&
+  //     _.chain(team.startingPositions)
+  //       .map(function (p) { return p.player; })
+  //       .compact()
+  //       .any(function (p) { return !p.isLocked; })
+  //       .value();
+  // })
+
+  $scope.$on("$ionicView.enter", function () {
+    var whereTo, teamId;
+
+    if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
+      $scope.leagueId = AppStateService.currentLeagueId();
+    }
+
+    if ($stateParams.teamId && $stateParams.teamId !== "default") {
+      // temporary until we have something to show on this screen
+      $state.go("app.roster", {
+        leagueId: $scope.leagueId,
+        teamId: $scope.teamId
+      }, { location: 'replace' });
+
+      return;
+    }
+
+    whereTo = $state.current.name.replace("-for-current-league", "");
+    teamId = currentLeagueTeamId();
+
+    if (teamId) {
+      $state.go(whereTo || "app.standings", {
+        leagueId: $scope.leagueId,
+        teamId: teamId
+      }, { location: 'replace' });
+    } else {
+      $state.go("app.leagues");
+    }
+  });
+
+  // $scope.$on("$ionicView.enter", function () {
+  //   $scope.setLastUpdated();
+
+  //   if ($scope.ajaxing) { return; }
+  //   if ($scope.divisionStandings && $scope.divisionStandings.length) { return; }
+
+  //   // this shouldn't often happen, but sometimes we re-load a view
+  //   // which failed to refresh the first time.
+  //   $scope.refresh();
+  // });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
+})
+
+.controller("RosterController", function ($scope, $state, $stateParams, $interval, $ionicPopup, $q, $filter, AppSettings, AppStateService, CacheService, TeamService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.teamId = $stateParams.teamId;
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.refresh = function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+
+    TeamService.fetchRoster($scope.leagueId, $scope.teamId)
       .then(function (response) {
         $scope.team = response.data || {};
         $scope.setLastUpdated(new Date());
@@ -625,7 +764,7 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
-  }, AppSettings.throttleRate);
+  };
 
   if ($scope.leagueId && $scope.teamId) {
     $scope.refresh();
@@ -645,11 +784,7 @@ angular.module('starter.controllers', [])
   $scope.$watch("team", function (team) {
     $scope.editable = team &&
       team.teamId == currentLeagueTeamId() &&
-      _.chain(team.startingPositions)
-        .map(function (p) { return p.player; })
-        .compact()
-        .any(function (p) { return !p.isLocked; })
-        .value();
+      team.editAllowed;
   })
 
   $scope.$on("$ionicView.enter", function () {
@@ -707,7 +842,8 @@ angular.module('starter.controllers', [])
       .reject(function (player) {
         return position.player &&
           player.playerId === position.player.playerId ||
-          player.startingSlot;
+          player.startingSlot ||
+          player.lineupStatus === 3; // IR
       })
       .value();
 
@@ -781,16 +917,17 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller("PlayersController", function ($rootScope, $scope, $state, $interval, $stateParams, $ionicModal, _, PlayersService) {
+.controller("PlayersController", function ($rootScope, $scope, $state, $interval, $stateParams, $ionicModal, _, AppStateService, PlayersService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.players = null;
   $scope.player = {};
 
   $scope.filters = PlayersService.currentFilters();
+  $scope.filtered = !PlayersService.isEmptyFilters();
 
-  $scope.$watch("filters", function (filters) {
-    $scope.filtered = !PlayersService.isEmptyFilters(filters);
-  });
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
@@ -813,7 +950,12 @@ angular.module('starter.controllers', [])
      });
   };
 
+  $scope.refresh();
+
   $rootScope.$on("rsoPlayerSearchFilters:apply", function (_idk, filters) {
+    $scope.filtered = !PlayersService.isEmptyFilters(filters);
+
+    // @todo: do we even need $scope.filters?
     $scope.filters = filters;
     $scope.refresh();
   });
@@ -823,12 +965,11 @@ angular.module('starter.controllers', [])
 
     $scope.setLastUpdated();
 
-    if ($scope.ajaxing) { return; }
-    if ($scope.divisionStandings && $scope.divisionStandings.length) { return; }
+    // if ($scope.ajaxing) { return; }
 
-    // this shouldn't often happen, but sometimes we re-load a view
-    // which failed to refresh the first time.
-    $scope.refresh();
+    // // this shouldn't often happen, but sometimes we re-load a view
+    // // which failed to refresh the first time.
+    // $scope.refresh();
   });
 
   $scope._intervalUpdated = $interval(function () {
@@ -857,9 +998,14 @@ angular.module('starter.controllers', [])
   });
 
   $scope.showPlayerDetails = function (player) {
-    angular.extend($scope.player, player);
+    return $state.go("app.player", {
+      leagueId: $scope.leagueId,
+      playerId: player.playerId
+    });
 
-    $scope.modal.show();
+    // angular.extend($scope.player, player);
+
+    // $scope.modal.show();
   };
 
   $scope.closeModal = function () {
@@ -874,34 +1020,218 @@ angular.module('starter.controllers', [])
 })
 
 .controller("PlayerModalController", function ($scope, PlayersService) {
-  $scope.$watch("leagueId", refresh);
-  $scope.$watch("player.playerId", refresh);
-  $scope.$watch("player", refresh);
-
-  function refresh() {
-    if ($scope.refreshing === true) { return; }
-
-    if (!$scope.leagueId || !$scope.player || !$scope.player.playerId) {
-      return;
-    }
-
-    $scope.refreshing = true;
-    $scope.ajaxing = $scope.indicateAjaxing(true);
-    PlayersService.read($scope.leagueId, $scope.player.playerId)
-      .then(function (response) {
-        $scope.playerData = response.data;
-        angular.extend($scope.player, $scope.playerData.player);
-      }, function (error) {
-        $scope.retryOnRsoError(error);
-      })
-      .finally(function () {
-        $scope.ajaxing = $scope.indicateAjaxing(false);
-        $scope.refreshing = false;
-      })
-  }
+  $scope.beginIndicateAjaxing = function () { $scope.indicateAjaxing(true); };
+  $scope.endIndicateAjaxing = function () { $scope.indicateAjaxing(false); };
 })
 
-.controller("PlayerController", function () {
+.controller("PlayerController", function ($scope, $state, $stateParams, $interval, $ionicHistory, AppStateService, PlayersService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.playerId = $stateParams.playerId;
+  $scope.player = {};
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  function goToPlayers() {
+    $state.go($scope.leagueId ? "app.players" : "app.players-for-current-league", {
+      leagueId: $scope.leagueId
+    });
+  }
+
+  if (!$scope.leagueId || !$scope.playerId) {
+    return goToPlayers();
+  }
+
+  $scope.beginIndicateAjaxing = function () { $scope.indicateAjaxing(true); };
+  $scope.endIndicateAjaxing = function () { $scope.indicateAjaxing(false); };
+  // the rsoPlayerDetail directive does most of the hard work here
+
+  $scope.goBack = function () {
+    if ($ionicHistory.backView()) {
+      return $ionicHistory.goBack();
+    }
+
+    $state.go("app.players", {
+      leagueId: $scope.leagueId
+    });
+  }
+
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+})
+
+.controller("BidController", function ($scope, $state, $stateParams, $interval, $ionicHistory, $q, $ionicPopup, $filter, _, AppStateService, TeamService, PlayersService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.teamId = $stateParams.teamId;
+  $scope.playerId = $stateParams.playerId;
+  $scope.player = {};
+
+  var increment = 500000;
+  $scope.leagueSalaryCap = 155270000;
+  $scope.bidMinimum = 500000;
+  $scope.bidMaximum = $scope.leagueSalaryCap;
+  $scope.formData = {
+    addPlayerId: $scope.playerId,
+    addPlayerBidAmount: $scope.bidMinimum,
+    dropPlayerId: ""
+  };
+
+  $scope.$watch("formData.dropPlayerId", function (val) { console.log(val); });
+
+  $scope.incrementBid = function () {
+    $scope.formData.addPlayerBidAmount += increment;
+  }
+
+  $scope.decrementBid = function () {
+    $scope.formData.addPlayerBidAmount = Math.max($scope.bidMinimum, $scope.formData.addPlayerBidAmount - increment);
+  }
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+  }
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  function goToPlayers() {
+    $state.go($scope.leagueId ? "app.players" : "app.players-for-current-league", {
+      leagueId: $scope.leagueId
+    });
+  }
+
+  if (!$scope.playerId) { return goToPlayers(); }
+
+  $scope.goBack = function () {
+    if ($ionicHistory.backView()) {
+      return $ionicHistory.goBack();
+    }
+
+    $state.go("app.player", {
+      leagueId: $scope.leagueId,
+      playerId: $scope.playerId
+    });
+  };
+
+
+
+
+
+  $scope.confirm = function () {
+    addDropPlayer()
+      .then(function (formData) {
+        $scope.ajaxing = $scope.indicateAjaxing(true);
+
+        TeamService.createBid($scope.leagueId, $scope.teamId, $scope.formData)
+          .then(function (response) {
+            $scope.info("Success");
+
+            $state.go("app.team", {
+              leagueId: $scope.leagueId,
+              teamId: $scope.teamId
+            }, { location: "replace" });
+          }, function (response) {
+            $scope.retryOnRsoError(response);
+          }).finally(function () {
+            $scope.ajaxing = $scope.indicateAjaxing(false);
+          });
+      }, function (response) {
+        if (!response) { return; /* cancel */ }
+      });
+  };
+
+  function addDropPlayer() {
+    var deferred = $q.defer(), addDropPopup;
+
+    if ($scope.formData.dropPlayerId) {
+      $scope.dropPlayer = _.find($scope.adjustableRoster.roster, function (player) {
+        return player.playerId === $scope.formData.dropPlayerId;
+      });
+    }
+
+    addDropPopup = $ionicPopup.show({
+      template: '<p>'+
+  'If successful, you will be adding {{ player | playerFullName }} for 1 year at {{ formData.addPlayerBidAmount | toCommaSeparated }}.' +
+'</p>' +
+'<p ng-if="formData.dropPlayerId">' +
+  'In addition, you will be dropping {{ dropPlayer | playerFullName }}.' +
+'</p>' +
+'<p ng-if="formData.dropPlayerId" ng-show="dropPlayer.acceleratedAmtCurrYear > 0">' +
+  'If {{ dropPlayer.lastName }} is unclaimed by another franchise, the following amounts will be charged against your salary cap:' +
+'</p>' +
+'<ion-list>' +
+  '<ion-item ng-if="dropPlayer.acceleratedAmtCurrYear > 0">This Year: {{ dropPlayer.acceleratedAmtCurrYear | toCommaSeparated }}</ion-item>' +
+  '<ion-item ng-if="dropPlayer.acceleratedAmtNextYear > 0">Next Year: {{ dropPlayer.acceleratedAmtNextYear | toCommaSeparated }}</ion-item>' +
+'</ion-list>',
+      title: $scope.player ? "Add " + $filter("playerFullName")($scope.player) : "",
+      subTitle: $scope.dropPlayer ? "Drop: " + $filter("playerFullName")($scope.dropPlayer) : "",
+      scope: $scope,
+      buttons: [
+        { text: 'Cancel' },
+        {
+          text: '<b>Confirm</b>',
+          type: 'button-positive',
+          onTap: function (e) {
+            return true;
+          }
+        }
+      ]
+    });
+
+    addDropPopup.then(function (response) {
+      if (response) {
+        deferred.resolve(response);
+      } else {
+        deferred.reject(response);
+      }
+    }, function (response) {
+      deferred.reject(response);
+    });
+
+    return deferred.promise;
+  }
+
+
+
+
+
+
+
+  $scope.refresh = function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    $scope.refreshing = true;
+    TeamService.fetchAdjustableRoster($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        $scope.adjustableRoster = response.data || {};
+        $scope.rosterByPosition = _.groupBy($scope.adjustableRoster.roster, "pos");
+
+        $scope.setLastUpdated(new Date());
+
+        $scope.error = null;
+      }, function (response) {
+        $scope.error = response.data;
+      }).finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+        $scope.refreshing = false;
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.refresh();
+  PlayersService.read($scope.leagueId, $scope.playerId)
+    .then(function (response) {
+      $scope.playerData = response.data;
+
+      $scope.player = $scope.playerData.player;
+    });
+
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
 })
 
 .controller("NewsController", function () {
@@ -1185,7 +1515,13 @@ angular.module('starter.controllers', [])
   }
 })
 
-.directive("toggleClass", function() {
+.filter("humanReadableDateSince", function (moment) {
+  return function (dateString, format) {
+    return moment(dateString, format).fromNow(true);
+  };
+})
+
+.directive("toggleClass", function () {
   return {
     restrict: "A",
     link: function(scope, element, attrs) {
@@ -1354,6 +1690,93 @@ angular.module('starter.controllers', [])
       });
     }
   }
+})
+
+.directive("rsoPlayerDetail", function (PlayersService, CacheService) {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      leagueId: "=",
+      playerId: "=",
+      player: "=", // if you want to seed some data
+      onRequest: "&",
+      onSuccess: "&",
+      onError: "&",
+      onComplete: "&"
+    },
+
+    templateUrl: "templates/directives/player-detail.html",
+
+    link: function ($scope) {
+      $scope.$watch("leagueId", refresh);
+      $scope.$watch("playerId", refresh);
+      $scope.$watch("player", refresh);
+
+      $scope.teamId = CacheService.getLeagueById($scope.leagueId).team.teamId;
+
+      function refresh() {
+        if ($scope.refreshing === true) { return; }
+
+        if (!$scope.player) { $scope.player = {}; }
+
+        if (!$scope.leagueId || !$scope.playerId) {
+          return;
+        }
+
+        $scope.refreshing = true;
+        $scope.onRequest();
+        PlayersService.read($scope.leagueId, $scope.playerId)
+          .then(function (response) {
+            $scope.playerData = response.data;
+
+            angular.extend($scope.player, $scope.playerData.player);
+
+            $scope.onSuccess({ response: response });
+          }, function (response) {
+            $scope.onError({ response: response });
+          })
+          .finally(function () {
+            $scope.refreshing = false;
+
+            $scope.onComplete();
+          });
+      }
+
+      refresh();
+    }
+  }
+})
+
+.directive("rsoMicroPlayerDetail", function () {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      player: "="
+    },
+
+    templateUrl: "templates/directives/micro-player-detail.html"
+  }
+})
+
+.directive("rsoPlayerCardHeader", function () {
+  return {
+    replace: true,
+
+    restrict: "E",
+
+    scope: {
+      player: "=",
+      showName: "="
+    },
+
+    templateUrl: "templates/directives/player-card-header.html"
+  };
 })
 
 .directive("rsoPlayerSearchResults", function () {

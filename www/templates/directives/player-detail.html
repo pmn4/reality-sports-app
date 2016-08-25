@@ -1,0 +1,65 @@
+<div>
+  <rso-player-card-header player="player"></rso-player-card-header>
+
+  <div class="row" ng-if="!player.ownedTeamId">
+    <div class="col">
+      <a class="button button-positive button-block button-small" ui-sref="app.bid({ leagueId: leagueId, teamId: teamId, playerId: player.playerId })">
+        Add {{ player | playerFullName }}
+        <em>(coming soon)</em>
+      </a>
+    </div>
+  </div>
+
+  <div class="row" ng-if="player.ownedTeamId">
+    <div class="col">
+      <div class="row row-no-padding row-center">
+        <div class="col col-80">
+          <div class="player-owner">
+            <span class="tiny label">
+              OWNER
+            </span>
+
+            <img ng-src="{{ player.ownedTeamId | teamLogoById }}" height="16px" />
+            <strong>{{ player.ownedTeamName }}</strong>
+          </div>
+
+          <div class="player-salary">
+            <span class="tiny label">
+              SALARY
+            </span>
+
+            ${{ player.salary | toCommaSeparated }}
+          </div>
+        </div>
+
+        <div class="col col-20">
+          <button class="button button-positive button-small" ng-disabled="true">
+            <i class="icon ion-arrow-swap"></i>
+            Trade
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="card-list-header">News</h4>
+
+  <div class="card" ng-repeat="report in playerData.news">
+    <div class="item item-divider">
+      <span class="item-note">
+        {{ report.releaseDateLabel | humanReadableDateSince:'LLLL' }} ago
+      </span>
+    </div>
+
+    <div class="item item-text-wrap">
+      {{ report.report }}
+
+      <hr />
+
+      <div class="insight">
+        <span class="tiny label">INSIGHT:</span>
+        {{ report.insight }}
+      </div>
+    </div>
+  </div>
+</div>

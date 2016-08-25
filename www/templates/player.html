@@ -1,12 +1,23 @@
-<ion-view view-title="Players<sup class='assertive'>PUP</sup>">
+<ion-view>
+  <ion-nav-title>
+    {{ (player | playerFullName) || 'loading...' }}
+  </ion-nav-title>
+
+  <ion-nav-buttons>
+    <button class="button button-clear" ng-click="goBack()">
+      <i class="icon ion-ios-arrow-back"></i>
+      Players
+    </button>
+  </ion-nav-buttons>
+
   <ion-content padding="true">
-    <p>
-      Coming soon.
-    </p>
-    <p>
-      We haven't built this page yet because some other pages took priority.
-      We keep track of the number of people who view this page.
-      The more it's viewed, the more we know it's important.
-    </p>
+    <rso-player-detail
+      player="player"
+      league-id="leagueId"
+      player-id="playerId"
+      on-request="beginIndicateAjaxing()"
+      on-complete="endIndicateAjaxing()"
+      on-error="retryOnRsoError(response)">
+    </rso-player-detail>
   </ion-content>
 </ion-view>

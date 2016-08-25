@@ -1,0 +1,73 @@
+<div class="row player-card-header">
+  <div class="col col-33">
+    <img class="player-image" ng-src="{{ player.playerImage ? player.playerImage : 'img/bo.svg' }}" width="100%" />
+  </div>
+
+  <div class="col col-67">
+    <h4 class="text-center one-liner player-name" ng-if="showName">
+      <span ng-show="!player.firstName">&nbsp;</span>
+
+      {{ player | playerFullName }}
+    </h4>
+
+    <div class="row row-no-padding player-details">
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">AGE</span>
+          {{ (player | playerAge) || "-" }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">POS</span>
+          {{ player.pos }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">TEAM</span>
+          {{ player.nflTeam }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">OPP</span>
+          {{ player.opponent }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-no-padding player-league-stats">
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">OWNED</span>
+          {{ player.percentOwned | toFixed:1 }}%
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">RANK</span>
+          {{ player.posRank || "-" }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">AVG</span>
+          {{ player.avgPoints }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="data-point">
+          <span class="tiny label">TOTAL</span>
+          {{ player.totalPoints }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

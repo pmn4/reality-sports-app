@@ -1,8 +1,10 @@
 BUGS:
 
 TODO:
-- Team Roster w/undefined league & team id??
+- move player to bench
+- move player from bench
 - view states when request errors (currently the loading page displays after an error)
+- Player details as a page instead of a modal - there was a reason....
 - Get Weeks on Bootstrap
 - do something with device info
 - refresh interval
@@ -34,3 +36,4 @@ DONE:
   - Not Available Message
 - Week Chooser Directive
 - Scroll Week Selector
+- Team Roster w/undefined league & team id??

@@ -106,7 +106,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 .one-liner {
-	overflow: hidden;
+	overflow-x: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
@@ -294,8 +294,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		border-bottom: 2px solid $stable;
 
 		&.player {
-			background: $light; // opaque bg
-			border-right: 1px solid $stable;
+			background: $stable; // opaque bg
+			border-color: $light;
 		}
 	}
 
@@ -316,7 +316,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 		.action-icon {
 			position: absolute;
 			bottom: 0;
-			right: 4px;
+			left: 4px;
 		}
 	}
 
@@ -402,6 +402,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	color: $bar-stable-text;
 	border: 1px solid $bar-stable-border;
 }
+
 .info-page-content {
 	background: $bar-stable-bg;
 	color: $calm;
@@ -468,17 +469,23 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 .player-detail-modal {
+	.player-salary,
+	.player-owner {
+		.label {
+			padding-right: $grid-padding-width;
+		}
+	}
+}
+
+.player-card-header {
 	.row {
 		&.player-league-stats {
 			margin-top: $grid-padding-width;
 		}
 	}
 
-	.player-salary,
-	.player-owner {
-		.label {
-			padding-right: $grid-padding-width;
-		}
+	.player-name {
+		margin-top: 0;
 	}
 }
 
@@ -633,6 +640,18 @@ $adjustment-minus-color: $assertive;
 	border-style: solid;
 	border-width: 1px 0 0 1px;
 
+	&.items-1 {
+		.radio-item {
+			width: 100%;
+		}
+	}
+
+	&.items-2 {
+		.radio-item {
+			width: 50%;
+		}
+	}
+
 	&.items-3 {
 		.radio-item {
 			width: 33.333%;
@@ -691,4 +710,64 @@ $adjustment-minus-color: $assertive;
 .input-field-icon {
 	position: absolute;
 	right: $grid-padding-width;
+}
+
+.micro-player-detail {
+	margin-top: -$grid-padding-width;
+	margin-bottom: -$grid-padding-width;
+
+	@include display-flex;
+	@include align-items(flex-end);
+
+	.player-name,
+	.micro-player-detail__detail {
+		display: inline-block;
+		padding-right: $grid-padding-width;
+
+		.label {
+			display: block;
+		}
+	}
+
+	.player-name {
+		width: 6em;
+
+		.label {
+			@include opacity(1);
+		}
+	}
+
+	.micro-player-detail__detail {
+		font-size: 80%;
+		line-height: 1.2;
+
+		&.position {
+			width: 2em;
+		}
+
+		&.team {
+			width: 2.5em;
+		}
+
+		&.rank {
+			width: 2em;
+			text-align: right;
+		}
+
+		&.points {
+			width: 2em;
+			text-align: right;
+		}
+	}
+}
+
+.item-radio {
+	em {
+		font-style: italic;
+	}
+
+	.radio-icon {
+		// for inputs which are a little taller than usual
+		line-height: 100%;
+	}
 }

@@ -1,0 +1,49 @@
+<ion-view view-title="{{ team.name || 'Team' }}">
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh()" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
+  </ion-nav-buttons>
+
+  <ion-tabs class="tabs-striped tabs-top">
+    <ion-tab title="Lineup">
+      <ion-view>
+        <ion-content class="has-tabs-top" ng-show="team">
+          <div class="player-list__container">
+            <rso-team-roster class-name="player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
+
+            <ion-scroll direction="x">
+              <rso-team-roster class-name="player-list__data" team="team" on-assign-position="assignPosition(position)"></rso-team-roster>
+            </ion-scroll>
+          </div>
+        </ion-content>
+      </ion-view>
+    </ion-tab>
+
+    <ion-tab title="Bench">
+      <ion-view>
+        <ion-content class="has-tabs-top" ng-show="team">
+          <div class="player-list__container">
+            <rso-team-roster-bench class-name="player-list__overlay" team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
+
+            <ion-scroll direction="x">
+              <rso-team-roster-bench class-name="player-list__data" team="team" on-assign-position="assignPosition(position)"></rso-team-roster-bench>
+            </ion-scroll>
+          </div>
+        </ion-content>
+      </ion-view>
+    </ion-tab>
+
+    <ion-tab title="IR">
+      <ion-view>
+        <ion-content class="has-tabs-top" ng-show="team">
+          <div class="player-list__container">
+            <rso-team-roster-reserves class-name="player-list__overlay" team="team"></rso-team-roster-reserves>
+
+            <ion-scroll direction="x">
+              <rso-team-roster-reserves class-name="player-list__data" team="team"></rso-team-roster-reserves>
+            </ion-scroll>
+          </div>
+        </ion-content>
+      </ion-view>
+    </ion-tab>
+  </ion-tabs>
+</ion-view>
