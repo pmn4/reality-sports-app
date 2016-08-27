@@ -672,7 +672,7 @@ angular.module('starter.controllers', [])
   function currentLeagueTeamId() {
     var league = _.find(CacheService.leagues(), function (league) {
       // likely comparing string to int
-      return league.leagueId === AppStateService.currentLeagueId();
+      return league.leagueId == AppStateService.currentLeagueId(); // jshint ignore:line
     });
 
     if (!league || !league.team) { return; }
@@ -772,7 +772,7 @@ angular.module('starter.controllers', [])
 
   function currentLeagueTeamId() {
     var league = _.find(CacheService.leagues(), function (league) {
-      return String(league.leagueId) === String(AppStateService.currentLeagueId());
+      return league.leagueId == AppStateService.currentLeagueId(); // jshint ignore:line
     });
 
     if (!league || !league.team) { return; }
