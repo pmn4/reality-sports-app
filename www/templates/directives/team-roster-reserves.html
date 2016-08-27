@@ -72,6 +72,8 @@
   <tbody>
     <tr ng-repeat="player in team.reserves" ng-hold="assignPlayer(player)">
       <th class="slot" ng-click="assignPlayer(player)" highlighter="player.playerId">
+        {{ player.pos }}
+
         <div class="action-icon"><!-- ng-if="team.editable" -->
           <i class="icon ion-locked dark" ng-if="player.isLocked"></i>
           <i class="icon ion-arrow-swap positive" ng-if="!player.isLocked"></i>

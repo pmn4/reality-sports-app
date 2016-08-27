@@ -1967,4 +1967,14 @@ angular.module('starter.controllers', [])
     }
   };
 })
+
+.directive("wipWipWip", function () {
+  return {
+    restrict: "E",
+
+    replace: true,
+
+    templateUrl: "templates/directives/wip-wip-wip.html"
+  };
+})
 ;
