@@ -717,7 +717,7 @@ $adjustment-minus-color: $assertive;
 	margin-bottom: -$grid-padding-width;
 
 	@include display-flex;
-	@include align-items(flex-end);
+	@include align-items(center);
 
 	.player-name,
 	.micro-player-detail__detail {
@@ -730,7 +730,7 @@ $adjustment-minus-color: $assertive;
 	}
 
 	.player-name {
-		width: 6em;
+		min-width: 5em; // width doesn't work here #flexbox
 
 		.label {
 			@include opacity(1);

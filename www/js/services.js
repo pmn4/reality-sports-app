@@ -149,14 +149,15 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("CacheService", function (/* $localStorage, */ _) {
+.service("CacheService", function (/* $localStorage, */ _, AppStateService) {
 	var STORE_KEY_LEAGUES;
 
 	STORE_KEY_LEAGUES = "realitySportsApp.Cache>leagues";
 
 	return {
 		leagues: leagues,
-		getLeagueById: getLeagueById
+		getLeagueById: getLeagueById,
+		currentLeague: currentLeague
 	};
 
 	function leagues(leaguesData) {
@@ -173,6 +174,10 @@ angular.module("starter.services", [])
 		return _.find(leagues(), function (l) {
 			return l.leagueId === leagueId;
 		});
+	}
+
+	function currentLeague() {
+		return this.getLeagueById(AppStateService.currentLeagueId());
 	}
 })
 

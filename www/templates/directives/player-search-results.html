@@ -82,14 +82,14 @@
       <th class="status" ng-click="onPlayerClick({ player: playerStats.player })">
         {{ playerStats.player.faStatus }}
 
-        <div class="action-icon"><!-- ng-if="team.editable" -->
-          <i class="icon ion-locked dark" ng-if="playerStats.player.isLocked"></i>
-          <i class="icon ion-plus positive" ng-if="!playerStats.player.isLocked"></i>
+        <div class="action-icon"><!-- ng-show="team.editable" -->
+          <i class="icon ion-locked dark" ng-show="playerStats.player.isLocked"></i>
+          <i class="icon ion-plus positive" ng-hide="playerStats.player.isLocked"></i>
         </div>
       </th>
 
       <td class="player" ng-click="onPlayerClick({ player: playerStats.player })">
-        <span ng-if="playerStats.player">
+        <span ng-show="playerStats.player">
           {{ playerStats.player | playerDisplayName }}
 
           <sup class="assertive">
@@ -97,7 +97,7 @@
           </sup>
         </span>
 
-        <em ng-if="!playerStats.player" class="empty assertive">
+        <em ng-hide="playerStats.player" class="empty assertive">
           (empty)
         </em>
       </td>
@@ -107,11 +107,11 @@
       </td>
 
       <td class="team">
-        <span ng-if="playerStats.player">
+        <span ng-show="playerStats.player">
           <span class="player-team">
             {{ playerStats.player | nflTeam }}
 
-            <em ng-if="playerStats.player.byeWeek > 0"> <!-- @todo: hide once bye has passed? -->
+            <em ng-show="playerStats.player.byeWeek > 0"> <!-- @todo: hide once bye has passed? -->
               ({{ playerStats.player.byeWeek }})
             </em>
           </span>
@@ -122,60 +122,60 @@
         <button
           class="button button-small button-clear button-positive"
           ng-click="onTeamClick({ teamId: playerStats.player.ownerTeamId })"
-          ng-if="playerStats.player.ownedTeamId">
+          ng-show="playerStats.player.ownedTeamId">
           {{ playerStats.player.ownedTeamName }}
         </button>
       </td>
 
       <td class="opponent">
-        <span ng-if="player">
+        <span ng-show="player">
           {{ playerStats.player.opponent }}
 
-          <em ng-if="playerStats.player.oppRank">
+          <em ng-show="playerStats.player.oppRank">
             ({{ playerStats.player.oppRank }})
           </em>
         </span>
       </td>
 
       <td class="points points__projected number">
-        <span ng-if="playerStats.stats">
+        <span ng-show="playerStats.stats">
           {{ playerStats.stats.projectedFantasyPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="points points__last number">
-        <span ng-if="playerStats.stats">
+        <span ng-show="playerStats.stats">
           {{ playerStats.stats.lastFantasyPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="points points__ytd number">
-        <span ng-if="playerStats.stats">
+        <span ng-show="playerStats.stats">
           {{ playerStats.stats.ytdFantasyPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="points points__average number">
-        <span ng-if="playerStats.player">
+        <span ng-show="playerStats.player">
           {{ playerStats.player.avgPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="number pct-owned">
-        <span ng-if="playerStats.player">
+        <span ng-show="playerStats.player">
           {{ playerStats.player.percentOwned | toFixed:0 }}%
         </span>
       </td>
 
       <td class="number pct-started">
-        <span ng-if="player">
-          {{ player.percentStarted | toFixed:0 }}%
+        <span ng-show="playerStats.player">
+          {{ playerStats.player.percentStarted | toFixed:0 }}%
         </span>
       </td>
 
       <td class="number salary">
-        <span ng-if="player">
-          ${{ player.salary | toCommaSeparated }}
+        <span ng-show="playerStats.player">
+          ${{ playerStats.player.salary | toCommaSeparated }}
         </span>
       </td>
     </tr>

@@ -8,11 +8,29 @@
   </ion-nav-buttons>
 
   <ion-content>
-    <div ng-if="!playerStatsData" class="padding">
-      <span nf-show="ajaxing">loading...</span>
+    <div ng-show="playerStatsData | none" class="padding">
+      <span ng-show="ajaxing">loading...</span>
+
+      <div ng-hide="ajaxing">
+        <div>
+          No results for:
+        </div>
+
+        <button class="button button-clear icon-right ion-close-circled" ng-show="filters.txtSearch != defaultFilters.txtSearch" ng-click="clearTxtSearch()">
+          {{ filters.txtSearch }}
+        </button>
+
+        <button class="button button-clear icon-right ion-close-circled" ng-show="filters.playerFilter != defaultFilters.playerFilter" ng-click="clearPlayerFilter()">
+          {{ filters.playerFilter }}
+        </button>
+
+        <button class="button button-clear icon-right ion-close-circled" ng-show="filters.posFilter != defaultFilters.posFilter" ng-click="clearPosFilter()">
+          {{ filters.posFilter }}
+        </button>
+      </div>
     </div>
 
-    <div class="player-list__container" ng-show="playerStatsData">
+    <div class="player-list__container" ng-show="playerStatsData | any">
       <rso-player-search-results
         player-stats-data="playerStatsData"
         on-player-click="showPlayerDetails(player)"

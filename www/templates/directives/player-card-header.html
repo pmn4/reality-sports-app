@@ -4,7 +4,7 @@
   </div>
 
   <div class="col col-67">
-    <h4 class="text-center one-liner player-name" ng-if="showName">
+    <h4 class="text-center one-liner player-name" ng-show="showName">
       <span ng-show="!player.firstName">&nbsp;</span>
 
       {{ player | playerFullName }}

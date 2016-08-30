@@ -74,24 +74,24 @@
       <th class="slot" ng-click="assignPosition(startingPosition)" highlighter="startingPosition.player.playerId">
         {{ startingPosition.slotLabel }}
 
-        <div class="action-icon"><!-- ng-if="team.editable" -->
-          <i class="icon ion-locked stable" ng-if="startingPosition.player.isLocked"></i>
-          <i class="icon ion-arrow-swap positive" ng-if="!startingPosition.player.isLocked"></i>
+        <div class="action-icon"><!-- ng-show="team.editable" -->
+          <i class="icon ion-locked stable" ng-show="startingPosition.player.isLocked"></i>
+          <i class="icon ion-arrow-swap positive" ng-hide="startingPosition.player.isLocked"></i>
         </div>
       </th>
 
       <td class="player">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player | playerDisplayName }}
         </span>
 
-        <em ng-if="!startingPosition.player" class="empty assertive">
+        <em ng-hide="startingPosition.player" class="empty assertive">
           (empty)
         </em>
       </td>
 
       <td class="team">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           <span class="player-team">
             {{ startingPosition.player | nflTeam }}
 
@@ -103,13 +103,13 @@
       </td>
 
       <td class="rank">
-        <span ng-if="startingPosition.player" class="number">
+        <span ng-show="startingPosition.player" class="number">
           {{ startingPosition.player.posRank | nullIf:0 }}
         </span>
       </td>
 
       <td class="opponent">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.opponent }}
 
           <em>
@@ -119,37 +119,37 @@
       </td>
 
       <td class="points points__projected number">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.projPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="points points__last number">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.lastPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="points points__average number">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.avgPoints | toFixed:1 }}
         </span>
       </td>
 
       <td class="number pct-owned">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.percentOwned | toFixed:0 }}%
         </span>
       </td>
 
       <td class="number pct-started">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           {{ startingPosition.player.percentStarted | toFixed:0 }}%
         </span>
       </td>
 
       <td class="number salary">
-        <span ng-if="startingPosition.player">
+        <span ng-show="startingPosition.player">
           ${{ startingPosition.player.salary | toCommaSeparated }}
         </span>
       </td>

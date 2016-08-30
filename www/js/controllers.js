@@ -989,6 +989,24 @@ angular.module('starter.controllers', [])
     });
   };
 
+  $scope.clearTxtSearch = function () {
+    $scope.filters.txtSearch = PlayersService.defaultFilters.txtSearch;
+
+    $scope.refresh();
+  }
+
+  $scope.clearPlayerFilter = function () {
+    $scope.filters.playerFilter = PlayersService.defaultFilters.playerFilter;
+
+    $scope.refresh();
+  }
+
+  $scope.clearPosFilter = function () {
+    $scope.filters.posFilter = PlayersService.defaultFilters.posFilter;
+
+    $scope.refresh();
+  }
+
   $ionicModal.fromTemplateUrl("templates/modals/player.html", {
     scope: $scope,
     animation: 'slide-in-up'
@@ -1320,7 +1338,7 @@ angular.module('starter.controllers', [])
   return function (figure) {
     if (figure == null) { return; }
 
-    return Number(Math.round(figure)).toLocaleString("en");
+    return (figure + '').replace(/(\d)(?=(\d{3})+$)/g, '$1,');
   };
 })
 
@@ -1798,7 +1816,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.directive("rsoPlayerSearchFilters", function ($rootScope, $ionicSideMenuDelegate, PlayersService, PlayerPositionsService) {
+.directive("rsoPlayerSearchFilters", function ($rootScope, $ionicSideMenuDelegate, CacheService, PlayersService) {
   return {
     replace: true,
 
@@ -1807,16 +1825,13 @@ angular.module('starter.controllers', [])
     templateUrl: "templates/directives/player-search-filters.html",
 
     link: function ($scope) {
+      var currentLeague = CacheService.currentLeague() || {};
       $scope.expanded = false;
       $scope.filters = PlayersService.currentFilters();
       $scope.positions = [];
       $scope.playerFilterOptions = PlayersService.playerFilterOptions;
-
-      PlayerPositionsService.list()
-        .then(function (response) {
-          $scope.positions = response.data;
-          $scope.positions.unshift("ALL");
-        });
+      $scope.positions = currentLeague.playerPositions || [];
+      $scope.positions.unshift("ALL");
 
       function broadcast() {
         $rootScope.$broadcast("rsoPlayerSearchFilters:apply", $scope.filters);
