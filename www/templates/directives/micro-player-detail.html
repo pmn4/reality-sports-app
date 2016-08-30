@@ -26,6 +26,6 @@
 
 	<div class="micro-player-detail__detail salary">
 		<span class="label tiny">SALARY</span>
-		${{ player.salary | toCommaSeparated }}
+		${{ player.salary | toFixed:0 | toCommaSeparated }}
 	</div>
 </div>
