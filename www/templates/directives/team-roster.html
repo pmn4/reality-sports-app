@@ -150,7 +150,7 @@
 
       <td class="number salary">
         <span ng-show="startingPosition.player">
-          ${{ startingPosition.player.salary | toCommaSeparated }}
+          ${{ startingPosition.player.salary | toFixed:0 | toCommaSeparated }}
         </span>
       </td>
     </tr>
