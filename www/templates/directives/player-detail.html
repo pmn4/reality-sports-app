@@ -1,7 +1,7 @@
 <div>
   <rso-player-card-header player="player"></rso-player-card-header>
 
-  <div class="row" ng-hide="!player.ownedTeamId">
+  <div class="row" ng-hide="player.ownedTeamId">
     <div class="col">
       <a class="button button-positive button-block button-small" ui-sref="app.bid({ leagueId: leagueId, teamId: teamId, playerId: player.playerId })">
         Add {{ player | playerFullName }}
