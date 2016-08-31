@@ -1,7 +1,7 @@
 <div>
   <rso-player-card-header player="player"></rso-player-card-header>
 
-  <div class="row" ng-hide="player.ownedTeamId">
+  <div class="row" ng-hide="!playerData || player.ownedTeamId">
     <div class="col">
       <a class="button button-positive button-block button-small" ui-sref="app.bid({ leagueId: leagueId, teamId: teamId, playerId: player.playerId })">
         Add {{ player | playerFullName }}
@@ -27,12 +27,12 @@
               SALARY
             </span>
 
-            ${{ player.salary | toCommaSeparated }}
+            {{ player.salary | toDollars }}
           </div>
         </div>
 
         <div class="col col-20">
-          <button class="button button-positive button-small" ng-disabled="true">
+          <button class="button button-positive button-small" ng-disabled="true" ng-hide="player.ownedTeamId == teamId">
             <i class="icon ion-arrow-swap"></i>
             Trade
           </button>
@@ -41,7 +41,9 @@
     </div>
   </div>
 
-  <h4 class="card-list-header">News</h4>
+  <h4 class="card-list-header" ng-show="playerData">
+    News
+  </h4>
 
   <div class="card" ng-repeat="report in playerData.news">
     <div class="item item-divider">

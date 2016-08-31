@@ -4,8 +4,7 @@ TODO:
 - move player to bench
 - move player from bench
 - view states when request errors (currently the loading page displays after an error)
-- Player details as a page instead of a modal - there was a reason....
-- Get Weeks on Bootstrap
+- update search menu (right menu) on 'click to clear' buttons ('click to clear' appears when no search results)
 - do something with device info
 - refresh interval
 - error logging (see Ionic User registration)
@@ -37,3 +36,6 @@ DONE:
 - Week Chooser Directive
 - Scroll Week Selector
 - Team Roster w/undefined league & team id??
+- Player details as a page instead of a modal - there was a reason....
+- player details from team page
+- Get Weeks on Bootstrap

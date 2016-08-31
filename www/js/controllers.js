@@ -264,7 +264,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("LeagueController", function ($scope, $state, $stateParams, AppStateService) {
+.controller("LeagueController", function ($rootScope, $scope, $state, $stateParams, AppStateService, CacheService) {
   $scope.$on("$ionicView.enter", function () {
     if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
       $scope.leagueId = $stateParams.leagueId;
@@ -923,6 +923,7 @@ angular.module('starter.controllers', [])
 
   $scope.filters = PlayersService.currentFilters();
   $scope.filtered = !PlayersService.isEmptyFilters();
+  $scope.defaultFilters = PlayersService.defaultFilters;
 
   if ($scope.leagueId) {
     AppStateService.currentLeagueId($scope.leagueId);
@@ -993,19 +994,19 @@ angular.module('starter.controllers', [])
     $scope.filters.txtSearch = PlayersService.defaultFilters.txtSearch;
 
     $scope.refresh();
-  }
+  };
 
   $scope.clearPlayerFilter = function () {
     $scope.filters.playerFilter = PlayersService.defaultFilters.playerFilter;
 
     $scope.refresh();
-  }
+  };
 
   $scope.clearPosFilter = function () {
     $scope.filters.posFilter = PlayersService.defaultFilters.posFilter;
 
     $scope.refresh();
-  }
+  };
 
   $ionicModal.fromTemplateUrl("templates/modals/player.html", {
     scope: $scope,
@@ -1042,24 +1043,29 @@ angular.module('starter.controllers', [])
 })
 
 .controller("PlayerController", function ($scope, $state, $stateParams, $interval, $ionicHistory, AppStateService, PlayersService) {
-  $scope.leagueId = $stateParams.leagueId;
   $scope.playerId = $stateParams.playerId;
   $scope.player = {};
 
-  if ($scope.leagueId) {
-    AppStateService.currentLeagueId($scope.leagueId);
+  if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
+    return $state.go("app.player", {
+      leagueId: AppStateService.currentLeagueId(),
+      playerId: $scope.playerId
+    }, { location: "replace" });
   }
+
+  $scope.leagueId = $stateParams.leagueId;
+
+  AppStateService.currentLeagueId($scope.leagueId);
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
-  function goToPlayers() {
-    $state.go($scope.leagueId ? "app.players" : "app.players-for-current-league", {
+  // this should happen on all entries
+  function checkRequiredParams() {
+    if ($scope.playerId) { return; }
+
+    return $state.go("app.players", {
       leagueId: $scope.leagueId
     });
-  }
-
-  if (!$scope.leagueId || !$scope.playerId) {
-    return goToPlayers();
   }
 
   $scope.beginIndicateAjaxing = function () { $scope.indicateAjaxing(true); };
@@ -1073,12 +1079,18 @@ angular.module('starter.controllers', [])
 
     $state.go("app.players", {
       leagueId: $scope.leagueId
-    });
+    }, { location: "replace" });
   };
 
   $scope._intervalUpdated = $interval(function () {
     $scope.setLastUpdated();
   }, 60000);
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+
+    checkRequiredParams();
+  });
 })
 
 .controller("BidController", function ($scope, $state, $stateParams, $interval, $ionicHistory, $q, $ionicPopup, $filter, _, AppStateService, TeamService, PlayersService) {
@@ -1129,7 +1141,7 @@ angular.module('starter.controllers', [])
     $state.go("app.player", {
       leagueId: $scope.leagueId,
       playerId: $scope.playerId
-    });
+    }, { location: "replace" });
   };
 
 
@@ -1170,17 +1182,17 @@ angular.module('starter.controllers', [])
 
     addDropPopup = $ionicPopup.show({
       template: '<p>'+
-  'If successful, you will be adding {{ player | playerFullName }} for 1 year at {{ formData.addPlayerBidAmount | toCommaSeparated }}.' +
+  'If successful, you will be <strong>adding {{ player | playerFullName }}</strong> for 1 year at {{ formData.addPlayerBidAmount | toDollars }}.' +
 '</p>' +
 '<p ng-if="formData.dropPlayerId">' +
-  'In addition, you will be dropping {{ dropPlayer | playerFullName }}.' +
+  'In addition, you will be <strong>dropping {{ dropPlayer | playerFullName }}</strong>.' +
 '</p>' +
 '<p ng-if="formData.dropPlayerId" ng-show="dropPlayer.acceleratedAmtCurrYear > 0">' +
   'If {{ dropPlayer.lastName }} is unclaimed by another franchise, the following amounts will be charged against your salary cap:' +
 '</p>' +
 '<ion-list>' +
-  '<ion-item ng-if="dropPlayer.acceleratedAmtCurrYear > 0">This Year: {{ dropPlayer.acceleratedAmtCurrYear | toCommaSeparated }}</ion-item>' +
-  '<ion-item ng-if="dropPlayer.acceleratedAmtNextYear > 0">Next Year: {{ dropPlayer.acceleratedAmtNextYear | toCommaSeparated }}</ion-item>' +
+  '<ion-item ng-if="dropPlayer.acceleratedAmtCurrYear > 0">This Year: {{ dropPlayer.acceleratedAmtCurrYear | toDollars }}</ion-item>' +
+  '<ion-item ng-if="dropPlayer.acceleratedAmtNextYear > 0">Next Year: {{ dropPlayer.acceleratedAmtNextYear | toDollars }}</ion-item>' +
 '</ion-list>',
       title: $scope.player ? "Add " + $filter("playerFullName")($scope.player) : "",
       subTitle: $scope.dropPlayer ? "Drop: " + $filter("playerFullName")($scope.dropPlayer) : "",
@@ -1334,11 +1346,15 @@ angular.module('starter.controllers', [])
   };
 })
 
-.filter("toCommaSeparated", function () {
+.filter("toDollars", function () {
   return function (figure) {
     if (figure == null) { return; }
 
-    return (figure + '').replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+    if (figure.toFixed) {
+      figure = figure.toFixed(0);
+    }
+
+    return "$" + (figure + "").replace(/(\d)(?=(\d{3})+$)/g, "$1,");
   };
 })
 
@@ -1728,11 +1744,16 @@ angular.module('starter.controllers', [])
     templateUrl: "templates/directives/player-detail.html",
 
     link: function ($scope) {
+      var league;
+
       $scope.$watch("leagueId", refresh);
       $scope.$watch("playerId", refresh);
       $scope.$watch("player", refresh);
 
-      $scope.teamId = CacheService.getLeagueById($scope.leagueId).team.teamId;
+      league = CacheService.getLeagueById($scope.leagueId);
+      if (league && league.team) {
+        $scope.teamId = league.team.teamId;
+      }
 
       function refresh() {
         if ($scope.refreshing === true) { return; }
@@ -1816,7 +1837,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.directive("rsoPlayerSearchFilters", function ($rootScope, $ionicSideMenuDelegate, CacheService, PlayersService) {
+.directive("rsoPlayerSearchFilters", function ($rootScope, $ionicSideMenuDelegate, AppStateService, PlayersService) {
   return {
     replace: true,
 
@@ -1825,17 +1846,18 @@ angular.module('starter.controllers', [])
     templateUrl: "templates/directives/player-search-filters.html",
 
     link: function ($scope) {
-      var currentLeague = CacheService.currentLeague() || {};
       $scope.expanded = false;
       $scope.filters = PlayersService.currentFilters();
-      $scope.positions = [];
       $scope.playerFilterOptions = PlayersService.playerFilterOptions;
-      $scope.positions = currentLeague.playerPositions || [];
-      $scope.positions.unshift("ALL");
 
       function broadcast() {
         $rootScope.$broadcast("rsoPlayerSearchFilters:apply", $scope.filters);
       }
+
+      $rootScope.$on(AppStateService.events.LEAGUE_CHANGE, function (_e, league) {
+        $scope.positions = league.playerPositions || [];
+        $scope.positions.unshift("ALL");
+      });
 
       $scope.clearTxtSearch = function () {
         $scope.filters.txtSearch = PlayersService.defaultFilters.txtSearch;

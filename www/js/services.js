@@ -149,15 +149,14 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("CacheService", function (/* $localStorage, */ _, AppStateService) {
+.service("CacheService", function (/* $localStorage, */ _) {
 	var STORE_KEY_LEAGUES;
 
 	STORE_KEY_LEAGUES = "realitySportsApp.Cache>leagues";
 
 	return {
 		leagues: leagues,
-		getLeagueById: getLeagueById,
-		currentLeague: currentLeague
+		getLeagueById: getLeagueById
 	};
 
 	function leagues(leaguesData) {
@@ -175,13 +174,9 @@ angular.module("starter.services", [])
 			return l.leagueId === leagueId;
 		});
 	}
-
-	function currentLeague() {
-		return this.getLeagueById(AppStateService.currentLeagueId());
-	}
 })
 
-.service("AppStateService", function (moment) {
+.service("AppStateService", function ($rootScope, moment, CacheService) {
 	var STORE_KEY_CURRENT_LEAGUE, STORE_KEY_LEAGUES, STORE_KEY_CURRENT_WEEK, STORE_KEY_CURRENT_EMAIL;
 
 	STORE_KEY_CURRENT_LEAGUE = "realitySportsApp.AppState>currentLeagueId";
@@ -191,7 +186,7 @@ angular.module("starter.services", [])
 	STORE_KEY_CURRENT_PLAYER_FILTERS = "realitySportsApp.AppState>currentPlayerFilters";
 
 	var OPENING_NIGHT = moment("2016-09-08");
-	var WEEK  = 24 * 60 * 60 * 1000;
+	var WEEK = 7 * 24 * 60 * 60 * 1000;
 
 	return {
 		currentLeagueId: currentLeagueId,
@@ -200,12 +195,24 @@ angular.module("starter.services", [])
 		clearCurrentPlayerFilters: clearCurrentPlayerFilters,
 		currentWeek: currentWeek,
 		currentEmail: currentEmail,
-		guessCurrentWeek: guessCurrentWeek
+		guessCurrentWeek: guessCurrentWeek,
+		events: {
+			LEAGUE_ID_CHANGE: "AppStateService.leagueId:change",
+			LEAGUE_CHANGE: "AppStateService.league:change",
+			FILTERS_CHANGE: "AppStateService.filters:change",
+			WEEK_CHANGE: "AppStateService.weekNum:change"
+		}
 	};
 
-	function currentLeagueId (leagueId) {
+	function currentLeagueId(leagueId) {
 		if (leagueId) {
 			localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, leagueId);
+
+			$rootScope.$broadcast(this.events.LEAGUE_ID_CHANGE, leagueId);
+			$rootScope.$broadcast(
+				this.events.LEAGUE_CHANGE,
+				CacheService.getLeagueById(leagueId)
+			);
 		}
 
 		return localStorage.getItem(STORE_KEY_CURRENT_LEAGUE);
@@ -213,11 +220,15 @@ angular.module("starter.services", [])
 
 	function clearCurrentLeagueId() {
 		localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, "");
+
+		$rootScope.$broadcast(this.events.LEAGUE_ID_CHANGE, "");
 	}
 
-	function currentPlayerFilters (filters) {
+	function currentPlayerFilters(filters) {
 		if (filters) {
 			localStorage.setItem(STORE_KEY_CURRENT_PLAYER_FILTERS, JSON.stringify(filters));
+
+			$rootScope.$broadcast(this.events.FILTERS_CHANGE, filters);
 		}
 
 		try {
@@ -229,23 +240,39 @@ angular.module("starter.services", [])
 
 	function clearCurrentPlayerFilters() {
 		localStorage.setItem(STORE_KEY_CURRENT_PLAYER_FILTERS, "");
+
+		$rootScope.$broadcast(this.events.FILTERS_CHANGE, {});
 	}
 
-	function currentWeek (leagueId) {
-		if (leagueId) {
-			localStorage.setItem(STORE_KEY_CURRENT_WEEK, leagueId);
+	function currentWeek(weekNum) {
+		if (weekNum) {
+			localStorage.setItem(STORE_KEY_CURRENT_WEEK, weekNum);
+
+			$rootScope.$broadcast(this.events.WEEK_CHANGE, weekNum);
 		}
 
 		return localStorage.getItem(STORE_KEY_CURRENT_WEEK);
 	}
 
 	function guessCurrentWeek () {
-		return Math.floor(OPENING_NIGHT.diff(moment()) / (-7 * WEEK)) + 1;
+		var week, league = CacheService.getLeagueById(this.currentLeagueId());
+
+		if (league && league.weeks && league.weeks.length) {
+			week = (league.weeks[league.weeks.length - 1] || {}).weekNum;
+		}
+
+		if (!week) {
+			week = Math.floor(OPENING_NIGHT.diff(moment()) / (-1 * WEEK)) + 1;
+		}
+
+		return week;
 	}
 
-	function currentEmail (e) {
-		if (e) {
-			localStorage.setItem(STORE_KEY_CURRENT_EMAIL, e);
+	function currentEmail(email) {
+		if (email) {
+			localStorage.setItem(STORE_KEY_CURRENT_EMAIL, email);
+
+			$rootScope.$broadcast(this.events.WEEK_CHANGE, email);
 		}
 
 		return localStorage.getItem(STORE_KEY_CURRENT_EMAIL);
@@ -380,9 +407,10 @@ angular.module("starter.services", [])
 			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId + "/rostered_players"
 		})
 		.then(function (response) {
-			var data, responseData = response.data, slotted = [];
+			var data, slotted = [];
 
-			data = responseData;
+			data = response.data;
+			data.leagueId = leagueId;
 
 			_.each(data.lineupPlayers, function (player) {
 				player.projectedPoints = player.projPoints;

@@ -81,9 +81,9 @@
       </th>
 
       <td class="player">
-        <span ng-show="player">
+        <a class="tappable" ui-sref="app.player({ leagueId: leagueId, playerId: player.playerId })" ng-show="player">
           {{ player | playerDisplayName }}
-        </span>
+        </a>
 
         <em ng-hide="player" class="empty assertive">
           (empty)
@@ -150,7 +150,7 @@
 
       <td class="number salary">
         <span ng-show="player">
-          ${{ player.salary | toFixed:0 | toCommaSeparated }}
+          {{ player.salary | toDollars }}
         </span>
       </td>
     </tr>

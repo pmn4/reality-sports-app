@@ -190,6 +190,16 @@ angular.module('starter', [
       }
     })
 
+    .state("app.player-for-current-league", {
+      url: "/leagues/default/players/:playerId",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "LeagueController"
+        }
+      }
+    })
+
     .state("app.players-for-current-league", {
       url: "/leagues/default/players",
       views: {

@@ -49,6 +49,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	100% { border-color: hsl(360, 100%, 50%); }
 }
 
+a.tappable {
+	text-decoration: none;
+	color: inherit;
+}
+
 .col-2-15 { // for use with 2/3 + 1/5
 	$pct: 100% / 7.5;
 	@include flex(0, 0, $pct);
@@ -423,11 +428,44 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	}
 }
 
-.label.tiny {
+.button-icon-label {
+	&,
+	.bar & {
+		line-height: 1;
+		text-align: center;
+
+		&:before {
+			font-size: $button-icon-size;
+		}
+
+		.label {
+			display: block;
+			font-size: 0.4em;
+		}
+	}
+}
+
+.label {
 	text-transform: uppercase;
-	font-size: 50%;
-	line-height: 2;
-	@include opacity(0.5);
+
+	&.small {
+		font-size: 75%;
+		line-height: 1.5;
+	}
+
+	&.tiny {
+		font-size: 50%;
+		line-height: 2;
+		// @include opacity(0.5);
+	}
+}
+
+.text-strong {
+	&,
+	&.button,
+	.bar &.button {
+		font-weight: bold;
+	}
 }
 
 .data-point {
