@@ -283,10 +283,10 @@ angular.module('starter.controllers', [])
     var whereTo = $state.current.name.replace("-for-current-league", "");
 
     if ($scope.leagueId) {
-      $state.go(whereTo || "app.standings", {
-        leagueId: $scope.leagueId,
-        week: $scope.week
-      }, { location: 'replace' });
+      $stateParams.leagueId = $scope.leagueId;
+      $stateParams.week = $scope.week;
+
+      $state.go(whereTo || "app.standings", $stateParams, { location: 'replace' });
     } else {
       $state.go("app.leagues");
     }
@@ -617,7 +617,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("TeamController", function ($scope, $state, $stateParams, $interval, $q, $filter, AppSettings, AppStateService, CacheService, TeamService) {
+.controller("TeamController", function ($scope, $state, $stateParams, $interval, $q, $filter, AppSettings, AppStateService, CacheService, TeamService, PlayersService) {
   $scope.leagueId = $stateParams.leagueId;
   $scope.teamId = $stateParams.teamId;
 
@@ -629,15 +629,20 @@ angular.module('starter.controllers', [])
 
   $scope.initialize = function () {
     $scope.refresh();
+
+    // if owner?
+    $scope.refreshBids();
     $scope.refreshNews();
   };
 
   $scope.refresh = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
+    var myTeam = CacheService.getLeagueById($scope.leagueId).team || {};
 
-    TeamService.fetchAdjustableRoster($scope.leagueId, $scope.teamId)
+    TeamService.fetchRoster($scope.leagueId, $scope.teamId)
       .then(function (response) {
-        $scope.adjustableRoster = response.data || {};
+        $scope.team = response.data || {};
+        $scope.isTeamOwner = $scope.team.teamId == myTeam.teamId;
 
         $scope.setLastUpdated(new Date());
       }, function (response) {
@@ -651,23 +656,55 @@ angular.module('starter.controllers', [])
      });
   };
 
+  $scope.refreshBids = function () {
+    $scope.fetchingBids = true;
+    TeamService.listBids($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        $scope.bids = response.data || [];
+      }, function (response) {
+        $scope.bidsError = 'Error fetching bids';
+      }).finally(function () {
+        $scope.fetchingBids = false;
+      });
+  };
+
   $scope.refreshNews = function () {
+    // @todo: once /teams/:id/news works, remove return;
+    return;
+
     $scope.fetchingNews = true;
     TeamService.news($scope.leagueId, $scope.teamId)
       .then(function (response) {
         $scope.news = response.data || [];
-
-        $scope.setLastUpdated(new Date());
       }, function (response) {
+        $scope.newsError = 'Error fetching news';
       }).finally(function () {
         $scope.fetchingNews = false;
-     });
+      });
   };
 
-  // Temporary until we have something to show on this page
-  // if ($scope.leagueId && $scope.teamId) {
-  //   $scope.initialize();
-  // }
+  $scope.goToFreeAgents = function () {
+    $state.go("app.players", {
+      leagueId: $scope.leagueId,
+      playerFilter: "available" // note: not PlayersService.playerFilterOptions.available (whose value is the label "Available")
+    });
+  };
+
+  $scope.goToActiveRoster = function () {
+    this.goToRoster("active");
+  };
+
+  $scope.goToBenchRoster = function () {
+    this.goToRoster("bench");
+  };
+
+  $scope.goToRoster = function (roster) {
+    $state.go("app.roster", {
+      leagueId: $scope.leagueId,
+      teamId: $scope.teamId,
+      roster: roster
+    });
+  };
 
   function currentLeagueTeamId() {
     var league = _.find(CacheService.leagues(), function (league) {
@@ -693,16 +730,12 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     var whereTo, teamId;
 
-    if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
+    if (!$scope.leagueId || $scope.leagueId === "default") {
       $scope.leagueId = AppStateService.currentLeagueId();
     }
 
-    if ($stateParams.teamId && $stateParams.teamId !== "default") {
-      // temporary until we have something to show on this screen
-      $state.go("app.roster", {
-        leagueId: $scope.leagueId,
-        teamId: $scope.teamId
-      }, { location: 'replace' });
+    if ($scope.teamId && $scope.teamId !== "default") {
+      $scope.initialize();
 
       return;
     }
@@ -916,14 +949,19 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller("PlayersController", function ($rootScope, $scope, $state, $interval, $stateParams, $ionicModal, _, AppStateService, PlayersService) {
+.controller("PlayersController", function ($rootScope, $scope, $state, $stateParams, $interval, $ionicModal, _, AppStateService, PlayersService) {
+  var filters;
+
   $scope.leagueId = $stateParams.leagueId;
   $scope.players = null;
   $scope.player = {};
 
-  $scope.filters = PlayersService.currentFilters();
   $scope.filtered = !PlayersService.isEmptyFilters();
   $scope.defaultFilters = PlayersService.defaultFilters;
+
+  filters = _.pick.apply(_, [$stateParams].concat(_.keys(PlayersService.defaultFilters)));
+  $scope.filters = _.defaults(filters, PlayersService.currentFilters());
+  PlayersService.currentFilters($scope.filters);
 
   if ($scope.leagueId) {
     AppStateService.currentLeagueId($scope.leagueId);
@@ -1042,15 +1080,16 @@ angular.module('starter.controllers', [])
   $scope.endIndicateAjaxing = function () { $scope.indicateAjaxing(false); };
 })
 
-.controller("PlayerController", function ($scope, $state, $stateParams, $interval, $ionicHistory, AppStateService, PlayersService) {
+.controller("PlayerController", function ($scope, $state, $stateParams, $interval, $ionicHistory, _, AppStateService, PlayersService) {
+  var filters = _.pick.apply(_, [$stateParams].concat(_.keys(PlayersService.defaultFilters)));
+
   $scope.playerId = $stateParams.playerId;
   $scope.player = {};
 
   if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
-    return $state.go("app.player", {
-      leagueId: AppStateService.currentLeagueId(),
-      playerId: $scope.playerId
-    }, { location: "replace" });
+    $stateParams.leagueId = AppStateService.currentLeagueId();
+
+    return $state.go("app.player", $stateParams, { location: "replace" });
   }
 
   $scope.leagueId = $stateParams.leagueId;
@@ -1190,10 +1229,9 @@ angular.module('starter.controllers', [])
 '<p ng-if="formData.dropPlayerId" ng-show="dropPlayer.acceleratedAmtCurrYear > 0">' +
   'If {{ dropPlayer.lastName }} is unclaimed by another franchise, the following amounts will be charged against your salary cap:' +
 '</p>' +
-'<ion-list>' +
-  '<ion-item ng-if="dropPlayer.acceleratedAmtCurrYear > 0">This Year: {{ dropPlayer.acceleratedAmtCurrYear | toDollars }}</ion-item>' +
-  '<ion-item ng-if="dropPlayer.acceleratedAmtNextYear > 0">Next Year: {{ dropPlayer.acceleratedAmtNextYear | toDollars }}</ion-item>' +
-'</ion-list>',
+  '<div class="row" ng-if="dropPlayer.acceleratedAmtCurrYear > 0"><div class="col">This Year:</div><div class="col text-right">{{ dropPlayer.acceleratedAmtCurrYear | toDollars }}</div></div>' +
+  '<div class="row" ng-if="dropPlayer.acceleratedAmtNextYear > 0"><div class="col">Next Year:</div><div class="col text-right">{{ dropPlayer.acceleratedAmtNextYear | toDollars }}</div></div>' +
+'',
       title: $scope.player ? "Add " + $filter("playerFullName")($scope.player) : "",
       subTitle: $scope.dropPlayer ? "Drop: " + $filter("playerFullName")($scope.dropPlayer) : "",
       scope: $scope,
@@ -1355,6 +1393,26 @@ angular.module('starter.controllers', [])
     }
 
     return "$" + (figure + "").replace(/(\d)(?=(\d{3})+$)/g, "$1,");
+  };
+})
+
+.filter("toMmDollars", function () {
+  return function (figure) {
+    if (figure == null) { return; }
+
+    if (!figure.toFixed) {
+      figure = 1 * figure;
+    }
+
+    whole = Math.floor(figure / 1000000);
+    fraction = (figure / 1000000) - whole;
+    if (fraction < 0.25) {
+      fraction = ".0";
+    } else {
+      fraction = (fraction + "").replace("0.", ".");
+    }
+
+    return "$" + (whole + "").replace(/(\d)(?=(\d{3})+$)/g, "$1,") + fraction + "mm";
   };
 })
 

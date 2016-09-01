@@ -101,6 +101,10 @@ a.tappable {
 	text-overflow: ellipsis;
 }
 
+.team-image + .team-name {
+	margin-top: 0;
+}
+
 .team-image {
 	@include display-flex;
 	@include align-items(center);
@@ -152,6 +156,10 @@ a.tappable {
 }
 .adjustment {
 	font-size: 75%;
+	font-style: italic;
+}
+
+em {
 	font-style: italic;
 }
 
@@ -808,4 +816,16 @@ $adjustment-minus-color: $assertive;
 		// for inputs which are a little taller than usual
 		line-height: 100%;
 	}
+}
+
+.item-button {
+	padding: $grid-padding-width;
+
+	.button {
+		margin: 0;
+	}
+}
+
+.wip-wip-wip {
+	@include opacity(0.5);
 }

@@ -1,8 +1,11 @@
 BUGS:
 
 TODO:
+- Team Page: Transactions, News
+
 - move player to bench
 - move player from bench
+- move player to IR: "What was Bo Jackson's #?"
 - view states when request errors (currently the loading page displays after an error)
 - update search menu (right menu) on 'click to clear' buttons ('click to clear' appears when no search results)
 - do something with device info

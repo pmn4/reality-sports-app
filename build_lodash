@@ -7,16 +7,19 @@ methods = %w(
   chain
   compact
   contains
+  defaults
   each
   find
   flatten
   groupBy
   isEmpty
   isEqual
+  keys
   map
   max
   memoize
   object
+  pick
   pluck
   reduce
   reject

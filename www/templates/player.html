@@ -3,7 +3,7 @@
     {{ (player | playerFullName) || 'loading...' }}
   </ion-nav-title>
 
-  <ion-nav-buttons>
+  <ion-nav-buttons ng-if="false"><!-- unreliable -->
     <button class="button button-clear" ng-click="goBack()">
       <i class="icon ion-ios-arrow-back"></i>
       Back

@@ -151,7 +151,7 @@ angular.module('starter', [
     })
 
     .state("app.roster-for-current-league", {
-      url: "/leagues/default/teams/default/players",
+      url: "/leagues/default/teams/default/players?roster",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
@@ -161,7 +161,7 @@ angular.module('starter', [
     })
 
     .state("app.roster", {
-      url: "/leagues/:leagueId/teams/:teamId/players",
+      url: "/leagues/:leagueId/teams/:teamId/players?roster",
       views: {
         "menuContent": {
           templateUrl: "templates/roster.html",
@@ -201,7 +201,7 @@ angular.module('starter', [
     })
 
     .state("app.players-for-current-league", {
-      url: "/leagues/default/players",
+      url: "/leagues/default/players?playerFilter&posFilter&txtSearch",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
@@ -211,7 +211,7 @@ angular.module('starter', [
     })
 
     .state("app.players", {
-      url: "/leagues/:leagueId/players",
+      url: "/leagues/:leagueId/players?playerFilter&posFilter&txtSearch",
       views: {
         "menuContent": {
           templateUrl: "templates/players.html",

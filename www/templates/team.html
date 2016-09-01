@@ -1,9 +1,83 @@
-<ion-view view-title="Team">
-  <ion-content padding="true">
-    <h2>Roster</h2>
-    <pre>{{ ajustableRoster | json }}</pre>
+<ion-view view-title="{{ (team.name || 'Team') }}">
+	<ion-content padding="true">
+		<div class="row row-no-padding team-image">
+			<div class="col col-50 col-offset-25">
+				<img ng-src="{{ team.teamLogo }}" width="100%" />
+			</div>
+		</div>
 
-    <h2>News</h2>
-    <pre>{{ news | json }}</pre>
-  </ion-content>
+		<h1 class="h3 team-name">
+			{{ team.teamName }}
+		</h1>
+
+		<ion-list ng-show="isTeamOwner">
+			<ion-item class="item-divider">
+				Free Agent Bids
+			</ion-item>
+
+			<ion-item ng-show="bids | none">
+				<p clss="adjustment text-center" ng-hide="fetchingBids">
+					<em ng-hide="bidsError">
+						None
+					</em>
+
+					<em ng-show="bidsError" class="assertive">
+						{{ bidsError }}
+					</em>
+				</p>
+
+				<p ng-show="fetchingBids">
+					<em>
+						fetching...
+					</em>
+				</p>
+			</ion-item>
+
+			<ion-item class="item-text-wrap" ng-repeat="bid in bids | orderBy:'teamPick' track by $index">
+				<div class="row row-no-padding micro-player-detail">
+					<a class="col col-33 micro-player-detail__detail tappable" ui-sref="app.player({ leagueId: leagueId, playerId: bid.addPlayer.playerId })">
+						<span class="label tiny">ADD</span>
+						{{ bid.addPlayer | playerDisplayName }}
+					</a>
+
+					<a class="col col-33 micro-player-detail__detail tappable" ui-sref="app.player({ leagueId: leagueId, playerId: bid.dropPlayer.playerId })">
+						<span class="label tiny">DROP</span>
+						{{ (bid.dropPlayer | playerDisplayName) || 'n/a' }}
+					</a>
+
+					<div class="col col-25 micro-player-detail__detail">
+						<span class="label tiny">BID</span>
+						{{ bid.bidAmount | toMmDollars }}
+					</div>
+
+					<div class="col col-1-6">
+						<button
+							class="button button-icon ion-edit button-clear button-stable button-positive-xx"
+							ng-click="editBid(bid)"
+							ng-disabled="true">
+						</button>
+					</div>
+				</div>
+			</ion-item>
+
+			<ion-item class="item-button">
+				<button class="button button-small button-block button-outline button-positive" ng-click="goToFreeAgents()">
+					Free Agent Search
+				</button>
+			</ion-item>
+		</ion-list>
+
+		<div class="button-bar">
+			<button class="button button-small button-block button-positive" ng-click="goToActiveRoster()">
+				Active Roster
+			</button>
+<!--
+			<button class="button button-small button-block button-positive" ng-click="goToBenchRoster()">
+				Bench
+			</button>
+-->
+		</div>
+
+		<wip-wip-wip></wip-wip-wip>
+	</ion-content>
 </ion-view>
