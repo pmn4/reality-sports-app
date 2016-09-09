@@ -544,7 +544,7 @@ angular.module('starter.controllers', [])
           case 0:
             $state.go("app.player", {
               leagueId: $scope.leagueId,
-              playerId: $scope.playerId
+              playerId: playerData.player.playerId
             });
             break;
           case 1:

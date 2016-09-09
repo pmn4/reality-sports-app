@@ -265,7 +265,9 @@ em {
 }
 
 .player-position {
-	font-size: 75%;
+	font-size: 50%;
+	line-height: 1.5;
+	white-space: normal;
 	text-align: center;
 	padding: 0;
 	background: $stable;

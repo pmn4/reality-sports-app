@@ -81,7 +81,7 @@
       </th>
 
       <td class="player">
-        <a class="tappable" ui-sref="app.player-for-current-league({ playerId: player.playerId })" ng-show="player">
+        <a class="tappable" ui-sref="app.player({ leagueId: 'default', playerId: player.playerId })" ng-show="player">
           {{ player | playerDisplayName }}
         </a>
 
