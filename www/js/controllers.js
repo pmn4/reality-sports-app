@@ -109,11 +109,13 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller("LoginController", function ($scope, $state, $cordovaToast, AuthService, AppStateService) {
+.controller("LoginController", function ($scope, $state, $timeout, $cordovaToast, $cordovaSplashscreen, AuthService, AppStateService) {
   // Form data for the login modal
   $scope.loginData = {
     username: AppStateService.currentEmail()
   };
+
+  $timeout(function () { $cordovaSplashscreen.hide(); });
 
   $scope.login = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
@@ -207,7 +209,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, LeagueService, AppStateService) {
+.controller("LeaguesController", function ($scope, $interval, $state, $stateParams, $filter, $timeout, $cordovaSplashscreen, LeagueService, AppStateService) {
   $scope.leagues = [];
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
@@ -218,6 +220,8 @@ angular.module('starter.controllers', [])
       .then(function (response) {
         $scope.leagues = response.data;
         $scope.setLastUpdated(new Date());
+
+        $timeout(function () { $cordovaSplashscreen.hide(); });
 
         if (!$scope.leagues || !$scope.leagues.length) {
           return $scope.retryOnRsoError({
@@ -1087,14 +1091,12 @@ angular.module('starter.controllers', [])
   $scope.player = {};
 
   if (!$stateParams.leagueId || $stateParams.leagueId === "default") {
-    $stateParams.leagueId = AppStateService.currentLeagueId();
+    $scope.leagueId = AppStateService.currentLeagueId();
+  } else {
+    $scope.leagueId = $stateParams.leagueId;
 
-    return $state.go("app.player", $stateParams, { location: "replace" });
+    AppStateService.currentLeagueId($scope.leagueId);
   }
-
-  $scope.leagueId = $stateParams.leagueId;
-
-  AppStateService.currentLeagueId($scope.leagueId);
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 

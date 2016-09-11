@@ -56,7 +56,9 @@
                   <img ng-src="{{ standing.team | teamLogo }}" width="90%" />
                 </div>
                 <div class="col col-5-6">
-                  <strong>{{ standing.team.name }}</strong>
+                  <a class="button button-clear" ui-sref="app.team({ leagueId: leagueId, teamId: standing.team.teamId })">
+                    <strong>{{ standing.team.name }}</strong>
+                  </a>
                 </div>
               </div>
             </div>
