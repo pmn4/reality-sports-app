@@ -40,16 +40,9 @@ var Mixins = {
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
+.controller("AppController", function ($rootScope, $scope, $state, $ionicSideMenuDelegate, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
   $scope.settings = AppSettings;
-  $scope.showRightMenu = false;
-
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
+  $scope.showRightMenu = false; // @todo: make this work
 
   $rootScope.indicators = {
     offline: false,
@@ -229,9 +222,17 @@ angular.module('starter.controllers', [])
             data: 'No leagues found'
           });
         }
-        if (!$scope.leagues || $scope.leagues.length !== 1) { return; }
+        if ($scope.leagues && $scope.leagues.length === 1) {
+          return $scope.gotoLeague($scope.leagues[0]);
+        }
 
-        $scope.gotoLeague($scope.leagues[0]);
+        currentLeague = _.find($scope.leagues, function (league) {
+          return String(league.leagueId) === AppStateService.currentLeagueId();
+        });
+
+        if (!currentLeague) { return; }
+
+        $scope.gotoLeague(currentLeague);
       }, function (response) {
         $scope.retryOnRsoError(response);
       }).finally(function () {
@@ -410,8 +411,10 @@ angular.module('starter.controllers', [])
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
   $scope.refresh = Mixins.throttle($scope, function () {
+    var week = Math.max(1, $scope.week - 1);
+
     $scope.ajaxing = $scope.indicateAjaxing(true);
-    StandingsService.fetch($scope.leagueId, $scope.week - 1)
+    StandingsService.fetch($scope.leagueId, week)
       .then(function (response) {
         var data = response.data || {};
 

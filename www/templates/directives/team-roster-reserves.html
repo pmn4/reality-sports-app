@@ -55,16 +55,16 @@
         Pos
       </th>
 
-      <th class="points__average">
-        Average
-      </th>
-
       <th class="points__projected">
         Projected
       </th>
 
       <th class="points__last">
         Last
+      </th>
+
+      <th class="points__average">
+        Average
       </th>
     </tr>
   </thead>
@@ -124,15 +124,15 @@
         </span>
       </td>
 
-      <td class="points points__average number">
-        <span ng-show="player">
-          {{ player.avgPoints | toFixed:1 }}
-        </span>
-      </td>
-
       <td class="points points__last number">
         <span ng-show="player">
           {{ player.lastPoints | toFixed:1 }}
+        </span>
+      </td>
+
+      <td class="points points__average number">
+        <span ng-show="player">
+          {{ player.avgPoints | toFixed:1 }}
         </span>
       </td>
 
