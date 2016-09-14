@@ -40,7 +40,7 @@ var Mixins = {
 
 angular.module('starter.controllers', [])
 
-.controller("AppController", function ($rootScope, $scope, $state, $ionicSideMenuDelegate, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
+.controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
   $scope.settings = AppSettings;
   $scope.showRightMenu = false; // @todo: make this work
 
