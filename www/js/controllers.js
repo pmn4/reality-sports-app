@@ -176,9 +176,6 @@ angular.module('starter.controllers', [])
 
 .controller("EntryController", function ($scope, $state, AuthService, AuthTokenStore, AppStateService) {
   $scope.$on("$ionicView.enter", function () {
-    // ok to remove?
-    AppStateService.clearCurrentLeagueId();
-
     if (AuthTokenStore.token()) {
       $state.go("app.leagues");
     } else {
