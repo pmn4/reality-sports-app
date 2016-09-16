@@ -37,7 +37,6 @@ var Mixins = {
   }
 };
 
-
 angular.module('starter.controllers', [])
 
 .controller("AppController", function ($rootScope, $scope, $state, $cordovaToast, AppSettings, AuthTokenStore, AppStateService) {
