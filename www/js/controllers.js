@@ -1502,12 +1502,15 @@ angular.module('starter.controllers', [])
 })
 
 .filter("playerDisplayName", function (_) {
+  var teamDefenseLabels = ["DF", "DST"];
+
   return function (player) {
-    var str;
+    var str, position;
 
     if (!player) { return; }
 
-    if (player.position === "DF" || player.pos === "DST") {
+    position = player.position || player.pos;
+    if (_.contains(teamDefenseLabels, position)) {
       return player.firstName;
     }
 

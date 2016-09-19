@@ -1,4 +1,5 @@
 BUGS:
+- when switching leagues, refresh available player search positions
 
 TODO:
 - Team Page: Transactions, News
