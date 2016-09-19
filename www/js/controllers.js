@@ -1717,13 +1717,13 @@ angular.module('starter.controllers', [])
       .then(function (response) {
         $scope.hasUpdate = response;
 
-        if (!$scope.hasUpdate) { return; }
-
-        $scope.doUpdate();
-
         // finally doesn't work??
         $scope.ajaxing = $scope.indicateAjaxing(false);
         $scope.checking = false;
+
+        if (!$scope.hasUpdate) { return; }
+
+        $scope.doUpdate();
 
         console.log('Ionic Deploy: Update Ready!', response);
       }, function (error) {
