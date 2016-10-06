@@ -163,6 +163,16 @@ em {
 	font-style: italic;
 }
 
+.standings {
+	& > .row {
+		&,
+		& > .col {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+}
+
 #player-scoring {
 	// $scoring-width: 15%;
 	$position-width: 5%;

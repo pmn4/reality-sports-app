@@ -1,5 +1,5 @@
 BUGS:
-- when switching leagues, refresh available player search positions
+- league id is cached when switching leagues // when switching leagues, refresh available player search positions
 
 TODO:
 - Team Page: Transactions, News

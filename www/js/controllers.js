@@ -265,18 +265,18 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("LeagueController", function ($rootScope, $scope, $state, $stateParams, AppStateService, CacheService) {
+.controller("LeagueController", function ($rootScope, $scope, $state, AppStateService, CacheService) {
   $scope.$on("$ionicView.enter", function () {
-    if ($stateParams.leagueId && $stateParams.leagueId !== "default") {
-      $scope.leagueId = $stateParams.leagueId;
+    if ($state.params.leagueId && $state.params.leagueId !== "default") {
+      $scope.leagueId = $state.params.leagueId;
 
       AppStateService.currentLeagueId($scope.leagueId);
     } else {
       $scope.leagueId = AppStateService.currentLeagueId();
     }
 
-    if ($stateParams.week && $stateParams.week !== "default") {
-      $scope.week = $stateParams.week;
+    if ($state.params.week && $state.params.week !== "default") {
+      $scope.week = $state.params.week;
     } else {
       $scope.week = AppStateService.currentWeek();
     }
@@ -284,10 +284,10 @@ angular.module('starter.controllers', [])
     var whereTo = $state.current.name.replace("-for-current-league", "");
 
     if ($scope.leagueId) {
-      $stateParams.leagueId = $scope.leagueId;
-      $stateParams.week = $scope.week;
+      $state.params.leagueId = $scope.leagueId;
+      $state.params.week = $scope.week;
 
-      $state.go(whereTo || "app.standings", $stateParams, { location: 'replace' });
+      $state.go(whereTo || "app.standings", $state.params, { location: 'replace' });
     } else {
       $state.go("app.leagues");
     }
