@@ -1342,7 +1342,7 @@ angular.module('starter.controllers', [])
 })
 
 .filter("dowPlusTime", function (moment) {
-  var DATE_STRING_RE = /^\w+ \d+ \d+:\d+$/i;
+  var DATE_STRING_RE = /^\w+ \d+ \d+:\d+( [AP]M)?$/i;
   return function (dateString, format) {
     if (!DATE_STRING_RE.test(dateString)) { return dateString; }
 
