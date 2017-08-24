@@ -1,0 +1,36 @@
+<ion-view view-title="Transactions">
+  <ion-content padding="true">
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="last-updated">
+      <div ng-show="ajaxing">
+        loading...
+      </div>
+      <div ng-hide="ajaxing || !lastUpdatedAgo">
+        <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
+      </div>
+    </div>
+
+    <rsa-transaction
+      ng-repeat="transaction in unreadTransactions"
+      transaction="transaction"
+      league-id="leagueId"
+      week="week"
+    ></rsa-transaction>
+
+    <div class="unread-news" ng-show="readTransactions | any">
+      <span class="unread-news__label">
+        //
+        <span ng-show="unreadTransactions | any">end</span>
+        <span ng-hide="unreadTransactions | any">no new</span>
+        unread transactions
+      </span>
+    </div>
+
+    <rsa-transaction
+      ng-repeat="transaction in readTransactions"
+      transaction="transaction"
+      league-id="leagueId"
+      week="week"
+    ></rsa-transaction>
+  </ion-content>
+</ion-view>

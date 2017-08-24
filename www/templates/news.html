@@ -1,12 +1,34 @@
-<ion-view view-title="My News<sup class='assertive'>PUP</sup>">
+<ion-view view-title="League News">
   <ion-content padding="true">
-    <p>
-      Coming soon.
-    </p>
-    <p>
-      I haven't built this page yet because some other pages took priority.
-      I am keeping track of the number of people who view this page.
-      The more it's viewed, the more I know it's important.
-    </p>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="last-updated">
+      <div ng-show="ajaxing">
+        loading...
+      </div>
+      <div ng-hide="ajaxing || !lastUpdatedAgo">
+        <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
+      </div>
+    </div>
+
+    <rsa-article
+      ng-repeat="article in unreadArticles"
+      article="article"
+      league-id="leagueId"
+    ></rsa-article>
+
+    <div class="unread-news" ng-show="readArticles | any">
+      <span class="unread-news__label">
+        //
+        <span ng-show="unreadArticles | any">end</span>
+        <span ng-hide="unreadArticles | any">no new</span>
+        unread news
+      </span>
+    </div>
+
+    <rsa-article
+      ng-repeat="article in readArticles"
+      article="article"
+      league-id="leagueId"
+    ></rsa-article>
   </ion-content>
 </ion-view>

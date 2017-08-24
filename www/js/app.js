@@ -85,7 +85,7 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "LeagueController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -105,7 +105,7 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "LeagueController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -125,7 +125,7 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "LeagueController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -134,7 +134,7 @@ angular.module('starter', [
       url: "/leagues/:leagueId",
       views: {
         "menuContent": {
-          templateUrl: "templates/redirecting.html",
+          templateUrl: "templates/league.html",
           controller: "LeagueController"
         }
       }
@@ -190,12 +190,22 @@ angular.module('starter', [
       }
     })
 
+    .state("app.teamNews", {
+      url: "/leagues/:leagueId/teams/:teamId/news",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/news.html",
+          controller: "TeamNewsController"
+        }
+      }
+    })
+
     .state("app.player-for-current-league", {
       url: "/leagues/default/players/:playerId",
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "LeagueController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -205,7 +215,7 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "LeagueController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -246,6 +256,16 @@ angular.module('starter', [
         "menuContent": {
           templateUrl: "templates/news.html",
           controller: "NewsController"
+        }
+      }
+    })
+
+    .state("app.transactions", {
+      url: "/leagues/:leagueId/weeks/:week/transactions",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/transactions.html",
+          controller: "TransactionsController"
         }
       }
     })

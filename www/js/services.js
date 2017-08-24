@@ -1,3 +1,45 @@
+function feedSplitter(_, moment, fnLastReadDate) {
+	var dateFormat = "YYYY-MM-DDThh:mm:ss";
+	return function (response) {
+		var maxReadDate, maxReadDateStr, lastReadDate;
+
+		lastReadDate = moment.utc(fnLastReadDate(), dateFormat);
+
+		var items = response.data || [];
+		var unreadItems = [];
+		var readItems = [];
+
+		_.each(items, function (item) {
+			var itemDate = moment.utc(item.releaseDate, dateFormat);
+			if (itemDate.isAfter(lastReadDate)) {
+				unreadItems.push(item);
+			} else {
+				readItems.push(item);
+			}
+
+			if (!maxReadDate || itemDate.isAfter(maxReadDate)) {
+				maxReadDate = itemDate;
+				maxReadDateStr = item.releaseDate;
+			}
+		});
+
+		if (maxReadDate) {
+			fnLastReadDate(maxReadDateStr);
+		}
+
+		return {
+			data: {
+				unread: unreadItems,
+				read: readItems,
+				all: items,
+				lastReadDate: lastReadDate,
+				maxReadDate: maxReadDate
+			}
+		};
+	};
+}
+
+
 angular.module("starter.services", [])
 
 .service("ImageCache", function (/* $localStorage, */ _) {
@@ -53,7 +95,11 @@ angular.module("starter.services", [])
 	var previousSession;
 
 	return {
-		list: list
+		list: list,
+		news: news,
+		splitNews: splitNews,
+		transactions: transactions,
+		splitTransactions: splitTransactions
 	};
 
 	function list(force) {
@@ -70,19 +116,30 @@ angular.module("starter.services", [])
 		});
 	}
 
-	function set(leagueId, force) {
-		// this call is expensive, so 200 OK! if it's a repeat request
-		if (leagueId === AppStateService.currentLeagueId() && previousSession === AuthTokenStore.session() && !force) {
-			return $q.resolve();
-		}
-
+	function news(leagueId, filters) {
 		return $http({
-			method: "PUT",
-			url: AppSettings.apiHost + "/v1/leagues/" + leagueId
-		}).then(function (response) {
-			AppStateService.currentLeagueId(leagueId);
-			previousSession = AuthTokenStore.session();
+			method: "GET",
+			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/articles",
+			params: filters
 		});
+	}
+
+	function splitNews(leagueId, teamId) {
+		return this.news(leagueId, teamId)
+			.then(feedSplitter(_, moment, AppStateService.lastLeagueNewsDate));
+	}
+
+	function transactions(leagueId, week, filters) {
+		return $http({
+			method: "GET",
+			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/weeks/" + week + "/transactions",
+			params: filters
+		});
+	}
+
+	function splitTransactions(leagueId, week, filters) {
+		return this.transactions(leagueId, week, filters)
+			.then(feedSplitter(_, moment, AppStateService.lastLeagueTransactionsDate));
 	}
 })
 
@@ -184,6 +241,9 @@ angular.module("starter.services", [])
 	STORE_KEY_CURRENT_WEEK = "realitySportsApp.AppState>currentWeek";
 	STORE_KEY_CURRENT_EMAIL = "realitySportsApp.AppState>currentEmail";
 	STORE_KEY_CURRENT_PLAYER_FILTERS = "realitySportsApp.AppState>currentPlayerFilters";
+	STORE_KEY_LAST_LEAGUE_NEWS_DATE = "realitySportsApp.AppState>lastLeagueNewsDate";
+	STORE_KEY_LAST_LEAGUE_TRANSACTIONS_DATE = "realitySportsApp.AppState>lastLeagueTransactionsDate";
+	STORE_KEY_LAST_TEAM_NEWS_DATE = "realitySportsApp.AppState>lastTeamNewsDate";
 
 	var OPENING_NIGHT = moment("2016-09-08");
 	var WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -196,6 +256,9 @@ angular.module("starter.services", [])
 		currentWeek: currentWeek,
 		currentEmail: currentEmail,
 		guessCurrentWeek: guessCurrentWeek,
+		lastLeagueNewsDate: lastLeagueNewsDate,
+		lastLeagueTransactionsDate: lastLeagueTransactionsDate,
+		lastTeamNewsDate: lastTeamNewsDate,
 		events: {
 			LEAGUE_ID_CHANGE: "AppStateService.leagueId:change",
 			LEAGUE_CHANGE: "AppStateService.league:change",
@@ -276,6 +339,36 @@ angular.module("starter.services", [])
 		}
 
 		return localStorage.getItem(STORE_KEY_CURRENT_EMAIL);
+	}
+
+	function lastLeagueNewsDate(date) {
+		var key = STORE_KEY_LAST_LEAGUE_NEWS_DATE;
+
+		if (date) {
+			localStorage.setItem(key, date);
+		}
+
+		return localStorage.getItem(key);
+	}
+
+	function lastLeagueTransactionsDate(date) {
+		var key = STORE_KEY_LAST_LEAGUE_TRANSACTIONS_DATE;
+
+		if (date) {
+			localStorage.setItem(key, date);
+		}
+
+		return localStorage.getItem(key);
+	}
+
+	function lastTeamNewsDate(teamId, date) {
+		var key = STORE_KEY_LAST_TEAM_NEWS_DATE + "-" + teamId;
+
+		if (date) {
+			localStorage.setItem(key, date);
+		}
+
+		return localStorage.getItem(key);
 	}
 })
 
@@ -380,9 +473,10 @@ angular.module("starter.services", [])
 	}
 })
 
-.service("TeamService", function ($http, AppSettings, _) {
+.service("TeamService", function ($http, _, moment, AppSettings, AppStateService) {
 	return {
 		news: news,
+		splitNews: splitNews,
 
 		fetchRoster: fetchRoster,
 		fetchAdjustableRoster: fetchAdjustableRoster,
@@ -397,8 +491,15 @@ angular.module("starter.services", [])
 	function news(leagueId, teamId) {
 		return $http({
 			method: "GET",
-			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId + "/news"
+			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/teams/" + teamId + "/articles"
 		});
+	}
+
+	function splitNews(leagueId, teamId) {
+		var fnLastReadDate = _.partial(AppStateService.lastTeamNewsDate, teamId);
+
+		return this.news(leagueId, teamId)
+			.then(feedSplitter(_, moment, fnLastReadDate));
 	}
 
 	function fetchRoster(leagueId, teamId) {
@@ -432,7 +533,7 @@ angular.module("starter.services", [])
 				position.player = _.find(data.lineupPlayers, function (player) {
 					return (player.startingSlot || player.pos) === position.startingSlot &&
 						player.lineupStatus === 1 &&
-						!_.contains( slotted, player.playerId );
+						!_.includes(slotted, player.playerId);
 				});
 
 				if (!position.player) { return; }
@@ -440,11 +541,11 @@ angular.module("starter.services", [])
 				slotted.push(position.player.playerId);
 			});
 
-			data.bench = _.select(data.lineupPlayers, function (player) {
+			data.bench = _.filter(data.lineupPlayers, function (player) {
 				return player.lineupStatus === 2;
 			});
 
-			data.reserves = _.select(data.lineupPlayers, function (player) {
+			data.reserves = _.filter(data.lineupPlayers, function (player) {
 				return player.lineupStatus === 3;
 			});
 
@@ -537,4 +638,5 @@ angular.module("starter.services", [])
 		});
 	}
 })
+
 ;

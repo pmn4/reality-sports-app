@@ -1,0 +1,51 @@
+<div class="card">
+  <ion-item class="item-divider item-icon-right">
+    <span ui-sref="app.player({ leagueId: leagueId, playerId: article.playerId })">
+      {{ article | playerFullName }}
+
+      <span class="tiny label">
+        {{ article.nflTeam }}
+        &mdash;
+        {{ article.pos }}
+      </span>
+    </span>
+
+    <i
+      class="icon ion-person positive"
+      ui-sref="app.player({ leagueId: leagueId, playerId: article.playerId })"
+    ></i>
+  </ion-item>
+
+  <ion-item class="item-text-wrap">
+    <div>
+      {{ article.report }}
+    </div>
+
+    <div ng-show="article.insight">
+      <hr />
+
+      <div class="insight">
+        <span class="tiny label">INSIGHT:</span>
+        {{ article.insight }}
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-item class="item-divider">
+    <div class="row row-no-padding">
+      <div
+        class="player-owner col"
+        ui-sref="app.team({ leagueId: leagueId, teamId: article.ownedByTeamID })"
+      >
+        <span ng-show="article.ownedByTeamID > 0">
+          <img ng-src="{{ article.ownedByTeamID | teamLogoById }}" height="16px" />
+          <strong>{{ article.ownedByTeamName }}</strong>
+        </span>
+      </div>
+
+      <div class="pull-right item-note col">
+        {{ article.releaseDate | humanReadableDateSince }} ago
+      </div>
+    </div>
+  </ion-item>
+</div>

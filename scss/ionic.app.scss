@@ -72,6 +72,10 @@ a.tappable {
 	max-width: $pct;
 }
 
+.row .col .button-block {
+	margin-top: 0;
+	margin-bottom: 0;
+}
 
 .action-indicator-bar {
 	border-bottom: 1px solid transparent;
@@ -840,4 +844,61 @@ $adjustment-minus-color: $assertive;
 
 .wip-wip-wip {
 	@include opacity(0.5);
+}
+
+.unread-news {
+	$unread-news-color: #ffc3b4;
+
+	position: relative;
+	@include clearfix;
+
+	.unread-news__label {
+		float: right;
+		padding-left: 10px;
+		color: $unread-news-color;
+		text-align: right;
+		background: white;
+	}
+
+	&:before {
+		content: " ";
+		position: absolute;
+		left: 0;
+		width: 100%;
+		top: 50%;
+		display: block;
+		border-bottom: 1px solid $unread-news-color;
+		z-index: -1;
+	}
+}
+
+.pull-left {
+	text-align: left;
+}
+
+.pull-center {
+	text-align: center;
+}
+
+.pull-right {
+	text-align: right;
+}
+
+.supplied-html {
+	br {
+		content: " ";
+		display: block;
+		margin-top: 5px;
+	}
+
+	&.indented {
+		text-indent: 20px;
+
+		br:after {
+			content: "";
+			width: 20px;
+			float: left;
+			height: 1em;
+		}
+	}
 }

@@ -16,7 +16,7 @@ var Mixins = {
       if (!$scope.lastUpdated) { return true; }
 
       // updated, but no data?  true.
-      if (_.all(properties, function (p) { _.isEmpty($scope[p]); })) {
+      if (_.every(properties, function (p) { _.isEmpty($scope[p]); })) {
         return true;
       }
 
@@ -265,7 +265,135 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller("LeagueController", function ($rootScope, $scope, $state, AppStateService, CacheService) {
+.controller("LeagueController", function ($rootScope, $scope, $state, $stateParams, $interval, AppStateService, CacheService, LeagueService, ScoreboardService, StandingsService, TeamService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.teamId = $stateParams.teamId;
+  $scope.week = AppStateService.currentWeek();
+
+  if ($scope.leagueId) {
+    AppStateService.currentLeagueId($scope.leagueId);
+
+    $scope.currentLeague = CacheService.getLeagueById($scope.leagueId);
+    $scope.week = AppStateService.guessCurrentWeek();
+    $scope.team = $scope.currentLeague.team;
+  }
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.initialize = function () {
+    $scope.refresh();
+  };
+
+  $scope.refresh = function () {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+
+    $scope.refreshScoreboard().finally(function () {
+      $scope.ajaxing = $scope.indicateAjaxing(false);
+
+      // Stop the ion-refresher from spinning
+      $scope.$broadcast('scroll.refreshComplete');
+    });
+
+    $scope.refreshBids();
+    $scope.refreshNews();
+    $scope.refreshStandings();
+    $scope.refreshTransactions();
+  };
+
+  $scope.refreshScoreboard = function () {
+    return ScoreboardService.fetch($scope.leagueId, $scope.week)
+      .then(function (response) {
+        var data = response.data || {};
+        $scope.boxScores = data.boxScores || [];
+        $scope.setLastUpdated(new Date());
+
+        $scope.boxScore = _.find($scope.boxScores, function (boxScore) {
+          return boxScore.awayTeam.team.teamId === $scope.team.teamId ||
+            boxScore.homeTeam.team.teamId === $scope.team.teamId;
+        });
+
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      })
+  };
+
+  $scope.refreshBids = function () {
+    $scope.fetchingBids = true;
+    TeamService.listBids($scope.leagueId, $scope.team.teamId)
+      .then(function (response) {
+        $scope.bids = response.data || [];
+      }, function (response) {
+        $scope.bidsError = 'Error fetching bids';
+      }).finally(function () {
+        $scope.fetchingBids = false;
+      });
+  };
+
+  $scope.refreshStandings = function () {
+    $scope.fetchingStandings = true;
+
+    StandingsService.fetch($scope.leagueId, $scope.week - 1)
+      .then(function (response) {
+        console.log(response);
+      }, function (response) {
+        $scope.standingsError = "Error fetching standings";
+      }).finally(function () {
+        $scope.fetchingStandings = false;
+      });
+  };
+
+  $scope.refreshTransactions = function () {
+    $scope.fetchingTransactions = true;
+
+    LeagueService.splitTransactions($scope.leagueId, $scope.week)
+      .then(function (response) {
+        $scope.transactions = response.data.all;
+        $scope.newTransactions = response.data.unread;
+      }, function (response) {
+        $scope.newsError = "Error fetching transactions";
+      }).finally(function () {
+        $scope.fetchingTransactions = false;
+      });
+  };
+
+  $scope.refreshNews = function () {
+    $scope.fetchingNews = true;
+    TeamService.splitNews($scope.leagueId, $scope.team.teamId)
+      .then(function (response) {
+        $scope.articles = response.data.all;
+        $scope.newArticles = response.data.unread;
+      }, function (response) {
+        $scope.newsError = "Error fetching news";
+      }).finally(function () {
+        $scope.fetchingNews = false;
+      });
+  };
+
+  $scope.goToScoreboard = function () {
+    $state.go("app.scoreboards", {
+      leagueId: $scope.leagueId,
+      week: AppStateService.currentWeek()
+    });
+  };
+
+  $scope.goToTeam = function () {
+    $state.go("app.team", {
+      leagueId: $scope.leagueId,
+      teamId: $scope.teamId
+    });
+  };
+
+  $scope.initialize();
+
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
+})
+
+.controller("CurrentLeagueController", function ($rootScope, $scope, $state, AppStateService, CacheService) {
   $scope.$on("$ionicView.enter", function () {
     if ($state.params.leagueId && $state.params.leagueId !== "default") {
       $scope.leagueId = $state.params.leagueId;
@@ -672,13 +800,10 @@ angular.module('starter.controllers', [])
   };
 
   $scope.refreshNews = function () {
-    // @todo: once /teams/:id/news works, remove return;
-    return;
-
     $scope.fetchingNews = true;
     TeamService.news($scope.leagueId, $scope.teamId)
       .then(function (response) {
-        $scope.news = response.data || [];
+        $scope.articles = response.data || [];
       }, function (response) {
         $scope.newsError = 'Error fetching news';
       }).finally(function () {
@@ -726,7 +851,7 @@ angular.module('starter.controllers', [])
   //     _.chain(team.startingPositions)
   //       .map(function (p) { return p.player; })
   //       .compact()
-  //       .any(function (p) { return !p.isLocked; })
+  //       .some(function (p) { return !p.isLocked; })
   //       .value();
   // })
 
@@ -871,8 +996,8 @@ angular.module('starter.controllers', [])
     if (!$scope.editable) { return; }
 
     players = _.chain($scope.team.lineupPlayers)
-      .select(function (player) {
-        return _.contains(position.positionsAllowed, player.pos);
+      .filter(function (player) {
+        return _.includes(position.positionsAllowed, player.pos);
       })
       .reject(function (player) {
         return position.player &&
@@ -1302,7 +1427,124 @@ angular.module('starter.controllers', [])
   }, 60000);
 })
 
-.controller("NewsController", function () {
+.controller("NewsController", function ($scope, moment, $interval, $state, $stateParams, LeagueService, AppStateService) {
+  $scope.leagueId = $stateParams.leagueId;
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.refresh = function (force) {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    LeagueService.splitNews($scope.leagueId)
+      .then(function (response) {
+        var articles = response.data || {};
+
+        $scope.articles = articles.all;
+        $scope.unreadArticles = articles.unread;
+        $scope.readArticles = articles.read;
+
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      }).finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.refresh();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
+})
+
+.controller("TransactionsController", function ($scope, moment, $interval, $state, $stateParams, LeagueService, AppStateService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.week = $stateParams.week;
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.refresh = function (force) {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    LeagueService.splitTransactions($scope.leagueId, $scope.week)
+      .then(function (response) {
+        var transactions = response.data || {};
+
+        $scope.transactions = transactions.all;
+        $scope.unreadTransactions = transactions.unread;
+        $scope.readTransactions = transactions.read;
+
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      }).finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.refresh();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
+})
+
+// TODO: Move unread/read logic to service: TeamService.splitNews
+.controller("TeamNewsController", function ($scope, $interval, $state, $stateParams, TeamService, AppStateService) {
+  $scope.leagueId = $stateParams.leagueId;
+  $scope.teamId = $stateParams.teamId;
+
+  $scope.setLastUpdated = Mixins.setLastUpdated($scope);
+
+  $scope.refresh = function (force) {
+    $scope.ajaxing = $scope.indicateAjaxing(true);
+    TeamService.splitNews($scope.leagueId, $scope.teamId)
+      .then(function (response) {
+        var articles = response.data || {};
+
+        $scope.articles = articles.all;
+        $scope.unreadArticles = articles.unread;
+        $scope.readArticles = articles.read;
+
+        $scope.setLastUpdated(new Date());
+      }, function (response) {
+        $scope.retryOnRsoError(response);
+      }).finally(function () {
+        $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        // Stop the ion-refresher from spinning
+        $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
+  $scope.refresh();
+
+  $scope.$on("$ionicView.enter", function () {
+    $scope.setLastUpdated();
+  });
+  $scope._intervalUpdated = $interval(function () {
+    $scope.setLastUpdated();
+  }, 60000);
+  $scope.$on("$ionicView.beforeLeave", function () {
+    $interval.cancel($scope._intervalUpdated);
+  });
 })
 
 .controller("SupportController", function () {
@@ -1510,7 +1752,7 @@ angular.module('starter.controllers', [])
     if (!player) { return; }
 
     position = player.position || player.pos;
-    if (_.contains(teamDefenseLabels, position)) {
+    if (_.includes(teamDefenseLabels, position)) {
       return player.firstName;
     }
 
@@ -1738,6 +1980,33 @@ angular.module('starter.controllers', [])
   $scope.$on("$ionicView.enter", function () {
     $scope.doCheck();
   });
+})
+
+.directive("rsaArticle", function () {
+  return {
+    restrict: "E",
+
+    scope: {
+      article: "=",
+      leagueId: "="
+    },
+
+    templateUrl: "templates/directives/article.html"
+  };
+})
+
+.directive("rsaTransaction", function () {
+  return {
+    restrict: "E",
+
+    scope: {
+      transaction: "=",
+      leagueId: "=",
+      week: "="
+    },
+
+    templateUrl: "templates/directives/transaction.html"
+  };
 })
 
 .directive("rsaWeekChooser", function ($ionicScrollDelegate, $timeout) {
@@ -2049,7 +2318,7 @@ angular.module('starter.controllers', [])
         if (!standingsData) { return; }
 
         flatStandings = _.chain(standingsData.divisionStandings)
-          .pluck("teamStandings")
+          .map("teamStandings")
           .flatten()
           .value();
 

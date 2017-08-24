@@ -1,0 +1,139 @@
+<ion-view view-title="{{ currentLeague.name }}">
+<!--
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon button-clear ion-ios-refresh-empty" ng-click="refresh(true)" ng-class="{ 'ion-ios7-reloading': ajaxing }"></button>
+  </ion-nav-buttons>
+-->
+
+  <ion-content>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh(true)"></ion-refresher>
+    <div class="last-updated">
+      <div ng-show="ajaxing">
+        loading...
+      </div>
+      <div ng-hide="ajaxing || !lastUpdatedAgo">
+        <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="item item-divider item-icon-right">
+        Week {{ week }}
+
+        <i
+          class="icon ion-ios-refresh-empty positive"
+          ng-click="refreshScoreboard()"
+        ></i>
+      </div>
+
+      <div
+        class="item"
+        ng-show="team"
+        ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
+      >
+        <div class="row row-no-padding">
+          <div class="col">
+            {{ team.name }}
+          </div>
+
+          <div class="col pull-right" ng-hide="fetchingStandings">
+            <span ng-show="rank">
+              {{ rank }} of {{ leagueSize }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="item" ng-hide="team">
+        <div class="item-note">
+          loading team information
+        </div>
+      </div>
+
+      <div class="item row-no-padding">
+        <rsa-box-score league-id="leagueId" week="week" box-score="boxScore"></rsa-box-score>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="item item-divider">
+        Updates:
+      </div>
+
+      <div
+        class="item"
+        ng-hide="fetchingNews"
+        ui-sref="app.teamNews({ leagueId: leagueId, teamId: team.teamId })"
+        ng-class="{ positive: newArticles.length }"
+      >
+        <p>
+          {{ newArticles.length || "no" }} new updates
+          for your team
+          ({{ articles.length || 0 }} total)
+        </p>
+      </div>
+
+      <div class="item" ng-show="fetchingNews">
+        <p>
+          <em>Fetching News...</em>
+        </p>
+      </div>
+
+      <div
+        class="item"
+        ng-hide="fetchingBids"
+        ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
+        ng-class="{ positive: bids.length }"
+      >
+        <p>
+          {{ bids.length || "no" }} free agent bids this week
+        </p>
+      </div>
+
+      <div class="item" ng-show="fetchingBids">
+        <p>
+          <em>Fetching Free Agent Bids...</em>
+        </p>
+      </div>
+
+      <div
+        class="item"
+        ng-hide="fetchingTransactions"
+        ui-sref="app.transactions({ leagueId: leagueId, week: week })"
+        ng-class="{ positive: newTransactions.length }"
+      >
+        <p>
+          {{ newTransactions.length || "no" }} new transactions
+          this week
+          ({{ transactions.length || 0 }} total)
+        </p>
+      </div>
+
+      <div class="item" ng-show="fetchingTransactions">
+        <p>
+          <em>Fetching League Transactions...</em>
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col col-50">
+        <a
+          class="button button-small button-block"
+          ui-sref="app.scoreboards({ leagueId: leagueId })"
+        >
+          Scoreboard
+        </a>
+      </div>
+
+      <div class="col col-50">
+        <a
+          class="button button-small button-block"
+          ui-sref="app.news({ leagueId: leagueId })"
+        >
+          League News
+        </a>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

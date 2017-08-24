@@ -1,0 +1,32 @@
+<div class="card">
+  <ion-item class="item-divider">
+    <div
+      class="player-owner"
+      ui-sref="app.team({ leagueId: leagueId, teamId: transaction.teamId })"
+    >
+      <span ng-show="transaction.teamId > 0">
+        <img ng-src="{{ transaction.teamId | teamLogoById }}" height="16px" />
+        <strong>{{ transaction.teamName }}</strong>
+      </span>
+    </div>
+  </ion-item>
+
+  <ion-item class="item-text-wrap">
+    <div
+      class="supplied-html indented"
+      ng-bind-html="transaction.fullDescription"
+    ></div>
+  </ion-item>
+
+  <ion-item class="item-divider">
+    <div class="row row-no-padding">
+      <div class="col">
+        {{ transaction.trxType }}
+      </div>
+
+      <div class="pull-right item-note col">
+        {{ transaction.trxDate | humanReadableDateSince }} ago
+      </div>
+    </div>
+  </ion-item>
+</div>

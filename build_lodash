@@ -2,32 +2,32 @@
 
 output = 'www/lib/lodash/lodash.custom.min.js'
 methods = %w(
-  all
-	any
   chain
   compact
-  contains
   defaults
   each
+  every
+  filter
   find
   flatten
   groupBy
+  includes
   isEmpty
   isEqual
   keys
   map
   max
   memoize
-  object
+  partial
   pick
-  pluck
   reduce
   reject
-  select
+  some
   sortBy
   throttle
   value
+  zipObject
 )
 
 # there is an undefined variable called freeGlobal which breaks "use strict", hence the iife
-`lodash modern include=#{ methods.join(',') } --production --output #{ output } iife='!function(window,freeGlobal,undefined){%output%}(this)'`
+`lodash include=#{ methods.join(',') } --production --output #{ output } iife='!function(window,freeGlobal,undefined){%output%}(this)'`
