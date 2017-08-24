@@ -1,5 +1,5 @@
 <ion-view view-title="League News">
-  <ion-content padding="true">
+  <ion-content>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="last-updated">
       <div ng-show="ajaxing">
@@ -7,6 +7,16 @@
       </div>
       <div ng-hide="ajaxing || !lastUpdatedAgo">
         <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
+      </div>
+    </div>
+
+    <div ng-hide="ajaxing">
+      <div class="info-page-content" ng-show="articles | none">
+        <h3>Nope</h3>
+
+        <p>
+          No news for week {{ week }}
+        </p>
       </div>
     </div>
 

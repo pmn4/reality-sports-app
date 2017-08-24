@@ -28,15 +28,50 @@
     <ion-content>
     <!-- <ion-content has-footer="true"> -->
       <ion-list>
+        <ion-item menu-close ui-sref="app.league-for-current-league">
+          <i class="icon ion-tshirt"></i>
+          League
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.scoreboards-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-flash"></i>
+          Scoreboard
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.news-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-ios-paper-outline"></i>
+          News
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.transactions-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-shuffle"></i>
+          Transactions
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.standings-for-current-league">
+          <span class="padding"></span>
+          <i class="icon ion-trophy"></i>
+          Standings
+        </ion-item>
+
+        <ion-item menu-close ui-sref="app.leagues">
+          <span class="padding"></span>
+          <i class="icon ion-arrow-swap"></i>
+          Switch Leagues
+        </ion-item>
+
         <ion-item menu-close ui-sref="app.team-for-current-league">
           <i class="icon ion-tshirt"></i>
           My Team
         </ion-item>
 
-        <ion-item menu-close ui-sref="app.team-for-current-league">
+        <ion-item menu-close ui-sref="app.team-news-for-current-league">
           <span class="padding"></span>
-          <i class="icon ion-ios-americanfootball"></i>
-          Overview
+          <i class="icon ion-ios-paper-outline"></i>
+          News
         </ion-item>
 
         <ion-item menu-close ui-sref="app.roster-for-current-league">
@@ -45,18 +80,8 @@
           Roster
         </ion-item>
 
-        <ion-item menu-close ui-sref="app.scoreboards-for-current-league">
-          <i class="icon ion-ios-list-outline"></i>
-          Scoreboard
-        </ion-item>
-
-        <ion-item menu-close ui-sref="app.standings-for-current-league">
-          <i class="icon ion-trophy"></i>
-          Standings
-        </ion-item>
-
         <ion-item menu-close ui-sref="app.players-for-current-league">
-          <i class="icon ion-person-stalker"></i>
+          <i class="icon ion-search"></i>
           Player Search
         </ion-item>
 
@@ -66,22 +91,12 @@
           My News
         </ion-item>
 -->
-        <ion-item menu-close ui-sref="app.leagues">
-          <i class="icon ion-arrow-swap"></i>
-          Switch Leagues
-        </ion-item>
-
         <ion-item class="item-divider"></ion-item>
         <ion-item menu-close ui-sref="app.help">
           <i class="icon ion-ios-help-outline assertive"></i>
           Help
         </ion-item>
-<!--
-        <ion-item menu-close ui-sref="app.support">
-          <i class="icon ion-cash balanced"></i>
-          Take my money, please
-        </ion-item>
--->
+
         <ion-item menu-close ui-sref="app.updates">
           <i class="icon ion-ios-cloud-download-outline positive"></i>
           <span ng-show="hasAppUpdate">

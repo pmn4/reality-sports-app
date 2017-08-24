@@ -1,12 +1,25 @@
 <ion-view view-title="Transactions">
-  <ion-content padding="true">
+  <ion-content has-subheader>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
+    <div class="subheader">
+      <rsa-week-chooser on-choose-week="setWeek(week)" week="week" first-week="1" last-week="17"></rsa-week-chooser>
+    </div>
     <div class="last-updated">
       <div ng-show="ajaxing">
         loading...
       </div>
       <div ng-hide="ajaxing || !lastUpdatedAgo">
         <em>updated {{ lastUpdatedAgo }} ago (pull to refresh)</em>
+      </div>
+    </div>
+
+    <div ng-hide="ajaxing">
+      <div class="info-page-content" ng-show="transactions | none">
+        <h3>Nope</h3>
+
+        <p>
+          No transactions for week {{ week }}
+        </p>
       </div>
     </div>
 

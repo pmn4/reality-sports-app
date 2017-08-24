@@ -2,7 +2,7 @@
 	<ion-content padding="true">
 		<div class="row row-no-padding team-image">
 			<div class="col col-50 col-offset-25">
-				<img ng-src="{{ team.teamLogo }}" width="100%" />
+				<img ng-src="{{ team.teamLogo || (teamId | teamLogoById) }}" width="100%" />
 			</div>
 		</div>
 
@@ -67,15 +67,33 @@
 			</ion-item>
 		</ion-list>
 
-		<div class="button-bar">
-			<button class="button button-small button-block button-positive" ng-click="goToActiveRoster()">
+		<div>
+			<button
+				class="button button-small button-block button-positive"
+				ng-click="goToActiveRoster()"
+			>
 				Active Roster
 			</button>
-<!--
-			<button class="button button-small button-block button-positive" ng-click="goToBenchRoster()">
-				Bench
+
+			<button
+				class="button button-small button-block button-positive button-outline"
+				ng-click="goToTeamNews()"
+			>
+				All Team News
 			</button>
--->
+		</div>
+
+		<div ng-show="recentArticles | any">
+			<h4>
+				<i class="icon ion-fireball energized"></i>
+				Recent News
+			</h4>
+
+			<rsa-article
+				ng-repeat="article in recentArticles"
+				article="article"
+				league-id="leagueId"
+			></rsa-article>
 		</div>
 
 		<wip-wip-wip></wip-wip-wip>

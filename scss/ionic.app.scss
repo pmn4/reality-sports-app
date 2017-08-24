@@ -854,7 +854,7 @@ $adjustment-minus-color: $assertive;
 
 	.unread-news__label {
 		float: right;
-		padding-left: 10px;
+		padding: 0 10px;
 		color: $unread-news-color;
 		text-align: right;
 		background: white;
@@ -888,17 +888,6 @@ $adjustment-minus-color: $assertive;
 	br {
 		content: " ";
 		display: block;
-		margin-top: 5px;
-	}
-
-	&.indented {
-		text-indent: 20px;
-
-		br:after {
-			content: "";
-			width: 20px;
-			float: left;
-			height: 1em;
-		}
+		margin-top: 10px;
 	}
 }

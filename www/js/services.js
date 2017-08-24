@@ -1,9 +1,10 @@
 function feedSplitter(_, moment, fnLastReadDate) {
 	var dateFormat = "YYYY-MM-DDThh:mm:ss";
 	return function (response) {
-		var maxReadDate, maxReadDateStr, lastReadDate;
+		var maxReadDate, maxReadDateStr, lastReadDate, lastReadDateStr;
 
-		lastReadDate = moment.utc(fnLastReadDate(), dateFormat);
+		lastReadDateStr = fnLastReadDate();
+		lastReadDate = moment.utc(lastReadDateStr, dateFormat);
 
 		var items = response.data || [];
 		var unreadItems = [];
@@ -23,17 +24,13 @@ function feedSplitter(_, moment, fnLastReadDate) {
 			}
 		});
 
-		if (maxReadDate) {
-			fnLastReadDate(maxReadDateStr);
-		}
-
 		return {
 			data: {
 				unread: unreadItems,
 				read: readItems,
 				all: items,
-				lastReadDate: lastReadDate,
-				maxReadDate: maxReadDate
+				lastReadDate: lastReadDateStr,
+				maxReadDate: maxReadDateStr
 			}
 		};
 	};
@@ -91,15 +88,20 @@ angular.module("starter.services", [])
 	};
 })
 
-.service("LeagueService", function ($http, $q, AppSettings, AppStateService, CacheService, AuthTokenStore) {
+.service("LeagueService", function ($http, $q, _, AppSettings, AppStateService, CacheService, AuthTokenStore) {
 	var previousSession;
+
+	var TRANSACTION_TYPE_LINEUP_CHANGE = 'Lineup Changes';
 
 	return {
 		list: list,
 		news: news,
 		splitNews: splitNews,
 		transactions: transactions,
-		splitTransactions: splitTransactions
+		splitTransactions: splitTransactions,
+		Types: {
+			LineupChange: TRANSACTION_TYPE_LINEUP_CHANGE
+		}
 	};
 
 	function list(force) {
@@ -129,16 +131,24 @@ angular.module("starter.services", [])
 			.then(feedSplitter(_, moment, AppStateService.lastLeagueNewsDate));
 	}
 
-	function transactions(leagueId, week, filters) {
+	function transactions(leagueId, week, filters, includeLineupChanges) {
 		return $http({
 			method: "GET",
 			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/weeks/" + week + "/transactions",
 			params: filters
+		}).then(function (response) {
+			if (!includeLineupChanges) { return response; }
+
+			return {
+				data: _.reject(response.data, function (transaction) {
+					return transaction.trxType === TRANSACTION_TYPE_LINEUP_CHANGE;
+				})
+			};
 		});
 	}
 
-	function splitTransactions(leagueId, week, filters) {
-		return this.transactions(leagueId, week, filters)
+	function splitTransactions(leagueId, week, filters, includeLineupChanges) {
+		return this.transactions(leagueId, week, filters, includeLineupChanges)
 			.then(feedSplitter(_, moment, AppStateService.lastLeagueTransactionsDate));
 	}
 })
@@ -213,7 +223,8 @@ angular.module("starter.services", [])
 
 	return {
 		leagues: leagues,
-		getLeagueById: getLeagueById
+		getLeagueById: getLeagueById,
+		getOwnedTeamIdForLeague: getOwnedTeamIdForLeague
 	};
 
 	function leagues(leaguesData) {
@@ -230,6 +241,12 @@ angular.module("starter.services", [])
 		return _.find(leagues(), function (l) {
 			return l.leagueId === leagueId;
 		});
+	}
+
+	function getOwnedTeamIdForLeague(leagueId) {
+		var league = this.getLeagueById(leagueId);
+
+		return _.get(league, "team.teamId");
 	}
 })
 
@@ -259,6 +276,7 @@ angular.module("starter.services", [])
 		lastLeagueNewsDate: lastLeagueNewsDate,
 		lastLeagueTransactionsDate: lastLeagueTransactionsDate,
 		lastTeamNewsDate: lastTeamNewsDate,
+		getOwnedTeamIdForCurrentLeague: getOwnedTeamIdForCurrentLeague,
 		events: {
 			LEAGUE_ID_CHANGE: "AppStateService.leagueId:change",
 			LEAGUE_CHANGE: "AppStateService.league:change",
@@ -268,7 +286,7 @@ angular.module("starter.services", [])
 	};
 
 	function currentLeagueId(leagueId) {
-		if (leagueId) {
+		if (leagueId && leagueId !== "default") {
 			localStorage.setItem(STORE_KEY_CURRENT_LEAGUE, leagueId);
 
 			$rootScope.$broadcast(this.events.LEAGUE_ID_CHANGE, leagueId);
@@ -308,7 +326,7 @@ angular.module("starter.services", [])
 	}
 
 	function currentWeek(weekNum) {
-		if (weekNum) {
+		if (weekNum && weekNum !== "default") {
 			localStorage.setItem(STORE_KEY_CURRENT_WEEK, weekNum);
 
 			$rootScope.$broadcast(this.events.WEEK_CHANGE, weekNum);
@@ -369,6 +387,12 @@ angular.module("starter.services", [])
 		}
 
 		return localStorage.getItem(key);
+	}
+
+	function getOwnedTeamIdForCurrentLeague() {
+	    var leagueId = this.currentLeagueId();
+
+	    return CacheService.getOwnedTeamIdForLeague(leagueId);
 	}
 })
 

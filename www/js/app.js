@@ -120,7 +120,7 @@ angular.module('starter', [
       }
     })
 
-    .state("app.current-league", {
+    .state("app.league-for-current-league", {
       url: "/leagues/default",
       views: {
         "menuContent": {
@@ -175,7 +175,7 @@ angular.module('starter', [
       views: {
         "menuContent": {
           templateUrl: "templates/redirecting.html",
-          controller: "TeamController"
+          controller: "CurrentLeagueController"
         }
       }
     })
@@ -190,7 +190,17 @@ angular.module('starter', [
       }
     })
 
-    .state("app.teamNews", {
+    .state("app.team-news-for-current-league", {
+      url: "/leagues/default/teams/default/news",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "CurrentLeagueController"
+        }
+      }
+    })
+
+    .state("app.team-news", {
       url: "/leagues/:leagueId/teams/:teamId/news",
       views: {
         "menuContent": {
@@ -250,12 +260,32 @@ angular.module('starter', [
       }
     })
 
+    .state("app.news-for-current-league", {
+      url: "/leagues/default/news",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "CurrentLeagueController"
+        }
+      }
+    })
+
     .state("app.news", {
       url: "/leagues/:leagueId/news",
       views: {
         "menuContent": {
           templateUrl: "templates/news.html",
           controller: "NewsController"
+        }
+      }
+    })
+
+    .state("app.transactions-for-current-league", {
+      url: "/leagues/default/weeks/default/transactions",
+      views: {
+        "menuContent": {
+          templateUrl: "templates/redirecting.html",
+          controller: "CurrentLeagueController"
         }
       }
     })

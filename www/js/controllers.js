@@ -242,10 +242,7 @@ angular.module('starter.controllers', [])
   $scope.gotoLeague = function (league) {
     AppStateService.currentLeagueId(league.leagueId);
 
-    $state.go("app.scoreboards", {
-      leagueId: league.leagueId,
-      week: AppStateService.currentWeek()
-    });
+    $state.go("app.league", { leagueId: league.leagueId });
   };
 
   $scope.refresh();
@@ -395,27 +392,24 @@ angular.module('starter.controllers', [])
 
 .controller("CurrentLeagueController", function ($rootScope, $scope, $state, AppStateService, CacheService) {
   $scope.$on("$ionicView.enter", function () {
-    if ($state.params.leagueId && $state.params.leagueId !== "default") {
-      $scope.leagueId = $state.params.leagueId;
-
-      AppStateService.currentLeagueId($scope.leagueId);
+    if (!$state.params.leagueId || $state.params.leagueId === "default") {
+      $state.params.leagueId = AppStateService.currentLeagueId();
     } else {
-      $scope.leagueId = AppStateService.currentLeagueId();
+      AppStateService.currentLeagueId($state.params.leagueId);
     }
 
-    if ($state.params.week && $state.params.week !== "default") {
-      $scope.week = $state.params.week;
-    } else {
-      $scope.week = AppStateService.currentWeek();
+    if (!$state.params.week || $state.params.week === "default") {
+      $state.params.week = AppStateService.currentWeek();
+    }
+
+    if (!$state.params.teamId || $state.params.teamId === "default") {
+      $state.params.teamId = AppStateService.getOwnedTeamIdForCurrentLeague();
     }
 
     var whereTo = $state.current.name.replace("-for-current-league", "");
 
-    if ($scope.leagueId) {
-      $state.params.leagueId = $scope.leagueId;
-      $state.params.week = $scope.week;
-
-      $state.go(whereTo || "app.standings", $state.params, { location: 'replace' });
+    if ($state.params.leagueId) {
+      $state.go(whereTo || "app.league", $state.params, { location: 'replace' });
     } else {
       $state.go("app.leagues");
     }
@@ -801,9 +795,12 @@ angular.module('starter.controllers', [])
 
   $scope.refreshNews = function () {
     $scope.fetchingNews = true;
-    TeamService.news($scope.leagueId, $scope.teamId)
+    TeamService.news($scope.leagueId, $scope.teamId, false)
       .then(function (response) {
-        $scope.articles = response.data || [];
+        $scope.articles = response.data;
+
+        $scope.recentArticles =
+          $filter("articlesWithinDays")($scope.articles, 1);
       }, function (response) {
         $scope.newsError = 'Error fetching news';
       }).finally(function () {
@@ -834,20 +831,16 @@ angular.module('starter.controllers', [])
     });
   };
 
-  function currentLeagueTeamId() {
-    var league = _.find(CacheService.leagues(), function (league) {
-      // likely comparing string to int
-      return league.leagueId == AppStateService.currentLeagueId(); // jshint ignore:line
+  $scope.goToTeamNews = function () {
+    $state.go("app.team-news", {
+      leagueId: $scope.leagueId,
+      teamId: $scope.teamId
     });
-
-    if (!league || !league.team) { return; }
-
-    return league.team.teamId;
-  }
+  };
 
   // $scope.$watch("team", function (team) {
   //   $scope.editable = team &&
-  //     team.teamId == currentLeagueTeamId() &&
+  //     team.teamId == AppStateService.getOwnedTeamIdForCurrentLeague() &&
   //     _.chain(team.startingPositions)
   //       .map(function (p) { return p.player; })
   //       .compact()
@@ -855,30 +848,21 @@ angular.module('starter.controllers', [])
   //       .value();
   // })
 
+  if ($scope.teamId && $scope.teamId !== "default") {
+    $scope.initialize();
+  }
+
   $scope.$on("$ionicView.enter", function () {
-    var whereTo, teamId;
+    var teamId;
 
-    if (!$scope.leagueId || $scope.leagueId === "default") {
-      $scope.leagueId = AppStateService.currentLeagueId();
-    }
+    if ($scope.teamId && $scope.teamId !== "default") { return; }
 
-    if ($scope.teamId && $scope.teamId !== "default") {
-      $scope.initialize();
+    teamId = CacheService.getOwnedTeamIdForLeague($scope.leagueId);
 
-      return;
-    }
-
-    whereTo = $state.current.name.replace("-for-current-league", "");
-    teamId = currentLeagueTeamId();
-
-    if (teamId) {
-      $state.go(whereTo || "app.standings", {
-        leagueId: $scope.leagueId,
-        teamId: teamId
-      }, { location: 'replace' });
-    } else {
-      $state.go("app.leagues");
-    }
+    $state.go(teamId ? $state.current.name : "app.league", {
+      leagueId: $scope.leagueId,
+      teamId: teamId
+    }, { location: 'replace' });
   });
 
   // $scope.$on("$ionicView.enter", function () {
@@ -931,19 +915,9 @@ angular.module('starter.controllers', [])
     $scope.refresh();
   }
 
-  function currentLeagueTeamId() {
-    var league = _.find(CacheService.leagues(), function (league) {
-      return league.leagueId == AppStateService.currentLeagueId(); // jshint ignore:line
-    });
-
-    if (!league || !league.team) { return; }
-
-    return league.team.teamId;
-  }
-
   $scope.$watch("team", function (team) {
     $scope.editable = team &&
-      team.teamId === currentLeagueTeamId() &&
+      team.teamId === AppStateService.getOwnedTeamIdForCurrentLeague() &&
       team.editAllowed;
   });
 
@@ -959,7 +933,7 @@ angular.module('starter.controllers', [])
     }
 
     whereTo = $state.current.name.replace("-for-current-league", "");
-    teamId = currentLeagueTeamId();
+    teamId = AppStateService.getOwnedTeamIdForCurrentLeague();
 
     if (teamId) {
       $state.go(whereTo || "app.standings", {
@@ -1442,6 +1416,10 @@ angular.module('starter.controllers', [])
         $scope.unreadArticles = articles.unread;
         $scope.readArticles = articles.read;
 
+        if (articles.maxReadDate) {
+          AppStateService.lastLeagueNewsDate(articles.maxReadDate);
+        }
+
         $scope.setLastUpdated(new Date());
       }, function (response) {
         $scope.retryOnRsoError(response);
@@ -1482,6 +1460,10 @@ angular.module('starter.controllers', [])
         $scope.unreadTransactions = transactions.unread;
         $scope.readTransactions = transactions.read;
 
+        if (transactions.maxReadDate) {
+          AppStateService.lastLeagueTransactionsDate(transactions.maxReadDate);
+        }
+
         $scope.setLastUpdated(new Date());
       }, function (response) {
         $scope.retryOnRsoError(response);
@@ -1491,6 +1473,13 @@ angular.module('starter.controllers', [])
         // Stop the ion-refresher from spinning
         $scope.$broadcast('scroll.refreshComplete');
      });
+  };
+
+  $scope.setWeek = function (week) {
+    $state.go("app.transactions", {
+      leagueId: $scope.leagueId,
+      week: week
+    });
   };
 
   $scope.refresh();
@@ -1523,6 +1512,10 @@ angular.module('starter.controllers', [])
         $scope.unreadArticles = articles.unread;
         $scope.readArticles = articles.read;
 
+        if (articles.maxReadDate) {
+          AppStateService.lastTeamNewsDate($scope.teamId,articles.maxReadDate);
+        }
+
         $scope.setLastUpdated(new Date());
       }, function (response) {
         $scope.retryOnRsoError(response);
@@ -1534,7 +1527,22 @@ angular.module('starter.controllers', [])
      });
   };
 
-  $scope.refresh();
+  if ($scope.teamId && $scope.teamId !== "default") {
+    $scope.refresh();
+  }
+
+  $scope.$on("$ionicView.enter", function () {
+    var teamId;
+
+    if ($scope.teamId && $scope.teamId !== "default") { return; }
+
+    teamId = CacheService.getOwnedTeamIdForLeague($scope.leagueId);
+
+    $state.go(teamId ? $state.current.name : "app.league", {
+      leagueId: $scope.leagueId,
+      teamId: teamId
+    }, { location: 'replace' });
+  });
 
   $scope.$on("$ionicView.enter", function () {
     $scope.setLastUpdated();
@@ -1591,6 +1599,29 @@ angular.module('starter.controllers', [])
     return moment(dateString, "MMM D h:mm")
       .year(new Date().getFullYear())
       .format("ddd h:mm");
+  };
+})
+
+.filter("articlesWithinDays", function (_, moment) {
+  var dateFormat = "YYYY-MM-DDThh:mm:ss";
+  var DATE_STRING_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d+$/i;
+
+  var today = moment();
+
+  return function (articles, numberOfDays) {
+    if (!articles || !articles.length) { return; }
+
+    return _.chain(articles)
+      .filter(function (article) {
+        return DATE_STRING_RE.test(article.releaseDate);
+      })
+      .filter(function (article) {
+        var diffDays =
+          moment(article.releaseDate, dateFormat).diff(today, "days");
+
+        return Math.abs(diffDays) <= numberOfDays;
+      })
+      .value();
   };
 })
 
@@ -1855,6 +1886,28 @@ angular.module('starter.controllers', [])
 .filter("humanReadableDateSince", function (moment) {
   return function (dateString, format) {
     return moment(dateString, format).fromNow(true);
+  };
+})
+
+.filter("transactionDescription", function () {
+  // TODO: replace <br>
+  var TRADED_PATTERN = /(^|<br>)Traded/g;
+  var TRADE_REPLACEMENT = '$1<i class="icon ion-reply energized"></i> Traded';
+  var RECEIVED_PATTERN = /(^|<br>)Received/g;
+  var RECEIVE_REPLACEMENT = '$1<i class="icon ion-forward positive"></i> Received';
+  var ADDED_PATTERN = /(^|<br>)Added/g;
+  var ADD_REPLACEMENT = '$1<i class="icon ion-plus balanced"></i> Added';
+  var DROPPED_PATTERN = /(^|<br>)Dropped/g;
+  var DROP_REPLACEMENT = '$1<i class="icon ion-minus assertive"></i> Dropped';
+
+  return function (transaction) {
+      if (!transaction || !transaction.fullDescription) { return; }
+
+      return transaction.fullDescription
+        .replace(TRADED_PATTERN, TRADE_REPLACEMENT)
+        .replace(RECEIVED_PATTERN, RECEIVE_REPLACEMENT)
+        .replace(ADDED_PATTERN, ADD_REPLACEMENT)
+        .replace(DROPPED_PATTERN, DROP_REPLACEMENT);
   };
 })
 
