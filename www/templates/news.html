@@ -1,4 +1,4 @@
-<ion-view view-title="League News">
+<ion-view view-title="{{ pageTitle || 'League News' }}">
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="refresh()"></ion-refresher>
     <div class="last-updated">

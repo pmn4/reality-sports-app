@@ -1502,6 +1502,8 @@ angular.module('starter.controllers', [])
 
   $scope.setLastUpdated = Mixins.setLastUpdated($scope);
 
+  $scope.pageTitle = "Team News";
+
   $scope.refresh = function (force) {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     TeamService.splitNews($scope.leagueId, $scope.teamId)
