@@ -28,6 +28,12 @@
     <ion-content>
     <!-- <ion-content has-footer="true"> -->
       <ion-list>
+        <ion-item menu-close ui-sref="app.updates" ng-show="hasAppUpdate">
+          <i class="icon ion-ios-cloud-download-outline positive"></i>
+          New features are waiting
+          <span class="badge badge-assertive">1</span>
+        </ion-item>
+
         <ion-item menu-close ui-sref="app.league-for-current-league">
           <i class="icon ion-tshirt"></i>
           League
@@ -97,16 +103,11 @@
           Help
         </ion-item>
 
-        <ion-item menu-close ui-sref="app.updates">
+        <ion-item menu-close ui-sref="app.updates" ng-hide="hasAppUpdate">
           <i class="icon ion-ios-cloud-download-outline positive"></i>
-          <span ng-show="hasAppUpdate">
-            New features are waiting
-          </span>
-          <span ng-hide="hasAppUpdate">
-            Check for app updates
-          </span>
-          <span class="badge badge-assertive" ng-show="hasAppUpdate">1</span>
+          Check for app updates
         </ion-item>
+
         <ion-item menu-close ui-sref="app.login" ng-hide="loggedInState">
           <i class="icon ion-log-in"></i>
           Log In
