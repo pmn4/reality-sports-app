@@ -1631,12 +1631,12 @@ angular.module('starter.controllers', [])
   var dateFormat = "YYYY-MM-DDThh:mm:ss";
   var DATE_STRING_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d+$/i;
 
-  var today = moment();
+  var thisMorning = moment().startOf("day");
 
   return function (dateStr) {
     if (!DATE_STRING_RE.test(dateStr)) { return; }
 
-    return !moment(dateStr, dateFormat).diff(today, "days");
+    return moment(dateStr, dateFormat).isAfter(thisMorning);
   };
 })
 
