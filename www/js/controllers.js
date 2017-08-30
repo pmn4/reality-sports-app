@@ -1627,6 +1627,19 @@ angular.module('starter.controllers', [])
   };
 })
 
+.filter("isToday", function (moment) {
+  var dateFormat = "YYYY-MM-DDThh:mm:ss";
+  var DATE_STRING_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d+$/i;
+
+  var today = moment();
+
+  return function (dateStr) {
+    if (!DATE_STRING_RE.test(dateStr)) { return; }
+
+    return !moment(dateStr, dateFormat).diff(today, "days");
+  };
+})
+
 .filter("nflGameYetToStart", function () {
   var FUTURE_GAME_RE = /^\w+ \d+ \d+:\d+/i;
   return function (game) {

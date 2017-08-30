@@ -81,23 +81,6 @@
 
       <div
         class="item"
-        ng-hide="fetchingBids"
-        ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
-        ng-class="{ positive: bids.length }"
-      >
-        <p>
-          {{ bids.length || "no" }} free agent bids this week
-        </p>
-      </div>
-
-      <div class="item" ng-show="fetchingBids">
-        <p>
-          <em>Fetching Free Agent Bids...</em>
-        </p>
-      </div>
-
-      <div
-        class="item"
         ng-hide="fetchingTransactions"
         ui-sref="app.transactions({ leagueId: leagueId, week: week })"
         ng-class="{ positive: newTransactions.length }"
@@ -112,6 +95,23 @@
       <div class="item" ng-show="fetchingTransactions">
         <p>
           <em>Fetching League Transactions...</em>
+        </p>
+      </div>
+
+      <div
+        class="item"
+        ng-hide="fetchingBids"
+        ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
+        ng-class="{ positive: bids.length }"
+      >
+        <p>
+          {{ bids.length || "no" }} free agent bids this week
+        </p>
+      </div>
+
+      <div class="item" ng-show="fetchingBids">
+        <p>
+          <em>Fetching Free Agent Bids...</em>
         </p>
       </div>
     </div>

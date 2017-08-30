@@ -44,6 +44,11 @@
       </div>
 
       <div class="pull-right item-note col">
+        <i
+          class="icon ion-fireball energized"
+          ng-show="article.releaseDate | isToday"
+        ></i>
+
         {{ article.releaseDate | humanReadableDateSince }} ago
       </div>
     </div>

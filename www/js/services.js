@@ -1,4 +1,4 @@
-function feedSplitter(_, moment, fnLastReadDate) {
+function feedSplitter(_, moment, fnLastReadDate, dateKey) {
 	var dateFormat = "YYYY-MM-DDThh:mm:ss";
 	return function (response) {
 		var maxReadDate, maxReadDateStr, lastReadDate, lastReadDateStr;
@@ -11,7 +11,7 @@ function feedSplitter(_, moment, fnLastReadDate) {
 		var readItems = [];
 
 		_.each(items, function (item) {
-			var itemDate = moment.utc(item.releaseDate, dateFormat);
+			var itemDate = moment.utc(item[dateKey], dateFormat);
 			if (itemDate.isAfter(lastReadDate)) {
 				unreadItems.push(item);
 			} else {
@@ -20,7 +20,7 @@ function feedSplitter(_, moment, fnLastReadDate) {
 
 			if (!maxReadDate || itemDate.isAfter(maxReadDate)) {
 				maxReadDate = itemDate;
-				maxReadDateStr = item.releaseDate;
+				maxReadDateStr = item[dateKey];
 			}
 		});
 
@@ -128,7 +128,7 @@ angular.module("starter.services", [])
 
 	function splitNews(leagueId, teamId) {
 		return this.news(leagueId, teamId)
-			.then(feedSplitter(_, moment, AppStateService.lastLeagueNewsDate));
+			.then(feedSplitter(_, moment, AppStateService.lastLeagueNewsDate, "releaseDate"));
 	}
 
 	function transactions(leagueId, week, filters, includeLineupChanges) {
@@ -149,7 +149,7 @@ angular.module("starter.services", [])
 
 	function splitTransactions(leagueId, week, filters, includeLineupChanges) {
 		return this.transactions(leagueId, week, filters, includeLineupChanges)
-			.then(feedSplitter(_, moment, AppStateService.lastLeagueTransactionsDate));
+			.then(feedSplitter(_, moment, AppStateService.lastLeagueTransactionsDate, "trxDate"));
 	}
 })
 
@@ -262,8 +262,9 @@ angular.module("starter.services", [])
 	STORE_KEY_LAST_LEAGUE_TRANSACTIONS_DATE = "realitySportsApp.AppState>lastLeagueTransactionsDate";
 	STORE_KEY_LAST_TEAM_NEWS_DATE = "realitySportsApp.AppState>lastTeamNewsDate";
 
-	var OPENING_NIGHT = moment("2016-09-08");
+	var OPENING_NIGHT = moment("2017-09-08");
 	var WEEK = 7 * 24 * 60 * 60 * 1000;
+	var START_OF_TODAY = moment().startOf("day");
 
 	return {
 		currentLeagueId: currentLeagueId,
@@ -366,7 +367,7 @@ angular.module("starter.services", [])
 			localStorage.setItem(key, date);
 		}
 
-		return localStorage.getItem(key);
+		return localStorage.getItem(key) || START_OF_TODAY;
 	}
 
 	function lastLeagueTransactionsDate(date) {
@@ -376,7 +377,7 @@ angular.module("starter.services", [])
 			localStorage.setItem(key, date);
 		}
 
-		return localStorage.getItem(key);
+		return localStorage.getItem(key) || START_OF_TODAY;
 	}
 
 	function lastTeamNewsDate(teamId, date) {
@@ -386,7 +387,7 @@ angular.module("starter.services", [])
 			localStorage.setItem(key, date);
 		}
 
-		return localStorage.getItem(key);
+		return localStorage.getItem(key) || START_OF_TODAY;
 	}
 
 	function getOwnedTeamIdForCurrentLeague() {
@@ -523,7 +524,7 @@ angular.module("starter.services", [])
 		var fnLastReadDate = _.partial(AppStateService.lastTeamNewsDate, teamId);
 
 		return this.news(leagueId, teamId)
-			.then(feedSplitter(_, moment, fnLastReadDate));
+			.then(feedSplitter(_, moment, fnLastReadDate, "releaseDate"));
 	}
 
 	function fetchRoster(leagueId, teamId) {

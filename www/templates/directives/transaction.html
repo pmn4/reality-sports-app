@@ -25,6 +25,11 @@
       </div>
 
       <div class="pull-right item-note col">
+        <i
+          class="icon ion-fireball energized"
+          ng-show="transaction.trxDate | isToday"
+        ></i>
+
         {{ transaction.trxDate | humanReadableDateSince }} ago
       </div>
     </div>
