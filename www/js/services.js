@@ -92,6 +92,8 @@ angular.module("starter.services", [])
 	var previousSession;
 
 	var TRANSACTION_TYPE_LINEUP_CHANGE = 'Lineup Changes';
+	var TRANSACTION_TYPE_ACQUISITIONS = 'Acquisitions';
+	var TRANSACTION_TYPE_ACQUISITIONS_REPLACEMENT = 'Add/Drop';
 
 	return {
 		list: list,
@@ -137,13 +139,24 @@ angular.module("starter.services", [])
 			url: AppSettings.apiHost + "/v3/leagues/" + leagueId + "/weeks/" + week + "/transactions",
 			params: filters
 		}).then(function (response) {
-			if (!includeLineupChanges) { return response; }
+			var data = response.data;
 
-			return {
-				data: _.reject(response.data, function (transaction) {
-					return transaction.trxType === TRANSACTION_TYPE_LINEUP_CHANGE;
+			_.chain(data)
+				.filter(function (transaction) {
+					return transaction.trxType === TRANSACTION_TYPE_ACQUISITIONS;
 				})
-			};
+				.each(function (transaction) {
+					transaction.trxType = TRANSACTION_TYPE_ACQUISITIONS_REPLACEMENT;
+				})
+				.value();
+
+			if (includeLineupChanges) { return response; }
+
+			data = _.reject(data, function (transaction) {
+				return transaction.trxType === TRANSACTION_TYPE_LINEUP_CHANGE;
+			});
+
+			return { data: data };
 		});
 	}
 
