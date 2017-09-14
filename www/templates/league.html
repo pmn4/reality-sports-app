@@ -29,17 +29,26 @@
       <div
         class="item"
         ng-show="team"
-        ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
       >
         <div class="row row-no-padding">
-          <div class="col">
+          <div
+            class="col"
+            ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
+          >
             {{ team.name }}
           </div>
 
-          <div class="col pull-right" ng-hide="fetchingStandings">
-            <span ng-show="rank">
-              {{ rank }} of {{ leagueSize }}
-            </span>
+          <div
+            class="col pull-right tiny label"
+            ng-hide="fetchingStandings"
+            ui-sref="app.standings({ leagueId: leagueId, week: week })"
+          >
+            <div ng-show="rank">
+              rank: {{ rank }} of {{ divisionSize }}
+            </div>
+            <div ng-show="pointsRank">
+              points: {{ pointsRank }} of {{ leagueSize }}
+            </div>
           </div>
         </div>
       </div>

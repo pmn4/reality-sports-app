@@ -264,7 +264,6 @@ angular.module('starter.controllers', [])
 
 .controller("LeagueController", function ($rootScope, $scope, $state, $stateParams, $interval, AppStateService, CacheService, LeagueService, ScoreboardService, StandingsService, TeamService) {
   $scope.leagueId = $stateParams.leagueId;
-  $scope.teamId = $stateParams.teamId;
   $scope.week = AppStateService.currentWeek();
 
   if ($scope.leagueId) {
@@ -331,7 +330,41 @@ angular.module('starter.controllers', [])
 
     StandingsService.fetch($scope.leagueId, $scope.week - 1)
       .then(function (response) {
-        console.log(response);
+        $scope.standings = response.data.divisionStandings;
+
+        if (!$scope.standings) { return; }
+
+        $scope.rankDivision = _.find($scope.standings, function (standing) {
+          if (!standing) { return false; }
+
+          $scope.teamStanding = _.find(standing.teamStandings, function (team) {
+            if (!team || !team.team) { return false; }
+
+            return team.team.teamId === $scope.team.teamId;
+          });
+
+          return !!$scope.teamStanding;
+        });
+
+        if (!$scope.teamStanding) { return; }
+
+        $scope.rank = $scope.teamStanding.rank;
+        $scope.divisionSize = $scope.rankDivision.teamStandings.length;
+
+        $scope.leagueSize = 0;
+        $scope.pointsRank = _.chain($scope.standings)
+          .map("teamStandings")
+          .flatten()
+          .reduce(function (memo, standing) {
+            $scope.leagueSize++;
+
+            if (standing.points >= $scope.teamStanding.points) {
+              return memo + 1;
+            }
+
+            return memo;
+          }, 0)
+          .value();
       }, function (response) {
         $scope.standingsError = "Error fetching standings";
       }).finally(function () {
@@ -1906,23 +1939,38 @@ angular.module('starter.controllers', [])
 
 .filter("transactionDescription", function () {
   // TODO: replace <br>
-  var TRADED_PATTERN = /(^|<br>)Traded/g;
-  var TRADE_REPLACEMENT = '$1<i class="icon ion-reply energized"></i> Traded';
-  var RECEIVED_PATTERN = /(^|<br>)Received/g;
-  var RECEIVE_REPLACEMENT = '$1<i class="icon ion-forward positive"></i> Received';
-  var ADDED_PATTERN = /(^|<br>)Added/g;
-  var ADD_REPLACEMENT = '$1<i class="icon ion-plus balanced"></i> Added';
-  var DROPPED_PATTERN = /(^|<br>)Dropped/g;
-  var DROP_REPLACEMENT = '$1<i class="icon ion-minus assertive"></i> Dropped';
+  var TRADED_PATTERN = /^Traded/g;
+  var TRADE_REPLACEMENT = '<i class="icon ion-reply energized"></i> Traded';
+  var RECEIVED_PATTERN = /^Received/g;
+  var RECEIVE_REPLACEMENT = '<i class="icon ion-forward positive"></i> Received';
+  var ADDED_PATTERN = /^(Added|Add Player)/g;
+  var ADD_REPLACEMENT = '<i class="icon ion-plus balanced"></i> $1';
+  var DROPPED_PATTERN = /^(Dropped|Drop Player)/g;
+  var DROP_REPLACEMENT = '<i class="icon ion-minus assertive"></i> $1';
+
+  var POOL_MOVEMENTS = /^(?:Remove Player from|Add Player to) Free Agent Pool[^<]*(?:<br>|$)/g;
+
+  // "Add Player to Free Agent Pool Lacy, Eddie SEA  (RB)<br>Remove Player from Free Agent Pool Cobb, Randall GB   (WR)<br>Drop Player from Roster Lacy, Eddie SEA  (RB)<br>Add Player to Roster Cobb, Randall GB   (WR)"
 
   return function (transaction) {
-      if (!transaction || !transaction.fullDescription) { return; }
+    var descriptions;
 
-      return transaction.fullDescription
-        .replace(TRADED_PATTERN, TRADE_REPLACEMENT)
-        .replace(RECEIVED_PATTERN, RECEIVE_REPLACEMENT)
-        .replace(ADDED_PATTERN, ADD_REPLACEMENT)
-        .replace(DROPPED_PATTERN, DROP_REPLACEMENT);
+    if (!transaction || !transaction.fullDescription) { return; }
+
+    descriptions = _.chain(transaction.fullDescription.split("<br>"))
+      .reject(function (description) {
+        return !description || description.match(POOL_MOVEMENTS);
+      })
+      .map(function (description) {
+        return description
+          .replace(TRADED_PATTERN, TRADE_REPLACEMENT)
+          .replace(RECEIVED_PATTERN, RECEIVE_REPLACEMENT)
+          .replace(ADDED_PATTERN, ADD_REPLACEMENT)
+          .replace(DROPPED_PATTERN, DROP_REPLACEMENT);
+      })
+      .value();
+
+    return descriptions.join("<br>"); // TODO:
   };
 })
 
