@@ -32,14 +32,14 @@
       >
         <div class="row row-no-padding">
           <div
-            class="col"
+            class="col col-66 one-liner"
             ui-sref="app.team({ leagueId: leagueId, teamId: team.teamId })"
           >
             {{ team.name }}
           </div>
 
           <div
-            class="col pull-right tiny label"
+            class="col col-33 pull-right tiny label"
             ng-hide="fetchingStandings"
             ui-sref="app.standings({ leagueId: leagueId, week: week })"
           >

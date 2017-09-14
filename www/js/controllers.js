@@ -109,6 +109,8 @@ angular.module('starter.controllers', [])
 
   $timeout(function () { $cordovaSplashscreen.hide(); });
 
+  $scope.attempts = 0;
+
   $scope.login = function () {
     $scope.ajaxing = $scope.indicateAjaxing(true);
     AuthService.login($scope.loginData)
@@ -131,6 +133,8 @@ angular.module('starter.controllers', [])
       })
       .finally(function () {
         $scope.ajaxing = $scope.indicateAjaxing(false);
+
+        $scope.attempts++;
       });
   };
 
